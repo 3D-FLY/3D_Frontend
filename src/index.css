@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+  --color-dark: #222222;
+  --color-green: #5ac422;
+  --color-gray: #959595;
+}
+
+/* משתני צבעים מותאמים אישית */
+:root {
+  --color-dark: #222222;
+  --color-green: #5ac422;
+  --color-gray: #959595;
+}
+:root {
+  font-family: "Montserrat";
+}
+
+/* כללים בסיסיים */
+* {
+  box-sizing: border-box;
+  font-family: "Montserrat" !important;
+}
+
+html {
+  font-family: "Montserrat" !important;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Montserrat" !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* הגדרות נוספות לוודא שהפונט יופיע בכל מקום */
+div,
+span,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a,
+button,
+input,
+textarea,
+select,
+label {
+  font-family: "Montserrat" !important;
+}

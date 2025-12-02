@@ -1,0 +1,420 @@
+* {
+  font-family: "Montserrat" !important;
+}
+.body {
+  min-height: 100vh;
+  scroll-behavior: smooth;
+}
+
+/* הגדרות פונט!! */
+.font-staatliches,
+.font-staatliches *,
+[style*="Staatliches"] {
+  font-family: "Staatliches", sans-serif !important;
+}
+
+body,
+html,
+div,
+span,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+button,
+input,
+textarea,
+select {
+  font-family: "Montserrat, italic" !important;
+}
+/* הגדרות פונט נוספות לוודא כיסוי מלא */
+#root,
+#app {
+  font-family: "Montserrat" !important;
+}
+
+/* הגדרות ספציפיות לרכיבי React */
+.section-1,
+.section-2,
+.section-3,
+.section-4,
+.section-5,
+.section-6 {
+  font-family: "Montserrat" !important;
+}
+/* הגדרות לכל רכיבי הטקסט */
+.text-xs,
+.text-sm,
+.text-base,
+.text-lg,
+.text-xl,
+.text-2xl,
+.text-3xl,
+.text-4xl,
+.text-5xl,
+.text-6xl,
+.text-7xl {
+  font-family: "Montserrat" !important;
+}
+
+/* הגדרות לכותרות */
+h1:not(.font-staatliches),
+h2:not(.font-staatliches),
+h3:not(.font-staatliches),
+h4:not(.font-staatliches),
+h5:not(.font-staatliches),
+h6:not(.font-staatliches) {
+  font-family: "Montserrat" !important;
+}
+
+/* הגדרות לפסקאות וטקסט רגיל */
+p,
+span,
+div:not(.font-staatliches),
+a,
+button,
+input,
+textarea,
+select,
+label {
+  font-family: "Montserrat" !important;
+}
+
+/* הגדרה כללית חזקה ביותר */
+[style*="font-family"]:not(.font-staatliches) {
+  font-family: "Montserrat" !important;
+}
+
+/* הגדרה לטקסט שנוצר דינמית */
+.font-sans {
+  font-family: "Montserrat" !important;
+}
+/* עד כאן הגדרות פונט */
+
+.home-section {
+  background-color: dark;
+  background-image: radial-gradient(
+      700px 700px at 0% 0%,
+      rgba(255, 255, 255, 0.04),
+      transparent 100%
+    ),
+    radial-gradient(
+      500px 500px at 100% 100%,
+      rgba(255, 255, 255, 0.04),
+      transparent 100%
+    );
+
+  background-size: auto auto, auto auto;
+  background-position: 0% 0%, 100% 100%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  position: relative;
+}
+
+.home-section::before {
+  content: "";
+  position: absolute;
+
+  top: 0px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("C:\assaf\3D-Fly\3D-FrontEnd\frontend\src\icons\3DFlyLogoTest .png");
+  background-size: 1000px 600px;
+  background-position: center 270px;
+  background-repeat: no-repeat;
+  opacity: 0.7;
+  pointer-events: none;
+}
+.section-2 {
+  min-height: 100vh;
+  font-family: "Montserrat";
+  position: relative;
+  width: 100%;
+  background: gray; /* זה הצבע של Grey3DFLY */
+}
+
+.section-2::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, #252525 transparent 70%);
+  z-index: 0;
+  pointer-events: none;
+  font-family: "Montserrat";
+}
+
+.section-2::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("C:\assaf\3D-Fly\3D-FrontEnd\frontend\src\icons\3DFlyLogoTest .png");
+  background-size: 1000px 600px;
+  background-position: center 270px;
+  background-repeat: no-repeat;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 1;
+}
+.section-3 {
+  position: relative;
+  background-color: #222222; /* צבע רקע בסיסי */
+}
+
+.section-3::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+      600px 600px at 0% 100%,
+      rgba(255, 255, 255, 0.04) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      600px 600px at 100% 0%,
+      rgba(255, 255, 255, 0.04) 0%,
+      transparent 70%
+    );
+  z-index: 0;
+  pointer-events: none;
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #5ac422;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #5ac422;
+  cursor: pointer;
+  border: none;
+}
+
+.section-4 {
+  background-image: url("C:/assaf/3D-Fly/3D-FrontEnd/frontend/src/Gallery/leftIcon.png");
+  background-size: 500px 600px;
+  background-position: right;
+  background-repeat: no-repeat;
+}
+.section4::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, #070707 transparent 70%);
+  z-index: 1;
+  pointer-events: none;
+}
+.section-5 {
+  background-color: dark;
+  background-image: radial-gradient(
+      700px 700px at 0% 0%,
+      rgba(255, 255, 255, 0.04),
+      transparent 100%
+    ),
+    radial-gradient(
+      500px 500px at 100% 100%,
+      rgba(255, 255, 255, 0.04),
+      transparent 100%
+    );
+
+  background-size: auto auto, auto auto; /* הגדלים: גרדיאנט1, גרדיאנט2 */
+  background-position: 0% 0%, 100% 100%; /* מיקום: גרדיאנט1, גרדיאנט2 */
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  position: relative;
+}
+
+/* אנימציות לקרוסלה */
+/* track רוחבו 200%: שני סטים רציפים */
+.track {
+  width: 200%;
+  display: flex;
+  gap: 2rem;
+}
+
+/* המכולה של כל סט (שורה אחת של כרטיסים) */
+.track .group {
+  display: flex;
+  gap: 2rem; /* מרווח בין כרטיסים — תתאים לפי הצורך */
+  align-items: center;
+}
+
+/* אנימציות — שימו לב: -50% ולא -100% */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-30%);
+  }
+}
+@keyframes scroll-reverse {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 18s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+.animate-scroll-reverse {
+  animation: scroll-reverse 18s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+/* עצירה על הובר (אופציונלי) */
+.track:hover {
+  animation-play-state: paused;
+}
+
+/* עבור משתמשים שמבקשים פחות תנועה */
+@media (prefers-reduced-motion: reduce) {
+  .animate-scroll,
+  .animate-scroll-reverse {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+.animate-scroll {
+  animation: scroll 30s linear infinite;
+  width: 200%;
+}
+
+.animate-scroll-reverse {
+  animation: scroll-reverse 30s linear infinite;
+  width: 200%;
+}
+.section-6 {
+  position: relative;
+  background-color: gray;
+  background-image: url("C:/assaf/3D-Fly/3D-FrontEnd/frontend/src/Gallery/rightIcon.png");
+
+  background-size: 500px 600px;
+  background-position: left;
+  background-repeat: no-repeat;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.explorePage {
+  min-height: 200vh; /* זמני*/
+  background-image: url("/src/Gallery/rightIcon.png"),
+    url("/src/Gallery/leftIcon.png"),
+    radial-gradient(
+      700px 700px at 0% 0%,
+      rgba(255, 255, 255, 0.04),
+      transparent 100%
+    ),
+    radial-gradient(
+      500px 500px at 100% 100%,
+      rgba(255, 255, 255, 0.04),
+      transparent 100%
+    );
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+  background-size: 500px 600px, 500px 600px, auto auto, auto auto;
+  background-position: left bottom, right top, 0% 0%, 100% 100%;
+}
+.FAQPage {
+  min-height: 200vh; /* זמני*/
+  background-image: url("/src/Gallery/rightIcon.png"),
+    url("/src/Gallery/leftIcon.png"),
+    radial-gradient(
+      700px 700px at 0% 0%,
+      rgba(255, 255, 255, 0.04),
+      transparent 100%
+    ),
+    radial-gradient(
+      500px 500px at 100% 100%,
+      rgba(255, 255, 255, 0.04),
+      transparent 100%
+    );
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+  background-size: 500px 600px, 500px 600px, auto auto, auto auto;
+  background-position: left bottom, right top, 0% 0%, 100% 100%;
+}
+
+.blogPage {
+  min-height: 200vh; /* זמני*/
+  background-image: url("/src/Gallery/rightIcon.png"),
+    url("/src/Gallery/leftIcon.png"),
+    radial-gradient(
+      700px 700px at 0% 0%,
+      rgba(0, 0, 0, 0.121),
+      transparent 100%
+    ),
+    radial-gradient(
+      500px 500px at 100% 100%,
+      rgba(0, 0, 0, 0.121),
+      transparent 100%
+    );
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+  background-size: 500px 600px, 500px 600px, auto auto, auto auto;
+  background-position: left bottom, right top, 0% 0%, 100% 100%;
+}
+.storePage {
+  min-height: 200vh; /* זמני*/
+  background-image: url("/src/Gallery/rightIcon.png"),
+    url("/src/Gallery/leftIcon.png"),
+    radial-gradient(
+      700px 700px at 0% 0%,
+      rgba(255, 255, 255, 0.04),
+      transparent 100%
+    ),
+    radial-gradient(
+      500px 500px at 100% 100%,
+      rgba(255, 255, 255, 0.04),
+      transparent 100%
+    );
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+  background-size: 500px 600px, 500px 600px, auto auto, auto auto;
+  background-position: left bottom, right top, 0% 0%, 100% 100%;
+}
+
+.aboutPage {
+  min-height: 200vh; /* זמני*/
+  background-image: url("/src/Gallery/rightIcon.png"),
+    url("/src/Gallery/leftIcon.png"),
+    radial-gradient(
+      700px 700px at 0% 0%,
+      rgba(0, 0, 0, 0.121),
+      transparent 100%
+    ),
+    radial-gradient(
+      500px 500px at 100% 100%,
+      rgba(0, 0, 0, 0.121),
+      transparent 100%
+    );
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat;
+  background-size: 500px 600px, 500px 600px, auto auto, auto auto;
+  background-position: left bottom, right top, 0% 0%, 100% 100%;
+}
+.footer {
+  font-family: "Montserrat", sans-serif !important;
+  font-variant-alternates: stylistic("salt") !important;
+}
