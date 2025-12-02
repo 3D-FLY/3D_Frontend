@@ -203,13 +203,12 @@ label {
   cursor: pointer;
   border: none;
 }
-
-.section-4 {
-  background-image: url("C:/assaf/3D-Fly/3D-FrontEnd/frontend/src/Gallery/leftIcon.png");
+.section-4 {  
+  background-image: url("/src/Gallery/leftIcon.png");
   background-size: 500px 600px;
-  background-position: right;
-  background-repeat: no-repeat;
-}
+    background-position: right;
+    background-repeat: no-repeat;
+  }
 .section4::after {
   content: "";
   position: absolute;
