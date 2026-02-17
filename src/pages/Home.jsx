@@ -1,39 +1,41 @@
-import React from "react";
-import "../App.css";
-import Features from "../components/Features";
-import HowDoesItWork from "../components/HowDoesItWork";
-import FileUploader from "../components/FileUploader";
-import WhatCanYouSell from "../components/WhatCanYouSell";
-import Footer from "../components/Footer";
-import MainSection from "../components/MainSection";
-import PrintFarmSection from "../components/PrintFarmSection";
+import React, { lazy, Suspense } from "react";
+import MainSection from "../features/home/MainSection/MainSection";
+
+const Features = lazy(() => import("../features/home/Features"));
+const HowDoesItWork = lazy(() => import("../features/home/HowDoesItWork/HowDoesItWork"));
+const FileUploader = lazy(() => import("../features/home/FileUploader"));
+const PrintFarmSection = lazy(() => import("../features/home/PrintFarmSection"));
+const WhatCanYouSell = lazy(() => import("../features/home/WhatCanYouSell"));
+const Footer = lazy(() => import("../components/ui/Footer"));
 
 export default function Home() {
   return (
-    <div style={{ fontFamily: "Montserrat" }}>
-      <section
-        className="home-section flex flex-col items-center justify-center h-screen text-center bg-dark relative"
-        style={{ fontFamily: "Montserrat" }}
-      >
+    <div className="font-sans">
+      {/* HERO — נטען מיד */}
+      <section className="relative w-full bg-dark overflow-hidden flex items-center justify-center h-[calc(100dvh-var(--nav-h))]">
         <MainSection />
       </section>
-      <section className="section-2" style={{ fontFamily: "Montserrat" }}>
-        <Features />
-      </section>
-      <section className="section-3" style={{ fontFamily: "Montserrat" }}>
-        <HowDoesItWork />
-      </section>
-      <section
-        className="section-4 bg-gray"
-        style={{ fontFamily: "Montserrat" }}
-      >
-        <FileUploader />
-      </section>
-      <section className="section-5 bg-dark flex items-center min-h-lh h-screen overflow-hidden">
-        <PrintFarmSection />
-      </section>
-      <WhatCanYouSell />
-      <Footer />
+
+      <Suspense fallback={null}>
+        <section className="relative w-full bg-gray h-[calc(100dvh-var(--nav-h))]">
+          <Features />
+        </section>
+
+        <section className="relative w-full bg-dark h-[calc(100dvh-var(--nav-h))]">
+          <HowDoesItWork />
+        </section>
+
+        <section className="relative w-full bg-gray h-[calc(100dvh-var(--nav-h))]">
+          <FileUploader />
+        </section>
+
+        <section className="relative w-full bg-dark h-[calc(100dvh-var(--nav-h))] overflow-hidden flex items-stretch">
+          <PrintFarmSection />
+        </section>
+
+        <WhatCanYouSell />
+        <Footer />
+      </Suspense>
     </div>
   );
 }

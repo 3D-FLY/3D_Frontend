@@ -1,0 +1,76 @@
+import React from "react";
+import Turtle from "./Turtle";
+
+export default function Background({
+  variant = "gray",
+  children,
+  className = "",
+}) {
+  const isDark = variant === "dark";
+
+  // הגדרות צבעים לפי הדרישה שלך
+  const bgColor = isDark ? "bg-dark" : "bg-gray";
+  // הארה: בכהה אפור בהיר (#959595), בבהיר שחור (#020202)
+  const glowColor = isDark ? "bg-[#959595]/50" : "bg-[#020202]/70";
+
+  return (
+    <div className={`relative w-full min-h-screen overflow-hidden ${bgColor} ${className}`}>
+      
+      {/* עיגול הארה נוסף – שמאל למעלה (רק בדארק), רספונסיבי */}
+      {isDark && (
+        <div
+          className="absolute rounded-full bg-[#959595]/90 blur-[400px] md:blur-[450px] xl:blur-[500px]"
+          style={{
+            top: "clamp(-120px, -12vw, -178px)",
+            left: "clamp(-120px, -12vw, -178px)",
+            width: "clamp(240px, 30vw, 500px)",
+            height: "clamp(240px, 30vw, 500px)",
+          }}
+        />
+      )}
+
+      {/* שכבת ההארות (Glows) בלופ – גודל רספונסיבי לפי רוחב החלון */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        {Array.from({ length: 10 }).map((_, i) => {
+          const isRight = i % 2 === 0;
+          const topPos = 60 + i * 200;
+
+          return (
+            <div
+              key={i}
+              className={`absolute rounded-full ${glowColor}`}
+              style={{
+                top: `${topPos}vh`,
+                [isRight ? "right" : "left"]: "-15vw", // חצי מהעיגול (40vw) מחוץ למסך
+                width: "40vw",
+                height: "40vw",
+                filter: "blur(30vw)", // הילה פי 2 מהגודל (2 × רדיוס 20vw = 40vw)
+              }}
+            />
+          );
+        })}
+      </div>
+
+      {/* שכבת הצבים (Turtles) */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Turtle
+            key={i}
+            width="100vw"
+            top={`${80 + i * 250}vh`}
+            right={i % 2 === 0 ? "0" : undefined}
+            left={i % 2 !== 0 ? "0" : undefined}
+            translateX={i % 2 === 0 ? "50%" : "-50%"}
+            opacity={0.15}
+            className="hidden md:block"
+          />
+        ))}
+      </div>
+
+      {/* תוכן האתר */}
+      <div className="relative z-10 w-full">
+        {children}
+      </div>
+    </div>
+  );
+}

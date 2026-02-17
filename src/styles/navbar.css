@@ -1,0 +1,69 @@
+/* Navbar responsive behavior */
+nav {
+  min-height: 72px; /* גובה מינימלי ל-navbar */
+  overflow-x: hidden; /* חותך תוכן שיוצא מהמסך */
+}
+
+/* הלוגו לא יתכווץ */
+nav > a:first-child {
+  flex-shrink: 0;
+}
+
+/* הכפתורים לא יתכווצו */
+nav > div:last-child {
+  flex-shrink: 0;
+  min-width: fit-content;
+}
+
+/* ה-nav links יתכווצו עד שהם מתנגשים בלוגו */
+nav ul {
+  flex-shrink: 1;
+  min-width: 0; /* מאפשר ל-flex item להתכווץ מתחת לגודל התוכן */
+  transition: all 0.3s ease;
+  overflow: hidden; /* חותך את התוכן שיוצא */
+  max-width: 100%; /* לא יעבור את רוחב המסך */
+}
+
+nav ul li {
+  flex-shrink: 0;
+  white-space: nowrap; /* מונע שבירת שורות */
+}
+
+/* Media queries להתנהגות responsive */
+@media (max-width: 1400px) {
+  nav ul {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  nav ul {
+    gap: 0.75rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 1024px) {
+  nav ul {
+    gap: 0.5rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* כשהמסך קטן מדי, ה-nav links יתכווצו יותר */
+@media (max-width: 900px) {
+  nav ul {
+    gap: 0.25rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* וודא שהכפתורים בדיוק בגודל הנכון */
+nav button {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 800;
+  font-style: italic;
+  font-size: 16px;
+  width: 143px;
+  height: 44px;
+}

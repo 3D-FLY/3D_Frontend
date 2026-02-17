@@ -1,54 +1,55 @@
+/* ייבוא פונטים מ-Google Fonts */
 @import "tailwindcss";
 
 @theme {
   --color-dark: #222222;
   --color-green: #5ac422;
   --color-gray: #959595;
+  
+  /* Tailwind v4 font tokens used by font-* utilities */
+  --font-sans: "Montserrat", sans-serif;
+  --font-staatliches: "Staatliches", sans-serif;
+  --font-inter: "Inter", sans-serif;
 }
 
-/* משתני צבעים מותאמים אישית */
-:root {
-  --color-dark: #222222;
-  --color-green: #5ac422;
-  --color-gray: #959595;
-}
-:root {
-  font-family: "Montserrat";
+/* ✅ הגדרות כלליות לכל הכותרות */
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    line-height: 100%;
+    letter-spacing: 0%;
+  }
 }
 
 /* כללים בסיסיים */
 * {
   box-sizing: border-box;
-  font-family: "Montserrat" !important;
-}
-
-html {
-  font-family: "Montserrat" !important;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: "Montserrat" !important;
+  scroll-behavior: smooth;
+  font-family: "Montserrat", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* הגדרות נוספות לוודא שהפונט יופיע בכל מקום */
-div,
-span,
-p,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-a,
-button,
-input,
-textarea,
-select,
-label {
-  font-family: "Montserrat" !important;
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Montserrat", sans-serif;
+}
+
+/* פונט מיוחד ל-Staatliches */
+.font-staatliches {
+  font-family: "Staatliches", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0.015em;
+}
+
+/* פונט מיוחד ל-Inter */
+.font-inter {
+  font-family: "Inter", sans-serif;
 }

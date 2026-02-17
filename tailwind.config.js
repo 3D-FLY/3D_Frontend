@@ -2,12 +2,12 @@
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
+    fontFamily: {
+      sans: ["Montserrat", "sans-serif"],
+      staatliches: ["Staatliches", "sans-serif"],
+      inter: ["Inter", "sans-serif"],
+    },
     extend: {
-      fontFamily: {
-        sans: ["Montserrat"],
-        DEFAULT: ["Montserrat"],
-        staatliches: ["Staatliches"],
-      },
       colors: {
         dark: {
           DEFAULT: "#222222", // שחור כהה
