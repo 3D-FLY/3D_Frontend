@@ -63,11 +63,11 @@ export default function Navbar() {
       {/* TOP BAR */}
       <nav className="relative flex items-center bg-dark px-5 py-2 italic text-gray">
         {/* LEFT: Logo (icon) + company name on desktop */}
-        <div className="flex flex-shrink-0 items-center gap-4 lg:gap-3">
+        <Link to="/" className="flex flex-shrink-0 items-center gap-4 lg:gap-3">
         <LogoIcon className="h-[80px] w-auto py-1" />
           {/* Desktop: show company name near logo */}
           <LogoText className="hidden lg:block h-9"/>
-        </div>
+        </Link>
 
         {/* CENTER: desktop nav */}
         <ul className="hidden flex-1 items-center justify-center gap-6 lg:flex">
@@ -75,9 +75,17 @@ export default function Navbar() {
             .filter((x) => x.to !== "/") // בדסקטופ לא חייבים HOME (אם כן—תורידי את השורה הזו)
             .map((item) => (
               <li key={item.to} className="whitespace-nowrap">
-                <span className="transition-colors hover:text-white text-gray cursor-default">
+                <NavLink
+                  to={item.to}
+                  className={({ isActive }) =>
+                    [
+                      "transition-colors hover:text-white",
+                      isActive ? "text-white" : "",
+                    ].join(" ")
+                  }
+                >
                   {item.label}
-                </span>
+                </NavLink>
               </li>
             ))}
         </ul>

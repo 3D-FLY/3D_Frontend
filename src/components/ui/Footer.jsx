@@ -45,27 +45,48 @@ export default function Footer() {
               MENU
             </h3>
             <div className="space-y-3">
-              <span className="block text-gray-300 cursor-default uppercase text-sm">
+              <Link
+                to="/"
+                className="block text-gray-300 hover:text-white transition-colors uppercase text-sm"
+              >
                 HOME
-              </span>
-              <span className="block text-gray-300 cursor-default uppercase text-sm">
+              </Link>
+              <Link
+                to="/explore"
+                className="block text-gray-300 hover:text-white transition-colors uppercase text-sm"
+              >
                 EXPLORE
-              </span>
-              <span className="block text-gray-300 cursor-default uppercase text-sm">
+              </Link>
+              <Link
+                to="/faq"
+                className="block text-gray-300 hover:text-white transition-colors uppercase text-sm"
+              >
                 FAQ
-              </span>
-              <span className="block text-gray-300 cursor-default uppercase text-sm">
+              </Link>
+              <Link
+                to="/store"
+                className="block text-gray-300 hover:text-white transition-colors uppercase text-sm"
+              >
                 STORE
-              </span>
-              <span className="block text-gray-300 cursor-default uppercase text-sm">
+              </Link>
+              <Link
+                to="/about"
+                className="block text-gray-300 hover:text-white transition-colors uppercase text-sm"
+              >
                 ABOUT
-              </span>
-              <span className="block text-gray-300 cursor-default uppercase text-sm">
+              </Link>
+              <a
+                href="#"
+                className="block text-gray-300 hover:text-white transition-colors uppercase text-sm"
+              >
                 PRIVACY POLICY
-              </span>
-              <span className="block text-gray-300 cursor-default uppercase text-sm">
+              </a>
+              <a
+                href="#"
+                className="block text-gray-300 hover:text-white transition-colors uppercase text-sm"
+              >
                 TERMS OF USE
-              </span>
+              </a>
             </div>
           </div>
 
