@@ -1,13 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-  IconConnectCopy,
-  IconFullfill,
-  IconSell,
-  IconUpload,
-} from "../../../icons/HowDoesItWork3";
+import React, { useEffect, useRef, useState } from "react";
 import Button from "../../../components/ui/Button";
 import HowItWorksStep from "./HowItWorksStep";
 import GlowCircle from "../../../components/ui/GlowCircle";
+import { howDoesItWorkSteps } from "./howDoesItWorkData";
 
 // desktop animation delay
 const STEP_DELAY_MS = 450;
@@ -43,51 +38,7 @@ export default function HowDoesItWork() {
     return () => obs.disconnect();
   }, []);
 
-  const steps = useMemo(
-    () => [
-      {
-        icon: IconConnectCopy,
-        title: "CONNECT",
-        subtitle: "Link your store to 3D-FLY",
-        description: "for free",
-        iconWidth: 255,
-        iconHeight: 189,
-        // iconMobileWidth: 200,
-        // iconMobileHeight: 85,
-        // iconPadding: "pl-5"
-      },
-      {
-        icon: IconUpload,
-        title: "UPLOAD",
-        subtitle: "Upload your 3D files and",
-        description: "sync them to your store",
-        iconWidth: 188,
-        iconHeight: 162,
-        // iconMobileWidth: 188,
-        // iconMobileHeight: 162,
-      },
-      {
-        icon: IconSell,
-        title: "SELL",
-        subtitle: "production and shipment",
-        description: "will automatically show up in 3D-FLY",
-        iconWidth: 240,
-        iconHeight: 166,
-        iconPadding: "pr-10",
-      },
-      {
-        icon: IconFullfill,
-        title: "FORGET",
-        subtitle: "Let 3D-FLY handle ",
-        description: "production and shipment",
-        iconWidth: 200,
-        iconHeight: 200,
-        // iconMobileWidth: 233,
-        // iconMobileHeight: 233,
-      },
-    ],
-    []
-  );
+  const steps = howDoesItWorkSteps;
 
   return (
     <section

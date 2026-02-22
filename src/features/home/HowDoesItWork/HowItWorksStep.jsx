@@ -33,7 +33,7 @@ export default function HowItWorksStep({
   delayMs = 450,
   className = "",
 }) {
-  const Icon = step.icon;
+  const imageSrc = step.imageSrc;
 
   /**
    * 1) גדלים יחסיים לפי הנתונים שלך:
@@ -148,8 +148,10 @@ export default function HowItWorksStep({
             transform: offsetTop ? `translateY(${offsetTop}px)` : undefined,
           }}
         >
-          <Icon
-            className={`icon-step-${index} text-green flex-shrink-0 ${step.iconPadding ?? ""}`}
+          <img
+            src={imageSrc}
+            alt=""
+            className={`icon-step-${index} object-contain flex-shrink-0 ${step.iconPadding ?? ""}`}
           />
         </div>
 

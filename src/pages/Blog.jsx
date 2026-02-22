@@ -1,14 +1,14 @@
 import React from "react";
-import Background from "../components/ui/Background";
 
 export default function Blog() {
   return (
-    <Background variant="gray">
-      <div className="min-h-screen flex items-center justify-center">
-        <h1 className="text-dark text-[clamp(3rem,8vw,8rem)] text-center">
-          Coming Soon...
-        </h1>
-      </div>
-    </Background>  
+    <div
+      className="flex flex-col items-center max-w-full min-h-screen bg-gray"
+      style={{ fontFamily: "Montserrat, sans-serif" }}
+    >
+      <h1 className="blogPage uppercase text-black font-bold w-full text-center text-3xl italic  pt-8">
+        test Blog Page
+      </h1>
+    </div>
   );
 }

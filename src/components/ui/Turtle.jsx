@@ -23,6 +23,7 @@ export default function Turtle({
     transform: `translate(${translateX}, ${translateY})`,
     opacity,
     zIndex,
+    objectFit: "contain",
     ...style,
   };
 
@@ -32,6 +33,9 @@ export default function Turtle({
 
   if (width && !className.includes("w-")) {
     imgStyle.width = width;
+  } else if (height) {
+    // כשמוגדר רק גובה – רוחב אוטומטי כדי לשמור על יחס גובה-רוחב
+    imgStyle.width = imgStyle.width ?? "auto";
   }
 
   return (
