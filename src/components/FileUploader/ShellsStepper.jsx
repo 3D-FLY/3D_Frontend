@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 export default function ShellsStepper({
   value,
@@ -7,12 +7,25 @@ export default function ShellsStepper({
   max = 10,
   className = "",
 }) {
+  const [editStr, setEditStr] = useState(null);
+  const displayValue = editStr !== null ? editStr : value;
+
   const dec = () => onChange(Math.max(min, value - 1));
   const inc = () => onChange(Math.min(max, value + 1));
 
+  const commit = (raw) => {
+    const n = parseFloat(String(raw).replace(",", ".").replace(/\s/g, ""));
+    if (!Number.isNaN(n)) {
+      const clamped = Math.min(max, Math.max(min, n));
+      const snapped = Math.round(clamped);
+      onChange(Math.min(max, Math.max(min, snapped)));
+    }
+    setEditStr(null);
+  };
+
   return (
     <div
-      className={`inline-flex items-center bg-[#222222] rounded-md h-10 px-2 gap-3 ${className}`}
+      className={`inline-flex items-center bg-dark rounded-md h-10 px-2 gap-3 ${className}`}
     >
       <button
         type="button"
@@ -23,9 +36,19 @@ export default function ShellsStepper({
         <span className="text-[#5AC422] text-xs leading-none">▼</span>
       </button>
 
-      <div className="min-w-[28px] text-center text-[#5AC422] font-medium tabular-nums">
-        {value}
-      </div>
+      <input
+        type="text"
+        inputMode="numeric"
+        aria-label="Shells"
+        value={displayValue}
+        onChange={(e) => setEditStr(e.target.value)}
+        onFocus={() => setEditStr(String(value))}
+        onBlur={() => commit(editStr ?? value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") commit(editStr ?? value);
+        }}
+        className="min-w-[28px] w-9 text-center text-[#5AC422] font-medium tabular-nums bg-transparent border-none focus:outline-none focus:ring-0 p-0"
+      />
 
       <button
         type="button"

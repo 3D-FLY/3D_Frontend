@@ -2,7 +2,7 @@ export default function GlowCircle({
   size = 700,
   blur = 140,
   opacity = 0.4,
-  color = "180,180,180",
+  color = "149,149,149",
   className = "",
 }) {
   const style = {

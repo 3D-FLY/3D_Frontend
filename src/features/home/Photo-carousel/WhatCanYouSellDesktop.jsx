@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
-import "../../styles/whatCanYouSell.css";
-import Button from "../../components/ui/Button";
-import Turtle from "../../components/ui/Turtle";
+import "./whatCanYouSell.css";
+import Button from "../../../components/ui/Button";
+import Turtle from "../../../components/ui/Turtle";
 
 /* דוגמת נתונים — החלף בנתונים אמיתיים */
 const itemsTop = [

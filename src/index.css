@@ -35,6 +35,8 @@ body {
   font-family: "Montserrat", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* מונע מילה בודדת בשורה – מנסה להשאיר לפחות שתי מילים יחד */
+  text-wrap: pretty;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -52,4 +54,10 @@ h1, h2, h3, h4, h5, h6 {
 /* פונט מיוחד ל-Inter */
 .font-inter {
   font-family: "Inter", sans-serif;
+}
+
+/* פוטר: כותרות וקישורים באותו פונט של הפוטר (Montserrat Alternates) */
+footer h3,
+footer a {
+  font-family: inherit;
 }

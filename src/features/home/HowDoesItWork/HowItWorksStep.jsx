@@ -1,31 +1,5 @@
 import React, { useEffect } from "react";
 
-// type Step = {
-//   icon: React.ComponentType<any>;
-//   title: string;
-//   subtitle: string;
-//   description: string;
-
-//   
-//   iconWidth?: number;
-//   iconHeight?: number;
-//   iconMobileWidth?: number;
-//   iconMobileHeight?: number;
-//   iconPadding?: string;
-
-//   // אופציונלי 
-//   iconToTitleGap?: number;
-//   iconOffsetTop?: number;
-// };
-
-// type Props = {
-//   step: Step;
-//   inView: boolean;
-//   index: number;
-//   delayMs?: number;
-//   className?: string; // למשל: "w-[270px]" במובייל
-// };
-
 export default function HowItWorksStep({
   step,
   inView,
@@ -33,17 +7,9 @@ export default function HowItWorksStep({
   delayMs = 450,
   className = "",
 }) {
-  const Icon = step.icon;
+  const imageSrc = step.imageSrc;
 
-  /**
-   * 1) גדלים יחסיים לפי הנתונים שלך:
-   * - בדסקטופ: iconWidth/iconHeight
-   * - במובייל: iconMobileWidth/iconMobileHeight
-   *
-   * אנחנו לא רוצים px קבועים, אבל כן לשמור על "הכוונה" שלך.
-   * לכן אנחנו עושים clamp(minMobilePx, preferredVW, maxDesktopPx)
-   * כך שבמסכים קטנים זה יתקרב למובייל, ובגדולים יתקרב לדסקטופ.
-   */
+ 
 
   // ברירות מחדל מהקוד שלך:
   const DEFAULT_DESKTOP_W = 220;
@@ -121,8 +87,10 @@ export default function HowItWorksStep({
       }
       @media (min-width: 1024px) {
         .icon-step-${index} {
-          width: ${desktopW}px !important;
-          height: ${desktopH}px !important;
+          width: clamp(140px, 18vw, ${desktopW}px) !important;
+          height: auto !important;
+          max-height: ${desktopH}px;
+          object-fit: contain;
         }
       }
     `;
@@ -137,9 +105,9 @@ export default function HowItWorksStep({
   }, [index, desktopW, desktopH, finalMobileW, finalMobileH]);
 
   return (
-    <div className={`w-[270px] shrink-0 ${className}`} style={animStyle}>
-      <div className="flex flex-col items-center text-center w-full">
-        {/* ICON AREA */}
+    <div className={`w-full min-w-0 ${className}`} style={animStyle}>
+      <div className="flex flex-col items-center text-center w-full min-w-0">
+        {/* ICON AREA — רספונסיבי עם רוחב הקולנה */}
         <div
           className="flex items-end justify-center w-full"
           style={{
@@ -148,21 +116,26 @@ export default function HowItWorksStep({
             transform: offsetTop ? `translateY(${offsetTop}px)` : undefined,
           }}
         >
-          <Icon
-            className={`icon-step-${index} text-green flex-shrink-0 ${step.iconPadding ?? ""}`}
+          <img
+            src={imageSrc}
+            alt=""
+            className={`icon-step-${index} object-contain flex-shrink-0 max-w-full ${step.iconPadding ?? ""}`}
           />
         </div>
 
-        {/* TITLE AREA — Staatliches 400, 64px, line-height 85px, center, title case */}
-        <div className="flex items-center justify-center w-full pt-2 pb-2 h-[clamp(64px,8vw,85px)]">
-          <h3 className="text-white font-normal font-staatliches text-center text-[64px] leading-[85px] tracking-normal capitalize">
+        {/* TITLE AREA — רספונסיבי */}
+        <div className="flex items-center justify-center w-full pt-2 pb-2 min-h-[clamp(48px,6vw,85px)]">
+          <h3 className="text-white font-normal font-staatliches text-center tracking-normal capitalize w-full" style={{ fontSize: "clamp(36px, 5vw, 64px)", lineHeight: "1.2" }}>
             {step.title}
           </h3>
         </div>
 
-        {/* TEXT AREA — Montserrat 400 italic, 20px, line-height 100%, center, max-width 270px */}
-        <div className="flex items-start justify-center w-full pt-0 min-h-[clamp(80px,10vw,120px)]">
-          <div className="text-gray font-normal italic text-[20px] leading-[120%] tracking-normal text-center w-full max-w-[270px] mx-auto">
+        {/* TEXT AREA — רספונסיבי */}
+        <div className="flex items-start justify-center w-full pt-0 min-h-[clamp(60px,8vw,120px)]">
+          <div
+            className="text-gray font-normal italic font-size-[clamp(13px, 1.4vw, 23px)] leading-[1.2] tracking-normal text-center w-full mx-auto"
+            style={{ fontVariant: "small-caps", textWrap: "pretty" }}
+          >
             {step.subtitle}
             <br />
             <span className="text-gray">{step.description}</span>
