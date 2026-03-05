@@ -1,7 +1,7 @@
 import React from "react";
 import OptionButton from "./OptionButton";
 
-export default function OptionGroup({ options, value, onChange, className = "" }) {
+export default function OptionGroup({ options, value, onChange, className = "", disabledOptions = [] }) {
   return (
     <div className={`flex gap-3 ${className}`}>
       {options.map((opt) => (
@@ -9,6 +9,7 @@ export default function OptionGroup({ options, value, onChange, className = "" }
           key={opt}
           active={value === opt}
           onClick={() => onChange(opt)}
+          disabled={disabledOptions.includes(opt)}
         >
           {opt}
         </OptionButton>

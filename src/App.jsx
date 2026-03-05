@@ -1,6 +1,7 @@
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Navbar from "./components/ui/Navbar";
+import Navbar from "./components/Footer+NavBar/Navbar.jsx";
+import Footer from "./components/Footer+NavBar/Footer.jsx";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Explore from "./pages/Explore";
@@ -23,6 +24,7 @@ function App() {
           <Route path="/blog" element={<Blog />} />
           <Route path="/stl-pricing" element={<STLPricing />} />
         </Routes>
+        <Footer />
       </div>
     </Router>
   );

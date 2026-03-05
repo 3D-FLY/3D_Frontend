@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import Button from "./Button";
-import LogoIcon from "../../icons/LogoIcon";
+import Button from "../ui/Button";
+import Turtle from "../ui/Turtle";
 import LogoText from "../../icons/LogoText";
+import IconNavMenu from "../../icons/IconNavMenu";
+import IconClose from "../../icons/IconClose";
 
 const navItems = [
   { label: "Home", to: "/" },
@@ -49,10 +51,10 @@ export default function Navbar() {
     }, MENU_ANIMATION_MS);
   };
 
-  // אם עוברים לדסקטופ כשהתפריט פתוח — נסגור אותו
+  // אם עוברים לדסקטופ (xl) כשהתפריט פתוח — נסגור אותו
   useEffect(() => {
     const onResize = () => {
-      if (window.innerWidth >= 1024) closeMenu();
+      if (window.innerWidth >= 1280) closeMenu();
     };
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
@@ -62,17 +64,15 @@ export default function Navbar() {
     <header className="sticky top-0 z-50">
       {/* TOP BAR */}
       <nav className="relative flex items-center bg-dark px-5 py-2 italic text-gray">
-        {/* LEFT: Logo (icon) + company name on desktop */}
-        <Link to="/" className="flex flex-shrink-0 items-center gap-4 lg:gap-3">
-        <LogoIcon className="h-[80px] w-auto py-1" />
-          {/* Desktop: show company name near logo */}
-          <LogoText className="hidden lg:block h-9"/>
+        {/* ===== דסקטופ (xl): לוגו + שם חברה | ניווט | כפתורים ===== */}
+        <Link to="/" className="hidden flex-shrink-0 items-center gap-3 xl:flex">
+          <Turtle icon className="h-[70px] w-auto py-1" />
+          <LogoText className="h-9" />
         </Link>
 
-        {/* CENTER: desktop nav */}
-        <ul className="hidden flex-1 items-center justify-center gap-6 lg:flex">
+        <ul className="hidden flex-1 items-center justify-center gap-6 xl:flex">
           {navItems
-            .filter((x) => x.to !== "/") // בדסקטופ לא חייבים HOME (אם כן—תורידי את השורה הזו)
+            .filter((x) => x.to !== "/")
             .map((item) => (
               <li key={item.to} className="whitespace-nowrap">
                 <NavLink
@@ -90,13 +90,7 @@ export default function Navbar() {
             ))}
         </ul>
 
-        {/* CENTER: mobile/tablet company name */}
-        <div className="absolute left-1/2 -translate-x-1/2 lg:hidden">
-          <LogoText className="h-5 sm:h-6" />
-        </div>
-
-        {/* RIGHT: desktop buttons */}
-        <div className="ml-auto hidden flex-shrink-0 items-center gap-2 lg:flex">
+        <div className="hidden flex-shrink-0 items-center gap-2 xl:flex">
           <Button
             hovering="darkBg"
             variant="secondary"
@@ -113,27 +107,28 @@ export default function Navbar() {
           </Button>
         </div>
 
-        {/* RIGHT: mobile hamburger */}
+        {/* ===== מובייל + טאבלט (< xl): לוגו | שם חברה | כפתור פופאפ ===== */}
+        <Link to="/" className="flex flex-shrink-0 items-center xl:hidden">
+          <Turtle icon className="h-[50px] w-auto py-1" />
+        </Link>
+
+        <div className="flex flex-1 justify-center xl:hidden">
+          <LogoText className="h-4 sm:h-5" />
+        </div>
+
         <button
           type="button"
           aria-label="Open menu"
           onClick={() => setOpen(true)}
-          className="ml-auto inline-flex items-center justify-center rounded-md p-2 text-green transition hover:bg-white/10 lg:hidden"
+          className="inline-flex flex-shrink-0 items-center justify-center rounded-md p-2 text-green transition hover:bg-white/10 xl:hidden"
         >
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M4 7h16M4 12h16M4 17h16"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-            />
-          </svg>
+          <IconNavMenu className="h-7 w-7" />
         </button>
       </nav>
 
       {/* MOBILE OVERLAY MENU */}
       {showOverlay && (
-        <div className="fixed inset-0 z-[60] lg:hidden" aria-hidden={!open}>
+        <div className="fixed inset-0 z-[60] xl:hidden" aria-hidden={!open}>
           {/* רקע מעומעם — fade in/out */}
           <div
             onClick={closeMenu}
@@ -159,14 +154,7 @@ export default function Navbar() {
                 onClick={closeMenu}
                 className="absolute right-4 top-4 rounded-md p-2 text-green transition hover:bg-white/10"
               >
-                <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M6 6l12 12M18 6L6 18"
-                    stroke="currentColor"
-                    strokeWidth="2.4"
-                    strokeLinecap="round"
-                  />
-                </svg>
+                <IconClose className="h-[22px] w-[22px]" />
               </button>
 
               <div className="mt-10 flex h-[calc(100%-40px)] flex-col items-center">
@@ -181,7 +169,7 @@ export default function Navbar() {
                 </ul>
 
                 <div className="mt-auto pb-10 opacity-70">
-                  <LogoIcon className="h-40 w-40" />
+                  <Turtle icon className="h-40 w-40" />
                 </div>
               </div>
             </div>

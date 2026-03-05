@@ -37,7 +37,23 @@ export default function FileUploader() {
       className="section-4 py-6 min-h-screen flex items-center justify-center relative overflow-hidden"
       style={{ fontFamily: "Montserrat, sans-serif" }}
     >
-      {/* צב ברקע - צד ימין, 50% מחוץ, במרכז האנכי */}
+      {/* צב ברקע — מובייל: גובה 70vh (נקבע לפי גובה, לא רוחב); דסקטופ: במרכז אנכי */}
+      <Turtle
+        right="0"
+        top="65%"
+        translateX="50%"
+        translateY="-50%"
+        height="60vh"
+        opacity={0.2}
+        zIndex={0}
+        className="lg:hidden"
+        style={{
+          height: "45vh",
+          minHeight: "45vh",
+          width: "auto",
+          maxWidth: "none",
+        }}
+      />
       <Turtle
         right="0"
         top="50%"
@@ -46,24 +62,21 @@ export default function FileUploader() {
         height="75%"
         opacity={0.2}
         zIndex={0}
-        className="
-          w-auto
-          sm:h-[75%]
-        "
+        className="w-auto sm:h-[75%] hidden lg:block"
       />
 
-        <div className="section4-1 w-full px-4 flex justify-center relative z-10">
-        <div className="w-full max-w-[901px] lg:h-[709px] grid grid-cols-1 lg:grid-cols-[minmax(0,582px)_minmax(0,319px)] gap-16 items-stretch">
+        <div className="section4-1 w-full px-4 flex justify-center relative z-10 min-h-[min(85vh,800px)] lg:min-h-0">
+        <div className="w-full max-w-[901px] lg:h-[709px] grid grid-cols-1 lg:grid-cols-[minmax(0,582px)_minmax(0,319px)] gap-8 lg:gap-16 items-stretch">
         {/* Left Side - File Upload */}
         <UploadDropCard
           accept={acceptedFileTypes}
           onFile={(file) => setUploadedFile(file)}
-          className="h-full"
+          className="h-full min-h-[min(36vh,320px)] lg:min-h-0"
         />
 
 
-        {/* Right Side - File Configuration */}
-        <div className="rounded-3xl px-2 w-full max-w-[319px] h-full flex flex-col">
+        {/* Right Side - File Configuration — מובייל בלבד: רוחב מלא; טאבלט+דסקטופ: כמו דסקטופ (max 319px) */}
+        <div className="rounded-3xl px-2 w-full max-w-full md:max-w-[319px] h-full flex flex-col">
           {/* File Name */}
           <h2 className="text-white text-[40px] leading-[100%] font-bold mb-4">
             {uploadedFile ? uploadedFile.name.toUpperCase() : "YOUR_FILE.STL"}
@@ -72,7 +85,7 @@ export default function FileUploader() {
           {/* Tech Selection */}
           <div className="mb-3">
             <FieldLabel>Tech</FieldLabel>
-            <OptionGroup options={techOptions} value={tech} onChange={setTech} />
+            <OptionGroup options={techOptions} value={tech} onChange={setTech} disabledOptions={techOptions.slice(1)} />
           </div>
 
           {/* Material Selection */}
@@ -113,22 +126,19 @@ export default function FileUploader() {
             />
           </div>
 
-          {/* Action Buttons */}
-          <div className="space-y-4 mt-auto">
+          {/* Action Buttons — מובייל/טאבלט: רק CHECK PRICE, קטן וצר; דסקטופ: שני כפתורים; אובר מהרכיב */}
+          <div className="space-y-4 mt-auto flex flex-col items-center lg:items-stretch">
             <Button
               variant="tertiary"
-              className=" mt-7 font-medium w-full h-20 py-4 text-[35px] relative italic overflow-hidden"
+              hovering="garyBg"
+              className="mt-7 font-medium w-full max-w-[200px] lg:max-w-none h-11 py-2.5 text-base lg:h-20 lg:py-4 lg:text-[35px] relative italic overflow-hidden"
               onClick={() => console.log("Check price clicked")}
-              style={{
-                background:
-                  "radial-gradient(circle at center, #353535 0%, #222222 70%, #1a1a1a 100%)",
-              }}
             >
               CHECK PRICE
             </Button>
             <Button
-            hovering="garyBg"
-              className="w-full italic py-4 text-lg"
+              hovering="garyBg"
+              className="w-full italic py-4 text-lg hidden lg:inline-flex"
               onClick={() => console.log("Start selling clicked")}
             >
               START SELLING

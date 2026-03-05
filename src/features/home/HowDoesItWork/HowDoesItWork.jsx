@@ -1,16 +1,26 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-  IconConnectCopy,
-  IconFullfill,
-  IconSell,
-  IconUpload,
-} from "../../../icons/HowDoesItWork3";
+import React, { useEffect, useRef, useState } from "react";
 import Button from "../../../components/ui/Button";
 import HowItWorksStep from "./HowItWorksStep";
-import GlowCircle from "../../../components/ui/GlowCircle";
+import HowDoesItWorkGlow from "./HowDoesItWorkGlow";
+import IconArrowAnimated from "../../../icons/section-3/IconArrowAnimated.jsx";
+import { howDoesItWorkSteps } from "./howDoesItWorkData";
+import HowItWorksStepMobile from "./HowItWorksStepMobile";
 
 // desktop animation delay
 const STEP_DELAY_MS = 450;
+
+// מובייל/טאבלט: Step Build Sequence
+const CARD_REVEAL_MS = 800;
+const ARROW_DELAY_AFTER_CARD_MS = 200;
+const ARROW_DRAW_MS = 600;
+const STEP_CYCLE_MS = CARD_REVEAL_MS + ARROW_DELAY_AFTER_CARD_MS + ARROW_DRAW_MS;
+
+function getRevealDelayForStep(index) {
+  return index * STEP_CYCLE_MS;
+}
+function getDrawDelayForArrow(index) {
+  return (index + 1) * CARD_REVEAL_MS + ARROW_DELAY_AFTER_CARD_MS + index * (ARROW_DELAY_AFTER_CARD_MS + ARROW_DRAW_MS);
+}
 
 export default function HowDoesItWork() {
   const [inView, setInView] = useState(false);
@@ -43,98 +53,34 @@ export default function HowDoesItWork() {
     return () => obs.disconnect();
   }, []);
 
-  const steps = useMemo(
-    () => [
-      {
-        icon: IconConnectCopy,
-        title: "CONNECT",
-        subtitle: "Link your store to 3D-FLY",
-        description: "for free",
-        iconWidth: 255,
-        iconHeight: 189,
-        // iconMobileWidth: 200,
-        // iconMobileHeight: 85,
-        // iconPadding: "pl-5"
-      },
-      {
-        icon: IconUpload,
-        title: "UPLOAD",
-        subtitle: "Upload your 3D files and",
-        description: "sync them to your store",
-        iconWidth: 188,
-        iconHeight: 162,
-        // iconMobileWidth: 188,
-        // iconMobileHeight: 162,
-      },
-      {
-        icon: IconSell,
-        title: "SELL",
-        subtitle: "production and shipment",
-        description: "will automatically show up in 3D-FLY",
-        iconWidth: 240,
-        iconHeight: 166,
-        iconPadding: "pr-10",
-      },
-      {
-        icon: IconFullfill,
-        title: "FORGET",
-        subtitle: "Let 3D-FLY handle ",
-        description: "production and shipment",
-        iconWidth: 200,
-        iconHeight: 200,
-        // iconMobileWidth: 233,
-        // iconMobileHeight: 233,
-      },
-    ],
-    []
-  );
+  const steps = howDoesItWorkSteps;
 
   return (
     <section
       ref={sectionRef}
-      className="px-4 lg:px-0 bg-dark overflow-hidden relative min-h-[calc(100vh-72px)] flex flex-col justify-center"
+      className="px-0 bg-dark overflow-hidden relative min-h-0 lg:min-h-[calc(100vh-72px)] flex flex-col justify-center"
       style={{ fontFamily: "Montserrat, sans-serif" }}
     >
-      {/* Glow circles in background */}
-      <GlowCircle
-        size={450}
-        blur={600}
-        opacity={0.8}
-        color="149, 149, 149"
-        top="0"
-        right="0"
-        translateX="20%"
-        translateY="20%"
-        zIndex={0}
-      />
-      <GlowCircle
-        size={356}
-        blur={600}
-        opacity={0.4}
-        color="149, 149, 149"
-        bottom="0"
-        left="0"
-        translateX="20%"
-        translateY="60%"
-        zIndex={0}
-      />
+      <HowDoesItWorkGlow />
 
-      <div className="w-full max-w-[1300px] mx-auto px-4 py-16 lg:px-0 flex flex-col justify-around h-full min-h-[calc(100vh-72px-104px)]">
-        {/* Title */}
+      <div className="w-full max-w-[1300px] mx-auto px-4 lg:px-0 py-10 lg:py-16 flex flex-col justify-around min-h-0 lg:min-h-[calc(100vh-72px-104px)] lg:h-full">
+        {/* Title — במובייל: פריסה על כל הרוחב (בלי ירידה שורה), בדסקטופ: ממורכז */}
         <h2
-          className="text-center font-extrabold italic text-gray"
+          className="flex flex-nowrap justify-evenly lg:justify-center items-baseline gap-1 text-left font-extrabold italic text-gray pt-10 pb-10 lg:flex-initial lg:block lg:text-center lg:pt-0 lg:pb-0"
           style={{ fontFamily: "Montserrat, italic" }}
         >
-          <span className="text-[clamp(2rem,8vw,7rem)]">H</span>
-          <span className="text-[clamp(28px,7vw,80px)]">OW DOES IT</span>
-          <span className="text-green text-[clamp(28px,7vw,80px)] ml-6">WORK?</span>
+          <span className="flex shrink-0 items-baseline lg:contents">
+            <span className="text-[clamp(2rem,8vw,7rem)]">H</span>
+            <span className="text-[clamp(20px,7vw,80px)]">OW DOES IT</span>
+          </span>
+          <span className="text-green text-[clamp(20px,7vw,80px)] shrink-0 lg:ml-6">WORK?</span>
         </h2>
 
         {/* =========================
             DESKTOP (>= lg)
             ========================= */}
-        <div className="hidden lg:flex items-center justify-center">
-          <div className="grid grid-cols-4 gap-[132px]">
+        <div className="hidden lg:flex items-center justify-center w-full">
+          <div className="grid w-full gap-[clamp(1rem,2.5vw,3.5rem)]" style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
             {steps.map((step, index) => (
               <HowItWorksStep
                 key={step.title}
@@ -152,34 +98,61 @@ export default function HowDoesItWork() {
             MOBILE + TABLET (< lg)
             zig-zag layout (same internal structure as desktop)
             ========================= */}
-        <div className="lg:hidden">
-          <div className="relative mx-auto w-full max-w-[420px]">
-            {steps.map((step, index) => {
-              const alignRight = index % 2 === 1;
+        {/* MOBILE + TABLET (< lg) — Step Build Sequence */}
+        <div className="lg:hidden flex flex-col gap-10 w-full mx-auto">
+          {steps.map((step, index) => {
+            const alignRight = index % 2 === 1;
+            const isLast = index === steps.length - 1;
 
-              return (
-                <div key={step.title} className="relative">
-                  {/* wrapper שמיישר לזיגזג */}
-                  <div className={`w-full flex ${alignRight ? "justify-end" : "justify-start"}`}>
-                    <HowItWorksStep
-                      step={step}
+            return (
+              <div
+                key={step.title}
+                className={`w-full flex items-center gap-3 ${alignRight ? "justify-end" : "justify-start"}`}
+              >
+                {alignRight && !isLast && (
+                  <div className="flex-shrink-0 w-10 flex justify-center pt-45">
+                    <IconArrowAnimated
+                      direction="left"
+                      className="w-10 h-7"
                       inView={inView}
-                      index={index}
-                      delayMs={220}
-                      className="w-[270px]"
+                      drawDelayMs={getDrawDelayForArrow(index)}
+                      drawDurationMs={ARROW_DRAW_MS}
                     />
                   </div>
-
-                  {/* רווח קבוע בין בלוק לבלוק */}
-                  {index < steps.length - 1 && <div className="h-14" />}
+                )}
+                <div className="w-4/7 shrink-0">
+                  <HowItWorksStepMobile
+                    imageSrc={step.imageSrc}
+                    title={step.title}
+                    subtitle={step.subtitle}
+                    description={step.description}
+                    iconWidth={step.iconWidth}
+                    iconHeight={step.iconHeight}
+                    iconWidthPercent={step.iconWidthPercent}
+                    iconPadding={step.iconPadding}
+                    inView={inView}
+                    index={index}
+                    revealDelayMs={getRevealDelayForStep(index)}
+                  />
                 </div>
-              );
-            })}
-          </div>
+                {!alignRight && !isLast && (
+                  <div className="flex-shrink-0 w-10 flex justify-center pt-45">
+                    <IconArrowAnimated
+                      direction="right"
+                      className="w-10 h-7"
+                      inView={inView}
+                      drawDelayMs={getDrawDelayForArrow(index)}
+                      drawDurationMs={ARROW_DRAW_MS}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* CTA Button */}
-        <div className="flex justify-center">
+        <div className="flex justify-center pt-12 pb-8 lg:pt-0 lg:pb-0">
           <Button
             hovering="darkBg"
             size="md"
