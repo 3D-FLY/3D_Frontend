@@ -3,6 +3,7 @@ import UploadImg from "../../../assets/images/section-3/Upload2.png";
 import SellImg from "../../../assets/images/section-3/Sell.png";
 import FullfillImg from "../../../assets/images/section-3/Fullfill.png";
 
+// דסקטופ: iconWidth, iconHeight. מובייל: רוחב התמונה כאחוז מרוחב הכרטיס (כל הכרטיסים 270px כמו בדסקטופ)
 export const howDoesItWorkSteps = [
   {
     imageSrc: ConnectCopyImg,
@@ -11,6 +12,7 @@ export const howDoesItWorkSteps = [
     description: "for free",
     iconWidth: 255,
     iconHeight: 189,
+    iconWidthPercent: 80, // רוחב התמונה = 94% מרוחב הכרטיס
   },
   {
     imageSrc: UploadImg,
@@ -19,6 +21,7 @@ export const howDoesItWorkSteps = [
     description: "sync them to your store",
     iconWidth: 188,
     iconHeight: 162,
+    iconWidthPercent: 50,
   },
   {
     imageSrc: SellImg,
@@ -27,6 +30,7 @@ export const howDoesItWorkSteps = [
     description: "will automatically show up in 3D-FLY",
     iconWidth: 230,
     iconHeight: 156,
+    iconWidthPercent: 60,
     iconPadding: "pr-10",
   },
   {
@@ -36,5 +40,6 @@ export const howDoesItWorkSteps = [
     description: "production and shipment",
     iconWidth: 200,
     iconHeight: 200,
+    iconWidthPercent: 50,
   },
 ];

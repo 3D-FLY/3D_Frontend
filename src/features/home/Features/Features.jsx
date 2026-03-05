@@ -41,9 +41,9 @@ export default function Features() {
   return (
     <section
       className="
-        flex flex-col relative text-center items-center justify-center
+        flex flex-col relative text-center items-center
         w-full max-w-full min-w-0
-        min-h-[calc(100vh-72px)]
+        min-h-0 lg:min-h-[calc(100vh-72px)] lg:justify-center
         overflow-hidden
         bg-gray
       "
@@ -116,7 +116,7 @@ export default function Features() {
         ))}
       </div>
 
-      {/* Mobile list */}
+      {/* Mobile list — גובה לפי תוכן */}
       <div
         className="
           relative z-10
