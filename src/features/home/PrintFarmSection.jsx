@@ -1,5 +1,5 @@
 import React from "react";
-import PrintFarmImage from "../../Gallery/PrintFarm1.png";
+import PrintFarmImage from "../../assets/images/section-5/PrintFarm3D-Fly2.png";
 import Button from "../../components/ui/Button";
 import GlowCircle from "../../components/ui/GlowCircle";
 
@@ -16,7 +16,7 @@ export default function PrintFarmSection() {
           <img
             src={PrintFarmImage}
             alt="printFarmPic"
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover object-left"
           />
         </div>
 
@@ -67,7 +67,7 @@ export default function PrintFarmSection() {
           <img
             src={PrintFarmImage}
             alt="printFarmPic"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-left"
           />
         </div>
 

@@ -2,12 +2,22 @@ import React, { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import Button from "../ui/Button";
 import Turtle from "../ui/Turtle";
-import LogoText from "../../icons/LogoText";
+import UserIcon from "../../icons/UserIcon";
 import IconNavMenu from "../../icons/IconNavMenu";
 import IconClose from "../../icons/IconClose";
 
 const navItems = [
   { label: "Home", to: "/" },
+  { label: "Explore", to: "/explore" },
+  { label: "FAQ", to: "/faq" },
+  { label: "Store", to: "/store" },
+  { label: "Blog", to: "/blog" },
+  { label: "About", to: "/about" },
+];
+
+const mobileMenuItems = [
+  { label: "Home", to: "/" },
+  { label: "Sign Up", to: "/signup" },
   { label: "Explore", to: "/explore" },
   { label: "FAQ", to: "/faq" },
   { label: "Store", to: "/store" },
@@ -67,7 +77,10 @@ export default function Navbar() {
         {/* ===== דסקטופ (xl): לוגו + שם חברה | ניווט | כפתורים ===== */}
         <Link to="/" className="hidden flex-shrink-0 items-center gap-3 xl:flex">
           <Turtle icon className="h-[70px] w-auto py-1" />
-          <LogoText className="h-9" />
+          {/* Figma 106-876: Montserrat ExtraBold Italic, 36 px, #959595 */}
+          <span className="font-sans font-extrabold italic text-gray text-4xl leading-none whitespace-nowrap select-none">
+            3D-Fly
+          </span>
         </Link>
 
         <ul className="hidden flex-1 items-center justify-center gap-6 xl:flex">
@@ -107,70 +120,85 @@ export default function Navbar() {
           </Button>
         </div>
 
-        {/* ===== מובייל + טאבלט (< xl): לוגו | שם חברה | כפתור פופאפ ===== */}
+        {/* ===== מובייל + טאבלט (< xl): לוגו | שם חברה | user + המבורגר ===== */}
         <Link to="/" className="flex flex-shrink-0 items-center xl:hidden">
-          <Turtle icon className="h-[50px] w-auto py-1" />
+          <Turtle icon className="h-[50px] w-auto" />
         </Link>
 
+        {/* Figma 1010-628: 3D-Fly centred, Montserrat ExtraBold Italic 32 px, #959595 */}
         <div className="flex flex-1 justify-center xl:hidden">
-          <LogoText className="h-4 sm:h-5" />
+          <span className="font-sans font-extrabold italic text-gray text-[32px] leading-none whitespace-nowrap select-none">
+            3D-Fly
+          </span>
         </div>
 
-        <button
-          type="button"
-          aria-label="Open menu"
-          onClick={() => setOpen(true)}
-          className="inline-flex flex-shrink-0 items-center justify-center rounded-md p-2 text-green transition hover:bg-white/10 xl:hidden"
-        >
-          <IconNavMenu className="h-7 w-7" />
-        </button>
+        {/* Right group: user icon + hamburger (Figma: user 27 px, gap ~8 px, hamburger 32 px) */}
+        <div className="flex flex-shrink-0 items-center gap-1 xl:hidden">
+          <UserIcon className="h-[27px] w-[27px]" />
+          <button
+            type="button"
+            aria-label="Open menu"
+            onClick={() => setOpen(true)}
+            className="inline-flex items-center justify-center rounded-md p-1 text-green transition"
+          >
+            <IconNavMenu className="h-[32px] w-[32px]" />
+          </button>
+        </div>
       </nav>
 
       {/* MOBILE OVERLAY MENU */}
       {showOverlay && (
         <div className="fixed inset-0 z-[60] xl:hidden" aria-hidden={!open}>
-          {/* רקע מעומעם — fade in/out */}
+          {/* פאנל מלא — slide + fade */}
           <div
-            onClick={closeMenu}
-            className={`absolute inset-0 bg-black/60 transition-opacity duration-[280ms] ease-out ${
-              closing ? "opacity-0" : "opacity-100"
+            className={`absolute inset-0 flex flex-col bg-[#1f1f1f] transition-[transform,opacity] duration-[280ms] ease-out ${
+              closing
+                ? "translate-y-[-8%] opacity-0"
+                : mounted
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-[-8%] opacity-0"
             }`}
-          />
-
-          {/* הפאנל — slide + fade */}
-          <div className="absolute inset-0 flex items-stretch justify-center pointer-events-none">
-            <div
-              className={`pointer-events-auto relative h-full w-full bg-[#1f1f1f] px-6 pt-6 transition-[transform,opacity] duration-[280ms] ease-out ${
-                closing
-                  ? "translate-y-[-8%] opacity-0"
-                  : mounted
-                    ? "translate-y-0 opacity-100"
-                    : "translate-y-[-8%] opacity-0"
-              }`}
-            >
+          >
+            {/* כפתור סגירה — פינה ימנית עליונה */}
+            <div className="flex justify-end px-4 pt-4">
               <button
                 type="button"
                 aria-label="Close menu"
                 onClick={closeMenu}
-                className="absolute right-4 top-4 rounded-md p-2 text-green transition hover:bg-white/10"
+                className="p-1 text-green transition hover:opacity-70"
               >
-                <IconClose className="h-[22px] w-[22px]" />
+                <IconClose className="h-7 w-7" />
               </button>
+            </div>
 
-              <div className="mt-10 flex h-[calc(100%-40px)] flex-col items-center">
-                <ul className="mt-6 flex w-full max-w-sm flex-col items-center gap-5">
-                  {navItems.map((item) => (
-                    <li key={item.to} className="w-full">
-                      <span className="block w-full rounded-md px-6 py-3 text-center text-xl uppercase tracking-wide text-gray transition cursor-default">
-                        {item.label}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+            {/* פריטי ניווט */}
+            <nav className="flex-1">
+              <ul className="flex flex-col">
+                {mobileMenuItems.map((item) => (
+                  <li key={item.to}>
+                    <NavLink
+                      to={item.to}
+                      onClick={closeMenu}
+                      className={({ isActive }) =>
+                        [
+                          "block w-full py-[22px] text-center text-[30px] font-medium italic uppercase tracking-wide transition-colors text-white",
+                          isActive ? "bg-[#333333]" : "hover:bg-[#2a2a2a]",
+                        ].join(" ")
+                      }
+                    >
+                      {item.label}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </nav>
 
-                <div className="mt-auto pb-10 opacity-70">
-                  <Turtle icon className="h-40 w-40" />
-                </div>
+            {/* Turtle — תחתית, ממורכז */}
+            <div className="flex justify-center pb-10">
+              <div className="relative flex items-center justify-center opacity-70 w-[50vw] md:w-[30vw]">
+                {/* Ellipse 4 — glow behind the logo */}
+                <div className="absolute w-[120%] aspect-square rounded-[50%] bg-[#858585] opacity-40 blur-3xl" />
+                <Turtle icon className="relative z-10 w-full h-auto" />
               </div>
             </div>
           </div>

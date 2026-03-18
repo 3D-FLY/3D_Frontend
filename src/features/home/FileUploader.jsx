@@ -78,24 +78,24 @@ export default function FileUploader() {
         {/* Right Side - File Configuration — מובייל בלבד: רוחב מלא; טאבלט+דסקטופ: כמו דסקטופ (max 319px) */}
         <div className="rounded-3xl px-2 w-full max-w-full md:max-w-[319px] h-full flex flex-col">
           {/* File Name */}
-          <h2 className="text-white text-[40px] leading-[100%] font-bold mb-4">
+          <h2 className="text-white text-[40px] leading-[100%] font-bold mb-5">
             {uploadedFile ? uploadedFile.name.toUpperCase() : "YOUR_FILE.STL"}
           </h2>
 
           {/* Tech Selection */}
-          <div className="mb-3">
+          <div className="mb-4">
             <FieldLabel>Tech</FieldLabel>
             <OptionGroup options={techOptions} value={tech} onChange={setTech} disabledOptions={techOptions.slice(1)} />
           </div>
 
           {/* Material Selection */}
-          <div className="mb-3">
+          <div className="mb-4">
             <FieldLabel>Material</FieldLabel>
             <OptionGroup options={materialOptions} value={material} onChange={setMaterial} />
           </div>
 
           {/* Layer Height Slider */}
-          <div className="mb-3">
+          <div className="mb-4">
             <FieldLabel>Layer Height</FieldLabel>
             <LabeledSlider
               value={layerHeight}
@@ -108,13 +108,13 @@ export default function FileUploader() {
           </div>
 
           {/* Scale Selection */}
-          <div className="mb-3">
+          <div className="mb-4">
             <FieldLabel>Shells</FieldLabel>
             <ShellsStepper value={shells} onChange={setShells} min={1} max={10} />
           </div>
 
           {/* Infill Selection */}
-          <div className="mb-3">
+          <div className="mb-4">
             <FieldLabel>Infill</FieldLabel>
             <LabeledSlider
               value={infill}

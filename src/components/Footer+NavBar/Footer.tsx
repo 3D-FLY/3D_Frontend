@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Turtle from "../ui/Turtle.jsx";
 import { footerSections } from "./footerConfig.js";
 import type { FooterItem } from "./footerConfig.js";
+import { FooterSocialIcons } from "./SocialIcons.js";
 
 function SmartLink({
   item,
@@ -38,10 +39,10 @@ function SmartLink({
 
 export default function Footer() {
   const baseLink =
-    "block text-gray-300 hover:text-white transition-colors uppercase text-sm";
+    "block text-white hover:text-white transition-colors uppercase text-sm xl:text-base";
 
   const underlineLink =
-    "block uppercase underline underline-offset-4 text-gray-200 hover:text-white transition-colors tracking-wider text-sm";
+    "block uppercase underline underline-offset-4 text-white text-medium hover:text-white/80 transition-colors tracking-wider text-xs xl:text-sm";
 
   return (
     <footer
@@ -62,75 +63,62 @@ export default function Footer() {
         className="absolute bottom-0 w-[80vw]"
       />
 
-        <div className="relative z-10 w-full px-5 flex justify-between gap-6 items-start">
+        {/* 2x2 grid */}
+        <div className="relative z-10 w-full px-6 grid grid-cols-2 gap-y-5">
 
-        {/* LEFT – Contact */}
-        <div className="flex-1 text-left">
-          {footerSections
-            .filter((s) => s.title === "CONTACT US")
-            .map((section, i) => (
-              <div key={i}>
-                <h3 className="text-green text-xs font-bold mb-4 uppercase tracking-wider text-[9px]">
-                  {section.title}
-                </h3>
+          {/* ROW 1 – LEFT: email + phone */}
+          <div className="flex flex-col gap-1 items-start">
+            {footerSections
+              .filter((s) => s.title === "CONTACT US")
+              .flatMap((s) => s.items)
+              .filter((item) => ["info@3d-fly.com", "+972-5000000"].includes(item.label))
+              .map((item) => (
+                <SmartLink
+                  key={item.label}
+                  item={item}
+                  className="block text-white text-[clamp(11px,2.5vw,12px)] uppercase whitespace-nowrap leading-6"
+                />
+              ))}
+          </div>
 
-                <div className="space-y-2 leading-5">
-                  {section.items.map((item) => (
-                    <SmartLink
-                      key={item.label}
-                      item={item}
-                      className="block text-white text-[clamp(7px,1.8vw,11px)] pl-4 uppercase whitespace-nowrap"
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-        </div>
+          {/* ROW 1 – RIGHT: Privacy Policy + Terms of Use */}
+          <div className="justify-self-end flex flex-col gap-1 items-start">
+            {footerSections
+              .filter((s) => s.mobileOnly)
+              .flatMap((s) => s.items)
+              .map((item) => (
+                <SmartLink
+                  key={item.label}
+                  item={item}
+                  className="block uppercase underline underline-offset-4 text-white text-[clamp(11px,2.5vw,12px)] tracking-wider whitespace-nowrap leading-6"
+                />
+              ))}
+          </div>
 
-        {/* CENTER – Legal */}
-        <div className="flex-1 flex justify-center">
-          {footerSections
-            .filter((s) => s.mobileOnly || !s.title)
-            .map((section, i) => (
-              <div key={i} className="space-y-4 pt-9 text-left">
-                {section.items.map((item) => (
-                  <SmartLink
-                    key={item.label}
-                    item={item}
-                    className="block uppercase underline underline-offset-4 text-white text-[clamp(7px,1.8vw,11px)] tracking-wider pl-4 whitespace-nowrap"
-                  />
-                ))}
-              </div>
-            ))}
-        </div>
+          {/* ROW 2 – LEFT: working days + hours */}
+          <div className="flex flex-col gap-1 items-start">
+            {footerSections
+              .filter((s) => s.title === "CONTACT US")
+              .flatMap((s) => s.items)
+              .filter((item) => ["Sunday-Thursday", "09:00-18:00"].includes(item.label))
+              .map((item) => (
+                <SmartLink
+                  key={item.label}
+                  item={item}
+                  className="block text-white text-[clamp(11px,2.5vw,12px)] uppercase whitespace-nowrap leading-6"
+                />
+              ))}
+          </div>
 
-        {/* RIGHT – Follow (column pushed right, text left) */}
-        <div className="flex-1 flex justify-end">
-          {footerSections
-            .filter((s) => s.title === "FOLLOW US")
-            .map((section, i) => (
-              <div key={i} className="text-left">
-                <h3 className="text-green text-xs font-bold mb-4 uppercase tracking-wider text-[9px]">
-                  {section.title}
-                </h3>
-
-                <div className="space-y-2 leading-5">
-                  {section.items.map((item) => (
-                    <SmartLink
-                      key={item.label}
-                      item={item}
-                      className="block uppercase underline underline-offset-4 text-white text-[clamp(7px,1.8vw,11px)] tracking-wider pl-4 whitespace-nowrap"
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-        </div>
+          {/* ROW 2 – RIGHT: social icons */}
+          <div className="justify-self-end flex items-start">
+            <FooterSocialIcons />
+          </div>
 
         </div>
 
       {/* BOTTOM SECTION */}
-      <div className="relative z-20 w-full bg-dark border-t border-white/15 mt-6 py-3">
+      <div className="relative z-20 w-full bg-dark border-t border-white/15 mt-8 py-2">
         <p className="text-center text-white text-[10px] tracking-wide uppercase">
           © 2025 3D-FLY | ALL RIGHTS RESERVED
         </p>
@@ -139,92 +127,73 @@ export default function Footer() {
       </div>
 
       {/* ================== DESKTOP ================== */}
-      <div className="hidden md:flex flex-col relative min-h-[390px]">
+      <div className="hidden md:flex flex-col relative h-[40dvh] min-h-[300px]">
 
-      {/* Turtle centered background */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <Turtle icon className="w-[260px] lg:w-[320px] h-auto opacity-85" />
-      </div>
+        {/* Turtle centered background */}
+        <Turtle
+          bottom="0%"
+          left="50%"
+          translateX="-50%"
+          translateY="28%"
+          opacity={0.3}
+          zIndex={0}
+          className="absolute bottom-0 w-[40vw] max-w-[650px]"
+        />
 
-      {/* CONTENT */}
-      <div className="relative z-10 w-full flex-1 flex items-center">
-        <div className="w-full flex items-start justify-around">
-          {/* LEFT column */}
-          <div className="w-[280px]">
-            {footerSections
-              .filter((s) => s.title === "CONTACT US")
-              .map((section, i) => (
-                <div key={i}>
-                  <h3 className="text-green text-sm font-bold mb-6 uppercase tracking-wider">
-                    {section.title}
-                  </h3>
+        {/* CONTENT */}
+        <div className="relative z-10 w-full flex-1 flex items-center px-[5%] xl:px-[15%]">
+          <div className="w-full h-[80%] flex items-stretch justify-between">
 
-                  <div className="space-y-3 pl-4">
-                    {section.items.map((item) => (
-                      <SmartLink key={item.label} item={item} className={baseLink} />
-                    ))}
-                  </div>
-                </div>
-              ))}
-          </div>
+            {/* LEFT – Contact info + social icons */}
+            <div className="flex flex-col justify-between h-full justify-self-start py-3">
+              {/* Email + phone */}
+              <div className="flex flex-col gap-1">
+                {footerSections
+                  .filter((s) => s.title === "CONTACT US")
+                  .flatMap((s) => s.items)
+                  .filter((item) => ["info@3d-fly.com", "+972-5000000"].includes(item.label))
+                  .map((item) => (
+                    <SmartLink key={item.label} item={item} className={baseLink} />
+                  ))}
+              </div>
 
-          {/* RIGHT columns */}
-          <div className="flex gap-6">
-            {/* MENU */}
-            <div className="min-w-[170px]">
+              {/* Hours */}
+              <div className="flex flex-col gap-1">
+                {footerSections
+                  .filter((s) => s.title === "CONTACT US")
+                  .flatMap((s) => s.items)
+                  .filter((item) => ["Sunday-Thursday", "09:00-18:00"].includes(item.label))
+                  .map((item) => (
+                    <SmartLink key={item.label} item={item} className={baseLink} />
+                  ))}
+              </div>
+
+              {/* Social icons */}
+              <FooterSocialIcons />
+            </div>
+
+            {/* CENTER – empty (turtle is absolute) */}
+            <div />
+
+            {/* RIGHT – Menu links */}
+            <div className="flex flex-col justify-between h-full justify-self-end py-3">
               {footerSections
                 .filter((s) => s.title === "MENU")
-                .map((section, i) => (
-                  <div key={i}>
-                    <h3 className="text-green text-sm font-bold mb-6 uppercase tracking-wider">
-                      {section.title}
-                    </h3>
-
-                    <div className="space-y-3 pl-4">
-                      {section.items.map((item) => (
-                        <SmartLink
-                          key={item.label}
-                          item={item}
-                          className={underlineLink}
-                        />
-                      ))}
-                    </div>
-                  </div>
+                .flatMap((s) => s.items)
+                .map((item) => (
+                  <SmartLink key={item.label} item={item} className={underlineLink} />
                 ))}
             </div>
 
-            {/* FOLLOW */}
-            <div className="min-w-[170px]">
-              {footerSections
-                .filter((s) => s.title === "FOLLOW US")
-                .map((section, i) => (
-                  <div key={i}>
-                    <h3 className="text-green text-sm font-bold mb-6 uppercase tracking-wider">
-                      {section.title}
-                    </h3>
-
-                    <div className="space-y-3 pl-4">
-                      {section.items.map((item) => (
-                        <SmartLink
-                          key={item.label}
-                          item={item}
-                          className={underlineLink}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-            </div>
           </div>
         </div>
-      </div>
 
-      {/* BOTTOM SECTION */}
-      <div className="w-full border-t-2 border-white/15 mt-6 py-4">
-        <p className="text-center text-white text-xs">
-          © 2025 3D-FLY ALL RIGHTS RESERVED
-        </p>
-      </div>
+        {/* BOTTOM SECTION */}
+        <div className="relative z-20 w-full bg-dark border-t border-white/15 py-3">
+          <p className="text-center text-white text-[12px] text-medium tracking-wide uppercase">
+            © 2025 3D-FLY | ALL RIGHTS RESERVED
+          </p>
+        </div>
 
       </div>
     </footer>

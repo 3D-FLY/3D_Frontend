@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Button from "../../../components/ui/Button.jsx";
 // כשתשימי את התמונות ב־src/assets/images/section-6/ (Group26.png, Group28.png, Group36.png) — החזירי את הייבואים והשתמשי בהן ב־pages
 
@@ -84,6 +84,32 @@ function ProductCard({ item, className }: { item: SellItem; className?: string }
 export default function WhatCanYouSellMobile() {
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
+  const touchStartX = useRef(0);
+
+  // Block the native touchmove so browser momentum can't carry past one page
+  useEffect(() => {
+    const el = sliderRef.current;
+    if (!el) return;
+    const prevent = (e: TouchEvent) => e.preventDefault();
+    el.addEventListener("touchmove", prevent, { passive: false });
+    return () => el.removeEventListener("touchmove", prevent);
+  }, []);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0]?.clientX ?? 0;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const el = sliderRef.current;
+    if (!el) return;
+    const delta = touchStartX.current - (e.changedTouches[0]?.clientX ?? touchStartX.current);
+    const threshold = 30;
+    let target = currentPage;
+    if (delta > threshold && currentPage < pages.length - 1) target = currentPage + 1;
+    else if (delta < -threshold && currentPage > 0) target = currentPage - 1;
+    el.scrollTo({ left: target * el.clientWidth, behavior: "smooth" });
+    setCurrentPage(target);
+  };
 
   const handleScroll = () => {
     const el = sliderRef.current;
@@ -125,10 +151,12 @@ export default function WhatCanYouSellMobile() {
             <div
               ref={sliderRef}
               onScroll={handleScroll}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
               className="
                 flex flex-1 min-h-0 gap-4
                 overflow-x-auto
-                snap-x snap-mandatory scroll-smooth
+                snap-x snap-mandatory
                 [scrollbar-width:none] [-ms-overflow-style:none]
               "
             >

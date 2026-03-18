@@ -66,8 +66,8 @@ export default function HowItWorksStepMobile({
         {title}
       </h3>
       <p
-        className="text-gray italic leading-[1.2] m-0 p-0 mt-1.5"
-        style={{ ...TEXT_STYLE, fontVariant: "small-caps", textWrap: "pretty" } as React.CSSProperties}
+        className="text-gray italic leading-[1.2] m-0 p-0 mt-1.5 uppercase"
+        style={{ ...TEXT_STYLE, textWrap: "pretty" } as React.CSSProperties}
       >
         {subtitle}
         <br />

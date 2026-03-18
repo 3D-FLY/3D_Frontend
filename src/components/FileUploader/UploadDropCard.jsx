@@ -5,7 +5,7 @@ export default function UploadDropCard({ accept, onFile, className = "" }) {
   return (
     <div className={`relative ${className}`}>
       <div
-        className="h-full min-h-[min(36vh,320px)] lg:min-h-0 bg-dark rounded-3xl w-full p-6 sm:p-8 lg:p-12 text-center flex flex-col justify-center items-center transition-colors relative overflow-hidden"
+        className="h-full min-h-[min(36vh,320px)] lg:min-h-0 bg-dark rounded-3xl w-full text-center flex flex-col items-center transition-colors relative overflow-hidden"
         style={{
           background:
             "radial-gradient(circle at center, #353535 10%, #222222 70%, #1a1a1a 100%)",
@@ -18,15 +18,18 @@ export default function UploadDropCard({ accept, onFile, className = "" }) {
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
         />
 
-        <div className="mb-1 lg:mb-2 scale-75 lg:scale-100 origin-center shrink-0">
-          <UploadFile />
+        {/* אייקון + STL — ממורכז בדיוק במרכז הכרטיס */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+          <div className="scale-75 lg:scale-100 origin-center shrink-0 mb-[-15px] lg:mb-0">
+            <UploadFile />
+          </div>
+          <p className="text-gray text-xs text-medium lg:text-sm mt-0 lg:mt-1">STL, OBJ, 3MF</p>
         </div>
 
-        <p className="text-gray-400 text-xs lg:text-sm mb-1 lg:mb-2">STL, OBJ, 3MF</p>
-
-        <div className="mt-auto pt-4 lg:pt-0 lg:absolute lg:bottom-16">
-          <p className="text-green text-sm sm:text-base lg:text-lg italic">UPLOAD YOUR FILE</p>
-          <p className="text-gray-400 text-xs lg:text-sm">TO GET AN INSTANT QUOTATION</p>
+        {/* בלוק תחתון — תמיד בתחתית */}
+        <div className="mt-auto w-full pb-4 lg:pb-8 flex flex-col items-center">
+          <p className="text-green text-[clamp(10px,2vw,18px)] italic">UPLOAD YOUR FILE</p>
+          <p className="text-gray-400 text-[clamp(8px,1.5vw,14px)]">TO GET AN INSTANT QUOTATION</p>
         </div>
       </div>
     </div>

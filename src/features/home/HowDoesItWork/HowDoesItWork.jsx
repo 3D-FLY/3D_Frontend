@@ -10,9 +10,9 @@ import HowItWorksStepMobile from "./HowItWorksStepMobile";
 const STEP_DELAY_MS = 450;
 
 // מובייל/טאבלט: Step Build Sequence
-const CARD_REVEAL_MS = 800;
-const ARROW_DELAY_AFTER_CARD_MS = 200;
-const ARROW_DRAW_MS = 600;
+const CARD_REVEAL_MS = 400;
+const ARROW_DELAY_AFTER_CARD_MS = 100;
+const ARROW_DRAW_MS = 300;
 const STEP_CYCLE_MS = CARD_REVEAL_MS + ARROW_DELAY_AFTER_CARD_MS + ARROW_DRAW_MS;
 
 function getRevealDelayForStep(index) {
