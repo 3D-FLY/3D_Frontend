@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.figma.com)",
+      "Bash(node -e \":*)",
+      "Bash(mkdir -p features/home/Features/assets/icons)",
+      "Bash(mkdir -p features/home/HowDoesItWork/assets/icons)",
+      "Bash(mkdir -p features/home/FileUploader/assets/icons)",
+      "Bash(mkdir -p features/home/MainSection/assets/icons)",
+      "Bash(cp assets/icons/section-2/* features/home/Features/assets/icons/)",
+      "Bash(cp assets/icons/section-3/* features/home/HowDoesItWork/assets/icons/)",
+      "Bash(cp assets/icons/section-4/* features/home/FileUploader/assets/icons/)",
+      "Bash(cp assets/icons/section-main/* features/home/MainSection/assets/icons/)",
+      "Bash(sed -i \"s|../../../assets/images/section-2/|./assets/images/|g\" features/home/Features/featuresData.tsx)",
+      "Bash(sed -i \"s|../../../assets/images/section-3/|./assets/images/|g\" features/home/HowDoesItWork/howDoesItWorkData.js)",
+      "Bash(sed -i \"s|../../assets/images/section-5/|./assets/images/|g\" features/home/PrintFarmSection.jsx)"
+    ]
+  }
+}

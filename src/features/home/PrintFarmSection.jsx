@@ -1,5 +1,5 @@
 import React from "react";
-import PrintFarmImage from "../../Gallery/PrintFarm1.png";
+import PrintFarmImage from "./assets/images/PrintFarm3D-Fly2.png";
 import Button from "../../components/ui/Button";
 import GlowCircle from "../../components/ui/GlowCircle";
 
@@ -12,11 +12,12 @@ export default function PrintFarmSection() {
 
         {/* תמונה */}
         {/* תמונה - 55% */}
-        <div className="w-full h-[60dvh]">
+        <div className="w-full h-[60dvh] overflow-hidden">
           <img
             src={PrintFarmImage}
             alt="printFarmPic"
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover object-left scale-[1.4]"
+            style={{ transformOrigin: "65% 80%" }}
           />
         </div>
 
@@ -63,11 +64,14 @@ export default function PrintFarmSection() {
         />
 
         {/* תמונה */}
-        <div className="flex-1 self-stretch">
+        <div className="flex-1 self-stretch overflow-hidden">
           <img
             src={PrintFarmImage}
             alt="printFarmPic"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-left scale-[1.15]"
+            // ↑ שני את הסקייל לפי מה שאת רוצה
+            style={{ transformOrigin: "70% center" }}
+            // ↑ שולט מאיזה נקודה היא מתרחבת
           />
         </div>
 
