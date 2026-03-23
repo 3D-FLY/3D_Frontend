@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import Background from "../components/ui/Background";
-import UploadDropCard from "../components/FileUploader/UploadDropCard";
-import FieldLabel from "../components/FileUploader/FieldLabel";
-import OptionGroup from "../components/FileUploader/OptionGroup";
-import LabeledSlider from "../components/FileUploader/LabeledSlider";
-import ShellsStepper from "../components/FileUploader/ShellsStepper";
+import UploadDropCard from "../features/home/FileUploader/UploadDropCard";
+import FieldLabel from "../features/home/FileUploader/FieldLabel";
+import OptionGroup from "../features/home/FileUploader/OptionGroup";
+import LabeledSlider from "../features/home/FileUploader/LabeledSlider";
+import ShellsStepper from "../features/home/FileUploader/ShellsStepper";
 import Button from "../components/ui/Button";
 
 export default function STLPricing() {

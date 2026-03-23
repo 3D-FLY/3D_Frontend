@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import Button from "../../../components/ui/Button.jsx";
-// כשתשימי את התמונות ב־src/assets/images/section-6/ (Group26.png, Group28.png, Group36.png) — החזירי את הייבואים והשתמשי בהן ב־pages
+import Group26 from "./assets/images/Group26.png";
+import Group28 from "./assets/images/Group28.png";
+import Group36 from "./assets/images/image36.png";
 
 type SellItem = {
   id: number;
@@ -13,34 +15,34 @@ type SellItem = {
 
 const pages: SellItem[][] = [
   [
-    { id: 1, src: "src/assets/images/section-6/Group26.png", name: "FIDGET TOYS", models: "7 MODELS", price: 10 },
-    { id: 2, src: "src/assets/images/section-6/Group26.png", name: "EARCUPS STAND", models: "3 SIZES", price: 16 },
-    { id: 3, src: "src/assets/images/section-6/Group26.png", name: "DESK ORGANIZER", models: "6 MODELS", price: 8 },
-    { id: 4, src: "src/assets/images/section-6/Group26.png", name: "LITHOPHANE LAMP", models: "16 MODELS", price: 12 },
-    { id: 5, src: "src/assets/images/section-6/Group26.png", name: "LIGHTING FIXTURE", models: "LAMP INCLUDED", price: 14 },
-    { id: 6, src: "src/assets/images/section-6/Group26.png", name: "CONTROLLER STAND", models: "2 MODELS", price: 7 },
-    { id: 7, src: "src/assets/images/section-6/Group26.png", name: "PLANTER", models: "4 MODELS", price: 6 },
-    { id: 8, src: "src/assets/images/section-6/Group26.png", name: "DESK LAMPS", models: "3 MODELS", price: 9 },
+    { id: 1, src: Group26, name: "FIDGET TOYS", models: "7 MODELS", price: 10 },
+    { id: 2, src: Group26, name: "EARCUPS STAND", models: "3 SIZES", price: 16 },
+    { id: 3, src: Group26, name: "DESK ORGANIZER", models: "6 MODELS", price: 8 },
+    { id: 4, src: Group26, name: "LITHOPHANE LAMP", models: "16 MODELS", price: 12 },
+    { id: 5, src: Group26, name: "LIGHTING FIXTURE", models: "LAMP INCLUDED", price: 14 },
+    { id: 6, src: Group26, name: "CONTROLLER STAND", models: "2 MODELS", price: 7 },
+    { id: 7, src: Group26, name: "PLANTER", models: "4 MODELS", price: 6 },
+    { id: 8, src: Group26, name: "DESK LAMPS", models: "3 MODELS", price: 9 },
   ],
   [
-    { id: 9, src: "src/assets/images/section-6/Group28.png", name: "PRODUCT 9", models: "5 MODELS", price: 11 },
-    { id: 10, src: "src/assets/images/section-6/Group28.png", name: "PRODUCT 10", models: "2 SIZES", price: 20 },
-    { id: 11, src: "src/assets/images/section-6/Group28.png", name: "PRODUCT 11", models: "8 MODELS", price: 5 },
-    { id: 12, src: "src/assets/images/section-6/Group28.png", name: "PRODUCT 12", models: "1 MODEL", price: 18 },
-    { id: 13, src: "src/assets/images/section-6/Group28.png", name: "PRODUCT 13", models: "3 MODELS", price: 13 },
-    { id: 14, src: "src/assets/images/section-6/Group28.png", name: "PRODUCT 14", models: "6 MODELS", price: 9 },
-    { id: 15, src: "src/assets/images/section-6/Group28.png", name: "PRODUCT 15", models: "4 MODELS", price: 7 },
-    { id: 16, src: "src/assets/images/section-6/Group28.png", name: "PRODUCT 16", models: "2 MODELS", price: 15 },
+    { id: 9, src: Group28, name: "PRODUCT 9", models: "5 MODELS", price: 11 },
+    { id: 10, src: Group28, name: "PRODUCT 10", models: "2 SIZES", price: 20 },
+    { id: 11, src: Group28, name: "PRODUCT 11", models: "8 MODELS", price: 5 },
+    { id: 12, src: Group28, name: "PRODUCT 12", models: "1 MODEL", price: 18 },
+    { id: 13, src: Group28, name: "PRODUCT 13", models: "3 MODELS", price: 13 },
+    { id: 14, src: Group28, name: "PRODUCT 14", models: "6 MODELS", price: 9 },
+    { id: 15, src: Group28, name: "PRODUCT 15", models: "4 MODELS", price: 7 },
+    { id: 16, src: Group28, name: "PRODUCT 16", models: "2 MODELS", price: 15 },
   ],
   [
-    { id: 17, src: "src/assets/images/section-6/Group36.png", name: "PRODUCT 17", models: "7 MODELS", price: 22 },
-    { id: 18, src: "src/assets/images/section-6/Group36.png", name: "PRODUCT 18", models: "3 SIZES", price: 8 },
-    { id: 19, src: "src/assets/images/section-6/Group36.png", name: "PRODUCT 19", models: "5 MODELS", price: 17 },
-    { id: 20, src: "src/assets/images/section-6/Group36.png", name: "PRODUCT 20", models: "9 MODELS", price: 11 },
-    { id: 21, src: "src/assets/images/section-6/Group36.png", name: "PRODUCT 21", models: "2 MODELS", price: 6 },
-    { id: 22, src: "src/assets/images/section-6/Group36.png", name: "PRODUCT 22", models: "4 SIZES", price: 19 },
-    { id: 23, src: "src/assets/images/section-6/Group36.png", name: "PRODUCT 23", models: "1 MODEL", price: 25 },
-    { id: 24, src: "src/assets/images/section-6/Group36.png", name: "PRODUCT 24", models: "6 MODELS", price: 14 },
+    { id: 17, src: Group36, name: "PRODUCT 17", models: "7 MODELS", price: 22 },
+    { id: 18, src: Group36, name: "PRODUCT 18", models: "3 SIZES", price: 8 },
+    { id: 19, src: Group36, name: "PRODUCT 19", models: "5 MODELS", price: 17 },
+    { id: 20, src: Group36, name: "PRODUCT 20", models: "9 MODELS", price: 11 },
+    { id: 21, src: Group36, name: "PRODUCT 21", models: "2 MODELS", price: 6 },
+    { id: 22, src: Group36, name: "PRODUCT 22", models: "4 SIZES", price: 19 },
+    { id: 23, src: Group36, name: "PRODUCT 23", models: "1 MODEL", price: 25 },
+    { id: 24, src: Group36, name: "PRODUCT 24", models: "6 MODELS", price: 14 },
   ],
 ];
 
@@ -85,8 +87,8 @@ export default function WhatCanYouSellMobile() {
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const touchStartX = useRef(0);
+  const isSwiping = useRef(false);
 
-  // Block the native touchmove so browser momentum can't carry past one page
   useEffect(() => {
     const el = sliderRef.current;
     if (!el) return;
@@ -97,82 +99,69 @@ export default function WhatCanYouSellMobile() {
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0]?.clientX ?? 0;
+    isSwiping.current = false;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     const el = sliderRef.current;
-    if (!el) return;
+    if (!el || isSwiping.current) return;
+    isSwiping.current = true;
+
     const delta = touchStartX.current - (e.changedTouches[0]?.clientX ?? touchStartX.current);
     const threshold = 30;
+
+    // עמוד אחד בלבד לכל החלקה
     let target = currentPage;
     if (delta > threshold && currentPage < pages.length - 1) target = currentPage + 1;
     else if (delta < -threshold && currentPage > 0) target = currentPage - 1;
-    el.scrollTo({ left: target * el.clientWidth, behavior: "smooth" });
-    setCurrentPage(target);
+
+    if (target !== currentPage) {
+      setCurrentPage(target);
+      el.scrollTo({ left: target * el.clientWidth, behavior: "smooth" });
+    }
   };
 
-  const handleScroll = () => {
-    const el = sliderRef.current;
-    if (!el) return;
-    const page = Math.round(el.scrollLeft / el.clientWidth);
-    setCurrentPage(Math.max(0, Math.min(pages.length - 1, page)));
-  };
-
-  // פס ירוק = שליש, תזוזה 0 / 33.333 / 66.666
+  // handleScroll מנוטרל – לא נרצה שגלילה חופשית תשנה עמוד
   const indicatorLeft = `${(currentPage / (pages.length - 1)) * 66.666}%`;
 
   return (
     <section
-      className="relative h-[100dvh] bg-gray italic overflow-hidden"
+      className="relative bg-gray italic overflow-hidden"
       style={{ fontFamily: "Montserrat, sans-serif" }}
     >
-      {/* מלבן כהה יוצא שמאלה — רק צד ימין מעוגל */}
-      {/* המיקום האנכי: items-center = מרכז; items-start + pt = מהתחלה עם ריווח מלמעלה */}
-      <div className="absolute inset-0 flex items-start justify-center pointer-events-none pt-[6%]">
-        <div className="h-[92%] w-full -ml-[19%] bg-dark/70 rounded-r-[49px]" />
-      </div>
+      <div className="flex flex-col">
 
-      {/* תוכן */}
-      <div className="relative z-10 h-full flex flex-col">
-        {/* אזור עליון: כותרת + קרוסלה + אינדיקטור (~92% גובה) */}
-        <div className="h-[90%] flex flex-col px-4 pt-[6%]">
-          {/* כותרת — שורה אחת, גודל = רוחב הקונטינר (9cqi ≈ fills width), min/max לפורפורציה */}
-          <div className="flex-none w-[85%] @container min-w-0 pt-6 px-3">
-            <h2 className="font-extrabold text-gray/90 leading-[0.85] whitespace-nowrap text-[clamp(18px,9cqi,48px)]">
-              <span className="text-[clamp(20px,10cqi,56px)]">W</span>
-              HAT CAN YOU <span className="text-green">SELL?</span>
-            </h2>
-          </div>
+        {/* ── אזור האפור ── */}
+        <div className="relative w-full mt-[6%]"> {/* ← רווח למעלה */}
+          {/* רקע אפור יוצא 19% שמאלה */}
+          <div className="absolute inset-0 -translate-x-[12%] bg-dark/70 rounded-r-[49px]" />
 
-          <div className="h-4" />
+          {/* תוכן מוזז 19% ימינה */}
+          <div className="relative z-10 px-4 pt-8 pb-6 flex flex-col gap-6">
+            {/* כותרת */}
+            <div className="w-full overflow-hidden">
+              <h2 className="font-extrabold text-gray/90 leading-[1.2]
+                            tracking-wide whitespace-nowrap
+                            text-[clamp(14px,5.5vw,36px)]">
+                <span className="text-[clamp(16px,6vw,40px)]">W</span>
+                HAT CAN YOU{" "}
+                <span className="text-green">SELL?</span>
+              </h2>
+            </div>
 
-          {/* קרוסלה (רק X). אין גלילה פנימית ברגיל; רק במצב מסך רחב/נמוך (landscape) נאפשר Y */}
-          <div className="flex-1 min-h-0 flex flex-col">
+            {/* קרוסלה */}
             <div
               ref={sliderRef}
-              onScroll={handleScroll}
               onTouchStart={handleTouchStart}
               onTouchEnd={handleTouchEnd}
-              className="
-                flex flex-1 min-h-0 gap-4
-                overflow-x-auto
-                snap-x snap-mandatory
-                [scrollbar-width:none] [-ms-overflow-style:none]
-              "
+              className="flex gap-4 overflow-x-hidden snap-x snap-mandatory
+                         [scrollbar-width:none] [-ms-overflow-style:none]"
             >
               {pages.map((pageItems, pageIndex) => (
-                <div key={pageIndex} className="min-w-full shrink-0 snap-start h-full">
-                  {/* הגריד המעודכן */}
-                  <div
-                    className="
-                      grid grid-cols-2 gap-4
-                      grid-rows-[repeat(4,minmax(0,1fr))] 
-                      h-full w-full
-                      place-items-stretch
-                    "
-                  >
+                <div key={pageIndex} className="min-w-full shrink-0 snap-start">
+                  <div className="grid grid-cols-2 gap-3">
                     {pageItems.map((item) => (
-                      <div key={item.id} className="aspect-square w-full h-full max-h-full max-w-full">
+                      <div key={item.id} className="aspect-square w-full">
                         <ProductCard item={item} className="h-full w-full" />
                       </div>
                     ))}
@@ -180,13 +169,13 @@ export default function WhatCanYouSellMobile() {
                 </div>
               ))}
             </div>
-          </div>
 
             {/* אינדיקטור */}
-            <div className="pt-4 flex justify-center">
+            <div className="flex justify-center">
               <div className="relative w-[45%] h-[8px] bg-dark rounded-full overflow-hidden">
                 <div
-                  className="absolute top-0 h-full bg-[#5AC422]/50 rounded-full transition-all duration-300 ease-out"
+                  className="absolute top-0 h-full bg-[#5AC422]/50 rounded-full
+                             transition-all duration-300 ease-out"
                   style={{
                     width: `${100 / pages.length}%`,
                     left: indicatorLeft,
@@ -194,18 +183,23 @@ export default function WhatCanYouSellMobile() {
                 />
               </div>
             </div>
-          </div>
 
-        {/* כפתור תחתון (~8% האחרונים למטה) */}
-        <div className="h-[12%] flex items-center justify-center pt-[4%]">
+          </div>
+        </div>
+
+        {/* ── כפתור ── */}
+        <div className="flex justify-center py-4">
           <Button
+            type="button"
             variant="tertiary"
             hovering="darkBg"
-            className="font-medium italic uppercase px-10 h-[70%] text-[clamp(14px,4vw,18px)]"
+            className="min-h-[44px] px-10 py-2.5 font-medium italic uppercase
+                       text-[clamp(14px,4vw,18px)]"
           >
             SEE MORE
           </Button>
         </div>
+
       </div>
     </section>
   );

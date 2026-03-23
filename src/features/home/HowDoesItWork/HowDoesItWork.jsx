@@ -1,59 +1,68 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useScroll, useMotionValue, useMotionValueEvent } from "framer-motion";
 import Button from "../../../components/ui/Button";
 import HowItWorksStep from "./HowItWorksStep";
 import HowDoesItWorkGlow from "./HowDoesItWorkGlow";
-import IconArrowAnimated from "../../../icons/section-3/IconArrowAnimated.jsx";
+import IconArrowAnimated from "./icons/arrows/IconArrowAnimated.jsx";
 import { howDoesItWorkSteps } from "./howDoesItWorkData";
 import HowItWorksStepMobile from "./HowItWorksStepMobile";
 
 // desktop animation delay
 const STEP_DELAY_MS = 450;
 
-// מובייל/טאבלט: Step Build Sequence
-const CARD_REVEAL_MS = 400;
-const ARROW_DELAY_AFTER_CARD_MS = 100;
-const ARROW_DRAW_MS = 300;
-const STEP_CYCLE_MS = CARD_REVEAL_MS + ARROW_DELAY_AFTER_CARD_MS + ARROW_DRAW_MS;
+// ─── Scroll-progress ranges (mobile) ─────────────────────────────────────────
+// All animations complete by MAX_PROGRESS so the last step is fully revealed
+// while the section is still well inside the viewport (not near-exited).
+const SCROLL_WINDOW = 0.35;
+const MAX_PROGRESS  = 0.65;
 
-function getRevealDelayForStep(index) {
-  return index * STEP_CYCLE_MS;
+function getStepRange(index, total) {
+  const stride = total > 1 ? (MAX_PROGRESS - SCROLL_WINDOW) / (total - 1) : 0;
+  const start  = index * stride;
+  return /** @type {[number, number]} */ ([start, start + SCROLL_WINDOW]);
 }
-function getDrawDelayForArrow(index) {
-  return (index + 1) * CARD_REVEAL_MS + ARROW_DELAY_AFTER_CARD_MS + index * (ARROW_DELAY_AFTER_CARD_MS + ARROW_DRAW_MS);
+
+// Arrow i fades in while step i is completing and step i+1 is starting
+function getArrowRange(arrowIndex, totalSteps) {
+  const stride = totalSteps > 1 ? (MAX_PROGRESS - SCROLL_WINDOW) / (totalSteps - 1) : 0;
+  const start  = arrowIndex * stride + SCROLL_WINDOW * 0.5;
+  return /** @type {[number, number]} */ ([start, start + SCROLL_WINDOW * 0.4]);
 }
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function HowDoesItWork() {
-  const [inView, setInView] = useState(false);
+  const [inView, setInView] = useState(false); // desktop trigger
   const sectionRef = useRef(null);
+
+  // Scroll progress for mobile scroll-driven animation.
+  // offset "end 0.3": progress reaches 1 when section bottom is at 30% viewport height
+  // (before section fully exits), so the last step completes while still in view.
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start 0.9", "end 0.1"],
+  });
+
+  // One-way progress: only ever increases so elements stay revealed on scroll-back
+  const committedProgress = useMotionValue(0);
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    if (latest > committedProgress.get()) {
+      committedProgress.set(latest);
+    }
+  });
 
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
-
-    // Fallback: אם האלמנט כבר גלוי, הגדר inView ל-true מיד
-    const checkVisibility = () => {
-      const rect = el.getBoundingClientRect();
-      const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
-      if (isVisible) {
-        setInView(true);
-      }
-    };
-
-    // בדיקה ראשונית
-    checkVisibility();
-
     const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setInView(true);
-      },
+      ([entry]) => { if (entry.isIntersecting) setInView(true); },
       { threshold: 0.12 }
     );
-
     obs.observe(el);
     return () => obs.disconnect();
   }, []);
 
   const steps = howDoesItWorkSteps;
+  const N     = steps.length;
 
   return (
     <section
@@ -64,7 +73,7 @@ export default function HowDoesItWork() {
       <HowDoesItWorkGlow />
 
       <div className="w-full max-w-[1300px] mx-auto px-4 lg:px-0 py-10 lg:py-16 flex flex-col justify-around min-h-0 lg:min-h-[calc(100vh-72px-104px)] lg:h-full">
-        {/* Title — במובייל: פריסה על כל הרוחב (בלי ירידה שורה), בדסקטופ: ממורכז */}
+        {/* Title */}
         <h2
           className="flex flex-nowrap justify-evenly lg:justify-center items-baseline gap-1 text-left font-extrabold italic text-gray pt-10 pb-10 lg:flex-initial lg:block lg:text-center lg:pt-0 lg:pb-0"
           style={{ fontFamily: "Montserrat, italic" }}
@@ -80,7 +89,10 @@ export default function HowDoesItWork() {
             DESKTOP (>= lg)
             ========================= */}
         <div className="hidden lg:flex items-center justify-center w-full">
-          <div className="grid w-full gap-[clamp(1rem,2.5vw,3.5rem)]" style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
+          <div
+            className="grid w-full gap-[clamp(1rem,2.5vw,3.5rem)]"
+            style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}
+          >
             {steps.map((step, index) => (
               <HowItWorksStep
                 key={step.title}
@@ -93,16 +105,14 @@ export default function HowDoesItWork() {
           </div>
         </div>
 
-
         {/* =========================
             MOBILE + TABLET (< lg)
-            zig-zag layout (same internal structure as desktop)
+            Scroll-driven reveal via Framer Motion
             ========================= */}
-        {/* MOBILE + TABLET (< lg) — Step Build Sequence */}
         <div className="lg:hidden flex flex-col gap-10 w-full mx-auto">
           {steps.map((step, index) => {
             const alignRight = index % 2 === 1;
-            const isLast = index === steps.length - 1;
+            const isLast     = index === N - 1;
 
             return (
               <div
@@ -114,12 +124,12 @@ export default function HowDoesItWork() {
                     <IconArrowAnimated
                       direction="left"
                       className="w-10 h-7"
-                      inView={inView}
-                      drawDelayMs={getDrawDelayForArrow(index)}
-                      drawDurationMs={ARROW_DRAW_MS}
+                      scrollYProgress={committedProgress}
+                      progressRange={getArrowRange(index, N)}
                     />
                   </div>
                 )}
+
                 <div className="w-4/7 shrink-0">
                   <HowItWorksStepMobile
                     imageSrc={step.imageSrc}
@@ -130,19 +140,18 @@ export default function HowDoesItWork() {
                     iconHeight={step.iconHeight}
                     iconWidthPercent={step.iconWidthPercent}
                     iconPadding={step.iconPadding}
-                    inView={inView}
-                    index={index}
-                    revealDelayMs={getRevealDelayForStep(index)}
+                    scrollYProgress={committedProgress}
+                    progressRange={getStepRange(index, N)}
                   />
                 </div>
+
                 {!alignRight && !isLast && (
                   <div className="flex-shrink-0 w-10 flex justify-center pt-45">
                     <IconArrowAnimated
                       direction="right"
                       className="w-10 h-7"
-                      inView={inView}
-                      drawDelayMs={getDrawDelayForArrow(index)}
-                      drawDurationMs={ARROW_DRAW_MS}
+                      scrollYProgress={committedProgress}
+                      progressRange={getArrowRange(index, N)}
                     />
                   </div>
                 )}

@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import Icon from "./Icon.js";
-import LocationSvg from "../../../../assets/icons/section-main/location.svg?react";
+import LocationSvg from "../assets/icons/location.svg?react";
 
 interface LocationPinProps {
   /** % distance from the scene-container left edge (pin tip is centred here) */

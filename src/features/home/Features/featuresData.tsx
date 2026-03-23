@@ -1,12 +1,12 @@
 // src/sections/home/features/featuresData.tsx
 import React from "react";
 
-import NoCostImg from "../../../assets/images/section-2/No Cost.png";
-import IntegrationImg from "../../../assets/images/section-2/Integration.png";
-import EarthImg from "../../../assets/images/section-2/Earth.png";
-import FastImg from "../../../assets/images/section-2/Fast.png";
-import Print3DImg from "../../../assets/images/section-2/3D Print.png";
-import LocallyImg from "../../../assets/images/section-2/Locally.png";
+import NoCostImg from "./assets/images/No Cost.png";
+import IntegrationImg from "./assets/images/Integration.png";
+import EarthImg from "./assets/images/Earth.png";
+import FastImg from "./assets/images/Fast.png";
+import Print3DImg from "./assets/images/3D Print.png";
+import LocallyImg from "./assets/images/Locally.png";
 
 export type FeatureItem = {
   imageSrc: string;

@@ -1,5 +1,5 @@
 import React from "react";
-import earthUrl from "../../../../assets/icons/section-main/Earth.svg?url";
+import earthUrl from "../assets/icons/Earth.svg?url";
 
 interface EarthProps {
   className?: string;
