@@ -124,17 +124,17 @@ export default function HowItWorksStep({
         </div>
 
         {/* TITLE AREA — רספונסיבי */}
-        <div className="flex items-center justify-center w-full pt-2 pb-2 min-h-[clamp(48px,6vw,85px)]">
+        <div className="flex items-center justify-center w-full pt-2 pb-0 min-h-[clamp(48px,6vw,85px)]">
           <h3 className="text-white font-normal font-staatliches text-center tracking-normal capitalize w-full" style={{ fontSize: "clamp(36px, 5vw, 64px)", lineHeight: "1.2" }}>
             {step.title}
           </h3>
         </div>
 
         {/* TEXT AREA — רספונסיבי */}
-        <div className="flex items-start justify-center w-full pt-0 min-h-[clamp(60px,8vw,120px)]">
+        <div className="flex items-start justify-center w-full pt-0 mt-[-4px] min-h-[clamp(60px,8vw,120px)]">
           <div
-            className="text-gray font-normal italic font-size-[clamp(13px, 1.4vw, 23px)] leading-[1.2] tracking-normal text-center w-full mx-auto"
-            style={{ fontVariant: "small-caps", textWrap: "pretty" }}
+            className="text-gray font-normal italic text-[clamp(13px, 1.4vw, 23px)] leading-[1.6] tracking-normal text-center w-full mx-auto uppercase"
+            style={{ textWrap: "pretty" }}
           >
             {step.subtitle}
             <br />

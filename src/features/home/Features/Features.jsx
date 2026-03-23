@@ -26,8 +26,7 @@ export default function Features() {
         }
       },
       {
-        threshold: 0.15,
-        rootMargin: "0px 0px 200px 0px",
+        threshold: 0.25,
       }
     );
 
@@ -40,6 +39,7 @@ export default function Features() {
 
   return (
     <section
+      ref={triggerRef}
       className="
         flex flex-col relative text-center items-center
         w-full max-w-full min-w-0
@@ -49,11 +49,6 @@ export default function Features() {
       "
       style={{ fontFamily: "Montserrat, sans-serif" }}
     >
-      {/* סנטינל לטריגר האנימציה */}
-      <div
-        ref={triggerRef}
-        className="absolute top-1/3 left-0 w-full h-px"
-      />
 
       {/* Glow circle — מובייל: באמצע הסקשיין */}
       <GlowCircle
@@ -133,7 +128,7 @@ export default function Features() {
             imageSrc={f.imageSrc}
             title={f.title}
             text={f.text}
-            animationDelay={index * (2 / 4)}
+            animationDelay={index * (1 / 4)}
             shouldAnimate={shouldAnimate}
           />
         ))}

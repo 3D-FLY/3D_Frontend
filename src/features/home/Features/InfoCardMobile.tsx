@@ -25,7 +25,7 @@ export default function InfoCardMobile({
         opacity: shouldAnimate ? 1 : 0.6,
         transform: shouldAnimate ? "translateX(0)" : "translateX(-100vw)",
         transition: shouldAnimate
-        ? `opacity 3s cubic-bezier(0.16, 1, 0.3, 1) ${animationDelay}s, transform 2s cubic-bezier(0.16, 1, 0.3, 1) ${animationDelay}s`
+        ? `opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1) ${animationDelay}s, transform 1s cubic-bezier(0.16, 1, 0.3, 1) ${animationDelay}s`
         : "none",
       }}
     >

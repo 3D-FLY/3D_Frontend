@@ -1,7 +1,7 @@
-import ConnectCopyImg from "../../../assets/images/section-3/Connect-copy .png";
-import UploadImg from "../../../assets/images/section-3/Upload2.png";
-import SellImg from "../../../assets/images/section-3/Sell.png";
-import FullfillImg from "../../../assets/images/section-3/Fullfill.png";
+import ConnectCopyImg from "./assets/images/Connect-copy .png";
+import UploadImg from "./assets/images/Upload2.png";
+import SellImg from "./assets/images/Sell.png";
+import FullfillImg from "./assets/images/Fullfill.png";
 
 // דסקטופ: iconWidth, iconHeight. מובייל: רוחב התמונה כאחוז מרוחב הכרטיס (כל הכרטיסים 270px כמו בדסקטופ)
 export const howDoesItWorkSteps = [

@@ -3,13 +3,22 @@ import GlowCircle from "../../../components/ui/GlowCircle";
 export default function MainSectionGlow() {
   return (
     <>
-      {/* MOBILE / TABLET – הילה בדיוק מאחורי הצב */}
+      {/* MOBILE / TABLET – corner ambient glows (match Figma Ellipse2 / Ellipse3) */}
+      {/* Top-right corner glow (Ellipse3) */}
       <GlowCircle
-        size={700}
-        blur={140}
-        opacity={0.4}
+        size={380}
+        blur={180}
+        opacity={0.25}
         color="149, 149, 149"
-        className="bottom-[28%] left-1/2 -translate-x-1/2 translate-y-[40%] z-0 xl:hidden"
+        className="-top-[95px] -right-[95px] z-0 xl:hidden"
+      />
+      {/* Top-left corner glow (Ellipse2) */}
+      <GlowCircle
+        size={380}
+        blur={180}
+        opacity={0.25}
+        color="149, 149, 149"
+        className="-top-[105px] -left-[95px] z-0 xl:hidden"
       />
 
       {/* DESKTOP */}

@@ -2,6 +2,7 @@ import React from "react";
 import Button from "../../../components/ui/Button";
 import Turtle from "../../../components/ui/Turtle";
 import MainSectionGlow from "./MainSectionGlow";
+import GlobalSupplierScene from "./GlobalSupplierScene/GlobalSupplierScene";
 
 export default function MainSection() {
   return (
@@ -16,10 +17,6 @@ export default function MainSection() {
           from { opacity: 0; transform: translate(-50%, 37%) translateY(36px); }
           to   { opacity: 0.7; transform: translate(-50%, 37%) translateY(0); }
         }
-        @keyframes riseUpTurtleMobile {
-          from { opacity: 0; transform: translate(-50%, 40%) translateY(36px); }
-          to   { opacity: 0.7; transform: translate(-50%, 40%) translateY(0); }
-        }
         @media (prefers-reduced-motion: reduce) {
           .anim-riseUp { animation: none !important; }
         }
@@ -30,17 +27,10 @@ export default function MainSection() {
       <MainSectionGlow />
 
 
-      {/* ===== TURTLE (מאחורה!) ===== */}
-      {/* מובייל + טאבלט: צב נוטה למרכז */}
-      <Turtle
-        bottom="28%"
-        translateY="40%"
-        opacity={0.7}
-        zIndex={0}
-        className="w-[90vw] sm:w-[90vw] anim-riseUp xl:hidden"
-        style={{ animation: "riseUpTurtleMobile 2800ms ease-out 0ms both" }}
-      />
-      {/* דסטופ (רק מ־xl = 1280px) */}
+      {/* ===== MOBILE / TABLET SCENE (Earth + Turtle + Lines + Pins) ===== */}
+      <GlobalSupplierScene className="xl:hidden" />
+
+      {/* ===== DESKTOP TURTLE (xl and above) ===== */}
       <Turtle
         bottom="0%"
         translateY="37%"
@@ -52,7 +42,7 @@ export default function MainSection() {
 
       {/* ===== TEXT + CTA (מקדימה!) ===== */}
       <div
-        className="relative z-20 w-full text-center px-4 pt-[10vh] xl:pt-[16vh]"
+        className="relative z-20 w-full text-center px-4 pt-[7vh] xl:pt-[16vh]"
         style={{ animation: "riseUp 2800ms ease-out 200ms both" }}
       >
         <h1
@@ -62,14 +52,14 @@ export default function MainSection() {
             text-[clamp(23px,3.2vw,34px)]
             leading-[clamp(27px,3.8vw,40px)]
             tracking-[0.015em]
-            px-2 sm:px-4 xl:px-16
+            px-4 sm:px-8 xl:px-16
           "
         >
-
           CONNECT YOUR STORE TO{" "}
           <span className="text-green">3DFLY&apos;S</span> GLOBAL SUPPLIER
-          NETWORK<span>! </span>
-          <br className="xl:hidden" />
+          NETWORK!{" "}
+          {/* ── gap after NETWORK! on mobile/tablet only ── */}
+          <span className="block mt-5 xl:hidden" />
           YOU SELL, WE HANDLE THE REST.
           <br />
           <span className="text-green">NO</span> INVENTORY.{" "}
