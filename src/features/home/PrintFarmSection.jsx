@@ -1,11 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import PrintFarmImage from "./assets/images/PrintFarm3D-Fly2.png";
 import Button from "../../components/ui/Button";
 import GlowCircle from "../../components/ui/GlowCircle";
 
 export default function PrintFarmSection() {
+  useEffect(() => {
+    // Capture viewport height once — never updates when browser toolbar shows/hides
+    if (!document.documentElement.style.getPropertyValue("--snap-vh")) {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--snap-vh", `${vh}px`);
+    }
+  }, []);
+
   return (
-    <section className="relative w-full overflow-hidden h-[90svh] min-h-0 2xl:h-auto 2xl:min-h-[calc(100dvh-var(--nav-h))]">
+    <section
+      className="relative w-full overflow-hidden min-h-0 2xl:h-auto 2xl:min-h-[calc(100dvh-var(--nav-h))]"
+      style={{ height: "calc(var(--snap-vh, 1svh) * 90)" }}
+    >
 
       {/* ========== MOBILE + TABLET (עד מסכים רחבים — כולל אייפדים בכל הכיוונים) ========== */}
       <div className="flex h-full min-h-0 flex-col 2xl:hidden">
@@ -21,7 +32,10 @@ export default function PrintFarmSection() {
         </div>
 
         {/* כרטיס תוכן (~50%) + חפיפה (svh — לא אחוז margin, שב־CSS יחסי לרוחב) */}
-        <div className="relative z-10 -mt-[5svh] flex h-[50%] min-h-0 shrink-0 flex-col items-center justify-between rounded-tr-[60px] bg-dark px-6 pt-8 pb-3">
+        <div
+          className="relative z-10 flex h-[50%] min-h-0 shrink-0 flex-col items-center justify-between rounded-tr-[60px] bg-dark px-6 pt-8 pb-3"
+          style={{ marginTop: "calc(var(--snap-vh, 1svh) * -5)" }}
+        >
           {/* כותרת */}
           <h3 className="text-gray italic font-extrabold leading-tight text-left m-0 text-[clamp(38px,11vw,60px)]">
             RUNNING A <br />

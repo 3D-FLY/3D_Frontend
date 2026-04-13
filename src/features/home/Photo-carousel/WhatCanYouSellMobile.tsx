@@ -84,6 +84,7 @@ export default function WhatCanYouSellMobile() {
   const [currentPage, setCurrentPage] = useState(0);
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
+  const touchStartTime = useRef(0);
   const directionLocked = useRef<"horizontal" | "vertical" | null>(null);
 
   useEffect(() => {
@@ -105,6 +106,7 @@ export default function WhatCanYouSellMobile() {
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0]?.clientX ?? 0;
     touchStartY.current = e.touches[0]?.clientY ?? 0;
+    touchStartTime.current = Date.now();
     directionLocked.current = null;
   };
 
@@ -125,7 +127,11 @@ export default function WhatCanYouSellMobile() {
     if (!el || directionLocked.current !== "horizontal") return;
 
     const delta = touchStartX.current - (e.changedTouches[0]?.clientX ?? touchStartX.current);
-    const threshold = 30;
+    const elapsed = Date.now() - touchStartTime.current;
+    const velocity = Math.abs(delta) / elapsed; // px/ms
+
+    // מהירה (>0.3px/ms) → מספיק 10px; איטית → צריך 40px
+    const threshold = velocity > 0.3 ? 10 : 40;
 
     let target = currentPage;
     if (delta > threshold && currentPage < pages.length - 1) target = currentPage + 1;
