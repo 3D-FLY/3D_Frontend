@@ -2,50 +2,58 @@
 import React from "react";
 import Earth from "./Earth.js";
 import LocationPin from "./LocationPin.js";
-import CurvedDashedLine from "./CurvedDashedLine.js";
+import AnimatedLinesCanvas from "./AnimatedLinesCanvas.js";
 import Turtle from "../../../../components/ui/Turtle.jsx";
 
-const TURTLE_STACK_BOTTOM    = "37%";
-const TURTLE_STACK_WIDTH     = "75.6%";
+const TURTLE_STACK_BOTTOM    = "34%";
+const TURTLE_STACK_WIDTH     = "65%";
 const TURTLE_GLOW_WIDTH_PCT  = "90%";
 const TURTLE_LOGO_FINE_CLASS = "";
 
+/**
+ * הזזת כל הסצנה למטה (אחוז מגובה **האלמנט** — רוחב/יחס 41:40).
+ * משמש כדי שכדור הארץ “יבלוט” מעט מתחת לפריים; יחד עם overflow ב-MainSection.
+ */
 // ── נקודות יציאה מהצב (% של הסצנה) ──────────────────────────────────────────
 // הצב: left=12.2%, width=75.6%, bottom=37% → top ≈ 14%,  height ≈ 54%
 // נקודות מחושבות: left + (relX × width),  top + (relY × height)
-const EXITS = {
-  leftWing:  { x: 40, y: 40 },
-  leftBody:  { x: 37.9, y: 40 },
-  rightBody: { x: 62.1, y: 31 },
-  rightWing: { x: 86.9, y: 25 },
-};
+const OFFSET_X = -12; // הזז שמאלה — שני את המספר
+const OFFSET_Y = 41;  // הזז למטה — שני את המספר
+const TURTLE_Y_WINGS = 5.4;  // Y של קווים 1 ו-4
+const TURTLE_Y_BODY  = 8.5;  // Y של קווים 2 ו-3
 
 const linesConfig = [
   {
-    start:    EXITS.leftWing,
-    ctrl:     { x: 7.3,  y: 17.7 },
-    end:      { x: 13.5, y: 73 },  // ← זו נקודת הסוף
-    endX:     13.5,  // ← הפין נוחת כאן
-    endY:     97.0,  // ← הפין נוחת כאן
-    pinWidth: "5%",
+    // קו 1 — מהצב לגלוב
+    start: { x: 53 + OFFSET_X, y: TURTLE_Y_WINGS + OFFSET_Y }, // צב
+    ctrl:  { x: 18.5 + OFFSET_X, y: 12 + OFFSET_Y },
+    ctrl2: { x: 15   + OFFSET_X, y: 15   + OFFSET_Y },
+    end:   { x: 20 + OFFSET_X, y: 45 + OFFSET_Y }, // גלוב
+    endX:  18.5 + OFFSET_X, endY: 41.9 + OFFSET_Y, pinWidth: "5%",
   },
   {
-    start:    EXITS.leftBody,
-    ctrl:     { x: 22, y: 54 },
-    end:      { x: 22.6, y: 70 },
-    endX:     22.6, endY: 70,  pinWidth: "5.5%",
+    // קו 2 — מהצב לגלוב
+    start: { x: 50 + OFFSET_X, y: TURTLE_Y_BODY + OFFSET_Y }, // צב
+    ctrl:  { x: 29 + OFFSET_X, y: 25 + OFFSET_Y },
+    ctrl2: { x: 15   + OFFSET_X, y: 48.2 + OFFSET_Y },
+    end:   { x: 34 + OFFSET_X, y: 46 + OFFSET_Y }, // גלוב
+    endX:  32.6 + OFFSET_X, endY: 46.5 + OFFSET_Y, pinWidth: "5.5%",
   },
   {
-    start:    EXITS.rightBody,
-    ctrl:     { x: 78, y: 50 },
-    end:      { x: 74.8, y: 62 },
-    endX:     74.8, endY: 62,  pinWidth: "5%",
+    // קו 3
+    start: { x: 74 + OFFSET_X, y: TURTLE_Y_BODY + OFFSET_Y },
+    ctrl:  { x: 90 + OFFSET_X, y: 20 + OFFSET_Y },
+    ctrl2: { x: 90.7 + OFFSET_X, y: 55.5 + OFFSET_Y },
+    end:   { x: 89 + OFFSET_X, y: 38.2 + OFFSET_Y },
+    endX:  86 + OFFSET_X, endY: 39 + OFFSET_Y, pinWidth: "5.5%",
   },
   {
-    start:    EXITS.rightWing,
-    ctrl:     { x: 97, y: 50 },
-    end:      { x: 89.2, y: 70 },
-    endX:     89.2, endY: 70,  pinWidth: "4.5%",
+    // קו 4
+    start: { x: 73.0 + OFFSET_X, y: TURTLE_Y_WINGS + OFFSET_Y },
+    ctrl:  { x: 99 + OFFSET_X, y: 10 + OFFSET_Y },
+    ctrl2: { x: 100 + OFFSET_X, y: 70 + OFFSET_Y },
+    end:   { x: 103 + OFFSET_X, y: 43 + OFFSET_Y },
+    endX:  100 + OFFSET_X, endY: 43.5 + OFFSET_Y, pinWidth: "4.5%",
   },
 ];
 
@@ -54,17 +62,19 @@ interface GlobalSupplierSceneProps {
 }
 
 export default function GlobalSupplierScene({ className = "" }: GlobalSupplierSceneProps) {
-  const lineDuration = 0.9;
-  const gap          = 0.15;
+  const lineDuration = 0.8;
+  const stagger      = 0.22;
 
+  // סדר: 1 → 3 → 4 → 2
   const line1Delay = 0.2;
-  const pin1Delay  = line1Delay + lineDuration + 0.1;
-  const line2Delay = pin1Delay  + gap;
-  const pin2Delay  = line2Delay + lineDuration + 0.1;
-  const line3Delay = pin2Delay  + gap;
-  const pin3Delay  = line3Delay + lineDuration + 0.1;
-  const line4Delay = pin3Delay  + gap;
-  const pin4Delay  = line4Delay + lineDuration + 0.1;
+  const line3Delay = line1Delay + stagger;
+  const line4Delay = line3Delay + stagger;
+  const line2Delay = line4Delay + stagger;
+
+  const pin1Delay  = line1Delay + lineDuration + 0.05;
+  const pin3Delay  = line3Delay + lineDuration + 0.05;
+  const pin4Delay  = line4Delay + lineDuration + 0.05;
+  const pin2Delay  = line2Delay + lineDuration + 0.05;
 
   const delays = [
     { line: line1Delay, pin: pin1Delay },
@@ -75,8 +85,12 @@ export default function GlobalSupplierScene({ className = "" }: GlobalSupplierSc
 
   return (
     <div
-      className={`absolute bottom-0 left-1/2 -translate-x-1/2 pointer-events-none ${className}`.trim()}
-      style={{ width: "100vw", aspectRatio: "41 / 40" }}
+      className={`absolute bottom-0 left-1/2 pointer-events-none ${className}`.trim()}
+      style={{
+        width:       "100vw",
+        aspectRatio: "41 / 40",
+        transform:   "translateX(-50%)",
+      }}
     >
       {/* Earth */}
       <div className="absolute inset-x-0 bottom-0 z-10">
@@ -107,29 +121,17 @@ export default function GlobalSupplierScene({ className = "" }: GlobalSupplierSc
         </div>
       </div>
 
-      {/* ── SVG אחד לכל הקווים (z-10, מאחורי הצב) ── */}
-      <svg
-        className="absolute inset-0 w-full h-full z-15 pointer-events-none"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-      >
-        <style>{`
-          @keyframes drawLine {
-            to { stroke-dashoffset: 0; }
-          }
-        `}</style>
-
-        {linesConfig.map((line, i) => (
-          <CurvedDashedLine
-            key={i}
-            start={line.start}
-            ctrl={line.ctrl}
-            end={line.end}
-            delay={delays[i]!.line}
-            duration={lineDuration}
-          />
-        ))}
-      </svg>
+      {/* ── Canvas לכל הקווים (z-15, מאחורי הצב) ── */}
+      <AnimatedLinesCanvas
+        className="z-15"
+        lines={linesConfig.map((line, i) => ({
+          start:    line.start,
+          ctrl:     line.ctrl,
+          end:      line.end,
+          delay:    delays[i]!.line,
+          duration: lineDuration,
+        }))}
+      />
 
       {/* ── Pins (z-30) ── */}
       {linesConfig.map((line, i) => (

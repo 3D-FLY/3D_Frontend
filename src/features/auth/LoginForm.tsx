@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 import "./registration-form.css";
 // @ts-expect-error js module
 import IconGoogle from "./icons/IconGoogle.jsx";
-import IconTitleUnderline from "./icons/IconTitleUnderline.js";
+import IconTitleUnderline from "../../components/ui/sectionTitle/IconTitleUnderline.js";
 import Input from "../../components/ui/input/Input.js";
 import Button from "../../components/ui/Button.jsx";
 import Turtle from "../../components/ui/Turtle.jsx";
 // @ts-expect-error js module
 import AmbientGlowBackdrop from "../../components/ui/AmbientGlowBackdrop.jsx";
+import SectionTitle from "../../components/ui/sectionTitle/SectionTitle.js";
 
 type FormState = {
   usernameOrEmail: string;
@@ -87,23 +88,9 @@ export default function LoginForm() {
   return (
     <div className="relative flex flex-1 flex-col w-full min-h-0 bg-dark items-center overflow-y-auto overflow-x-hidden">
       <AmbientGlowBackdrop />
-      <Turtle
-        bottom="0"
-        left="50%"
-        height="50vh"
-        translateX="-50%"
-        translateY="0"
-        opacity={0.1}
-        zIndex={0}
-      />
 
-      <div className="reg-form-content-in relative z-10 flex flex-col items-center justify-start gap-6 w-full max-w-[850px] h-full mt-18 px-6 py-8 mb-[50vh]">
-        <div className="relative w-full flex items-center justify-center mb-7">
-          <IconTitleUnderline className="w-full h-full" />
-          <h1 className="absolute z-10 text-[#DBDADA] italic font-extrabold text-[clamp(2.8rem,8vw,5.5rem)] leading-none tracking-tight uppercase">
-            SIGN IN
-          </h1>
-        </div>
+      <div className="reg-form-content-in relative z-10 flex flex-col items-center justify-start gap-6 w-full max-w-[850px] h-full my-18 px-6 py-8">
+      <SectionTitle className="w-full mb-7">SIGN IN</SectionTitle>
 
         <IconGoogle onClick={() => {}} className="w-[clamp(150px,60vw,280px)]" />
 
@@ -152,12 +139,12 @@ export default function LoginForm() {
           </div>
 
           <p className="text-center text-[10px] font-medium italic text-[#DFDFDF] uppercase tracking-widest mt-2">
-            <span className="text-[#DFDFDF]">DON&apos;T HAVE AN ACCOUNT?</span>
+            Don&apos;t have an account?{" "}
             <Link
               to="/register"
-              className="font-bold text-[#DFDFDF] underline underline-offset-[3px] decoration-[#DFDFDF] hover:text-green hover:decoration-green transition-colors"
+              className="text-[#DFDFDF] font-bold underline underline-offset-2 hover:text-green transition-colors"
             >
-              CREATE ONE
+              Create one
             </Link>
           </p>
         </form>

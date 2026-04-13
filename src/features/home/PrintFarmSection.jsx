@@ -5,14 +5,13 @@ import GlowCircle from "../../components/ui/GlowCircle";
 
 export default function PrintFarmSection() {
   return (
-    <section className="relative w-full overflow-hidden min-h-[105vh] md:min-h-[calc(100vh-72px)]">
+    <section className="relative w-full overflow-hidden h-[90svh] min-h-0 2xl:h-auto 2xl:min-h-[calc(100dvh-var(--nav-h))]">
 
-      {/* ========== MOBILE ========== */}
-      <div className="flex flex-col md:hidden min-h-[105vh]">
+      {/* ========== MOBILE + TABLET (עד מסכים רחבים — כולל אייפדים בכל הכיוונים) ========== */}
+      <div className="flex h-full min-h-0 flex-col 2xl:hidden">
 
-        {/* תמונה */}
-        {/* תמונה - 55% */}
-        <div className="w-full h-[60dvh] overflow-hidden">
+        {/* תמונה (~55% מתוך 90svh; אחוזים מההורה כדי שלא יחרוג מ־h-[90svh]) */}
+        <div className="h-[55%] min-h-0 w-full shrink-0 overflow-hidden">
           <img
             src={PrintFarmImage}
             alt="printFarmPic"
@@ -21,8 +20,8 @@ export default function PrintFarmSection() {
           />
         </div>
 
-        {/* כרטיס תוכן - 50% כולל החפיפה */}
-        <div className="relative z-10 bg-dark rounded-tr-[60px] flex flex-col px-6 pt-8 pb-8 h-[50dvh] -mt-[5dvh] justify-between items-center">
+        {/* כרטיס תוכן (~50%) + חפיפה (svh — לא אחוז margin, שב־CSS יחסי לרוחב) */}
+        <div className="relative z-10 -mt-[5svh] flex h-[50%] min-h-0 shrink-0 flex-col items-center justify-between rounded-tr-[60px] bg-dark px-6 pt-8 pb-3">
           {/* כותרת */}
           <h3 className="text-gray italic font-extrabold leading-tight text-left m-0 text-[clamp(38px,11vw,60px)]">
             RUNNING A <br />
@@ -49,8 +48,8 @@ export default function PrintFarmSection() {
         </div>
       </div>
 
-      {/* ========== DESKTOP ========== */}
-      <div className="hidden md:flex h-[calc(100vh-72px)]">
+      {/* ========== DESKTOP (מסכים רחבים בלבד) ========== */}
+      <div className="hidden h-[calc(100dvh-var(--nav-h))] 2xl:flex">
         <GlowCircle
           size={450}
           blur={600}

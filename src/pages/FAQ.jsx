@@ -1,15 +1,17 @@
 import React from "react";
+import Background from "../components/ui/Background";
 
 export default function FAQ() {
   return (
-    <div
-      className="FAQPage flex flex-col items-center max-w-full min-h-screen bg-dark pt-8 "
-      style={{ fontFamily: "Montserrat, sans-serif" }}
-    >
-      <h1 className=" uppercase text-gray font-bold w-full text-center text-3xl italic">
-        <span className="text-4xl">F</span>
-        requently asked questions
-      </h1>
-    </div>
+    <Background variant="dark">
+      <div className="flex h-screen items-center justify-center">
+        <h1
+          className="text-center font-extrabold uppercase italic text-gray"
+          style={{ fontSize: "clamp(3rem, 12vw, 10rem)", lineHeight: 1 }}
+        >
+          Coming Soon
+        </h1>
+      </div>
+    </Background>
   );
 }

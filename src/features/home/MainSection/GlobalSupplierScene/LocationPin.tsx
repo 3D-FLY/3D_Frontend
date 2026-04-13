@@ -40,10 +40,9 @@ export default function LocationPin({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       transition={{
         delay,
-        duration:   0.35,
         type:       "spring",
-        stiffness:  260,
-        damping:    20,
+        stiffness:  420,
+        damping:    16,
       }}
     >
       <Icon Svg={LocationSvg} width="100%" />

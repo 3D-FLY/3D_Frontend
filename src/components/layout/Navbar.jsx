@@ -128,19 +128,26 @@ export default function Navbar() {
 
         {/* ===== מובייל + טאבלט (< xl): לוגו | שם חברה | user + המבורגר ===== */}
         <Link to="/" className="flex flex-shrink-0 items-center xl:hidden">
-          <Turtle icon className="h-[50px] w-auto" />
+          <Turtle icon className="h-[45px] w-auto py-1" />
         </Link>
 
         {/* Figma 1010-628: 3D-Fly centred, Montserrat ExtraBold Italic 32 px, #959595 */}
         <div className="flex flex-1 justify-center xl:hidden">
-          <span className="font-sans font-extrabold italic text-gray text-[32px] leading-none whitespace-nowrap select-none">
+          <span className="font-sans font-extrabold italic text-gray text-[30px] leading-none whitespace-nowrap select-none">
             3D-Fly
           </span>
         </div>
 
         {/* Right group: user icon + hamburger (Figma: user 27 px, gap ~8 px, hamburger 32 px) */}
         <div className="flex flex-shrink-0 items-center gap-1 xl:hidden">
-          <UserIcon className="h-[27px] w-[27px]" />
+          <button
+            type="button"
+            aria-label="Log in"
+            onClick={() => navigate("/login")}
+            className="inline-flex items-center justify-center rounded-md p-1 text-green transition hover:opacity-80"
+          >
+            <UserIcon className="h-[27px] w-[27px]" />
+          </button>
           <button
             type="button"
             aria-label="Open menu"
@@ -154,10 +161,13 @@ export default function Navbar() {
 
       {/* MOBILE OVERLAY MENU */}
       {showOverlay && (
-        <div className="fixed inset-0 z-[60] xl:hidden" aria-hidden={!open}>
+        <div
+          className="fixed inset-0 z-[60] h-dvh min-h-dvh max-h-dvh w-full overflow-hidden xl:hidden"
+          aria-hidden={!open}
+        >
           {/* פאנל מלא — slide + fade */}
           <div
-            className={`absolute inset-0 flex flex-col bg-[#1f1f1f] transition-[transform,opacity] duration-[280ms] ease-out ${
+            className={`absolute inset-0 flex h-full min-h-0 w-full flex-col overflow-hidden bg-[#1f1f1f] transition-[transform,opacity] duration-[280ms] ease-out ${
               closing
                 ? "translate-y-[-8%] opacity-0"
                 : mounted
@@ -166,7 +176,7 @@ export default function Navbar() {
             }`}
           >
             {/* כפתור סגירה — פינה ימנית עליונה */}
-            <div className="flex justify-end px-4 pt-4">
+            <div className="flex shrink-0 justify-end px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-2">
               <button
                 type="button"
                 aria-label="Close menu"
@@ -177,18 +187,21 @@ export default function Navbar() {
               </button>
             </div>
 
-            {/* פריטי ניווט */}
-            <nav className="flex-1">
-              <ul className="flex flex-col">
+            {/* פריטי ניווט — מתחילים קרוב לסגירה; ריווח מתון בין פריטים */}
+            <nav className="flex min-h-0 flex-1 flex-col">
+              <ul className="flex min-h-0 flex-1 flex-col justify-start gap-0 overflow-y-auto px-2 pt-1 pb-2">
                 {mobileMenuItems.map((item) => (
-                  <li key={item.to}>
+                  <li key={item.to} className="shrink-0">
                     <NavLink
                       to={item.to}
                       onClick={closeMenu}
                       className={({ isActive }) =>
                         [
-                          "block w-full py-[22px] text-center text-[30px] font-medium italic uppercase tracking-wide transition-colors text-white",
-                          isActive ? "bg-[#333333]" : "hover:bg-[#2a2a2a]",
+                          "block w-full text-center font-medium italic uppercase tracking-[0.08em] transition-colors",
+                          "py-[clamp(14px,4.2vw,26px)] text-[clamp(18px,5vw,28px)] leading-tight",
+                          isActive
+                            ? "bg-[#d4d4d4] text-[#1a1a1a]"
+                            : "text-[#DADADA] hover:bg-[#2a2a2a]",
                         ].join(" ")
                       }
                     >
@@ -199,11 +212,11 @@ export default function Navbar() {
               </ul>
             </nav>
 
-            {/* Turtle — תחתית, ממורכז */}
-            <div className="flex justify-center pb-10">
-              <div className="relative flex items-center justify-center opacity-70 w-[50vw] md:w-[30vw]">
+            {/* Turtle — padding אנכי + safe area */}
+            <div className="flex shrink-0 justify-center px-4 pt-[clamp(1.5rem,4.8vw,2.65rem)] pb-[max(4.25rem,env(safe-area-inset-bottom))]">
+              <div className="relative flex w-[min(50vw,220px)] items-center justify-center opacity-70 md:w-[min(30vw,240px)]">
                 {/* Ellipse 4 — glow behind the logo */}
-                <div className="absolute w-[120%] aspect-square rounded-[50%] bg-[#858585] opacity-40 blur-3xl" />
+                <div className="absolute w-[120%] aspect-square rounded-[50%] bg-gray opacity-40 blur-[96px]" />
                 <Turtle icon className="relative z-10 w-full h-auto" />
               </div>
             </div>
