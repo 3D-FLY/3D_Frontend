@@ -8,7 +8,8 @@ import {
   ZoomableGroup,
   useZoomPanContext,
 } from "react-simple-maps";
-import IconTitleUnderline from "../auth/icons/IconTitleUnderline";
+import SectionTitle from "../../components/ui/sectionTitle/SectionTitle.js";
+import Button from "../../components/ui/Button.jsx";
 import AmbientGlowBackdrop from "../../components/ui/AmbientGlowBackdrop.jsx";
 import Turtle from "../../components/ui/Turtle.jsx";
 import { usePartnerLocations } from "./PartnerLocationsContext.jsx";
@@ -205,12 +206,7 @@ export default function PartnerMap() {
       />
 
       <div className="reg-form-content-in partner-map-content relative z-10 flex w-full max-w-[1440px] flex-col items-center gap-8 mt-18 px-6 py-8 pb-[50vh]">
-        <div className="partner-map-title-wrap relative mb-2 flex w-full min-w-0 items-center justify-center">
-          <IconTitleUnderline className="h-full w-full" />
-          <h1 className="absolute left-1/2 z-10 -translate-x-1/2 whitespace-nowrap px-4 text-center text-[clamp(2.8rem,8vw,5.5rem)] font-extrabold leading-tight tracking-tight text-[#DBDADA] uppercase italic">
-            3D-Fly Global Network
-          </h1>
-        </div>
+      <SectionTitle className="w-full mb-7">3D-FLY GLOBAL NETWORK</SectionTitle>
 
         <div className="partner-map-map-column flex w-full flex-col items-center gap-3">
           <div
@@ -255,13 +251,25 @@ export default function PartnerMap() {
           </div>
         </div>
 
-        <div className="partner-map-counter-block flex flex-col items-center gap-3 text-center">
-          <div>
-            <p className="partner-map-counter" aria-live="polite">
+        <div className="flex flex-col items-center gap-8 text-center">
+          <div className="flex flex-col items-center justify-center gap-1">
+            <p
+              className="m-0 font-sans text-[clamp(2rem,12vw,128px)] font-extrabold italic leading-none tracking-[0.02em] text-[#5AC422]"
+              aria-live="polite"
+            >
               {partnerCount}
             </p>
-            <p className="partner-map-counter-label">Worldwide partners!</p>
+            <p className="text-gray font-extrabold uppercase tracking-wide leading-tight text-[clamp(12px,4.2vw,85px)]">
+              Worldwide partners!
+            </p>
           </div>
+          <Button
+            hovering="darkBg"
+            className="rounded-[28px] text-[clamp(14px,2vw,32px)] font-extrabold px-[clamp(16px,3vw,32px)] py-[clamp(8px,1.5vw,16px)] italic"
+            onClick={() => navigate("/join-as-partner")}
+          >
+            Join As a Partner!
+          </Button>
           <Link
             to="/partner-locations"
             className="partner-map-manage-link font-mono text-sm font-bold uppercase tracking-wide text-[#5AC422] underline-offset-4 hover:underline"

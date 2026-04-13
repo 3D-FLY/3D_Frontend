@@ -6,12 +6,12 @@ import PasswordRulesTooltip from "./components/PasswordRulesTooltip.jsx";
 import IconPasswordInfo from "./icons/IconPasswordInfo.jsx";
 // @ts-expect-error js module
 import IconGoogle from "./icons/IconGoogle.jsx";
-import IconTitleUnderline from "./icons/IconTitleUnderline.js";
 import Input from "../../components/ui/input/Input.js";
 import Button from "../../components/ui/Button.jsx";
 import Turtle from "../../components/ui/Turtle.jsx";
 // @ts-expect-error js module
 import AmbientGlowBackdrop from "../../components/ui/AmbientGlowBackdrop.jsx";
+import SectionTitle from "../../components/ui/sectionTitle/SectionTitle.js";
 
 type FormState = {
   username: string;
@@ -108,26 +108,12 @@ export default function RegistrationForm() {
   return (
     <div className="relative flex flex-1 flex-col w-full min-h-0 bg-dark items-center overflow-y-auto overflow-x-hidden">
       <AmbientGlowBackdrop />
-      {/* Turtle background decoration */}
-      <Turtle
-        bottom="0"
-        left="50%"
-        height="50vh"
-        translateX="-50%"
-        translateY="0"
-        opacity={0.1}
-        zIndex={0}
-      />
+    
 
       {/* Main content container — enter animation in registration-form.css */}
-      <div className="reg-form-content-in relative z-10 flex flex-col items-center justify-start gap-6 w-full max-w-[850px] h-full mt-18 px-6 py-8 mb-[50vh]">
+      <div className="reg-form-content-in relative z-10 flex flex-col items-center justify-start gap-6 w-full max-w-[850px] h-full my-18 px-6 py-8">
         {/* Title + underline */}
-        <div className="relative w-full flex items-center justify-center mb-7">
-          <IconTitleUnderline className="w-full h-full" />
-          <h1 className="absolute z-10 text-[#DBDADA] italic font-extrabold text-[clamp(2.8rem,8vw,5.5rem)] leading-none tracking-tight uppercase">
-            Sign Up
-          </h1>
-        </div>
+        <SectionTitle className="w-full mb-7">SIGN UP</SectionTitle>
 
         {/* Google sign-up button */}
         <IconGoogle onClick={() => {}} className="w-[clamp(150px,60vw,280px)]" />
@@ -166,7 +152,7 @@ export default function RegistrationForm() {
               autoComplete="email"
             />
 
-            <div className="relative">
+            <div className="relative overflow-visible">
               <Input
                 label="Password"
                 password
@@ -175,16 +161,37 @@ export default function RegistrationForm() {
                 onChange={setField("password")}
                 error={errors.password}
                 autoComplete="new-password"
+                endAccessory={
+                  <div
+                    className="flex items-center"
+                    onMouseEnter={() => setTooltipVisible(true)}
+                    onMouseLeave={() => setTooltipVisible(false)}
+                  >
+                    <button
+                      type="button"
+                      className="flex cursor-pointer items-center p-0.5"
+                      aria-label="Password requirements"
+                      tabIndex={-1}
+                    >
+                      <IconPasswordInfo className="!h-5 !w-5" />
+                    </button>
+                    <PasswordRulesTooltip
+                      password={form.password}
+                      visible={tooltipVisible}
+                    />
+                  </div>
+                }
               />
 
+              {/* מסכים רחבים: אייקון מחוץ לשדה */}
               <div
-                className="absolute left-full bottom-0 top-[calc(50%+10px)] -translate-y-1/2 ml-3 flex items-center"
+                className="absolute left-full top-[calc(50%+2px)] bottom-0 ml-3 hidden -translate-y-1/2 items-center md:flex"
                 onMouseEnter={() => setTooltipVisible(true)}
                 onMouseLeave={() => setTooltipVisible(false)}
               >
                 <button
                   type="button"
-                  className="flex items-center cursor-pointer"
+                  className="flex cursor-pointer items-center"
                   aria-label="Password requirements"
                   tabIndex={-1}
                 >

@@ -33,7 +33,7 @@ export default function FileUploader() {
 
   return (
     <section
-      className="section-4 py-6 min-h-screen flex items-center justify-center relative overflow-hidden"
+      className="section-4 relative flex min-h-[calc(100svh-var(--nav-h))] w-full flex-col items-center justify-center overflow-hidden py-6"
       style={{ fontFamily: "Montserrat, sans-serif" }}
     >
       {/* צב ברקע — מובייל: גובה 70vh (נקבע לפי גובה, לא רוחב); דסקטופ: במרכז אנכי */}
@@ -70,12 +70,12 @@ export default function FileUploader() {
         <UploadDropCard
           accept={acceptedFileTypes}
           onFile={(file) => setUploadedFile(file)}
-          className="h-full min-h-[min(36vh,320px)] lg:min-h-0"
+          className="w-full max-w-[500px] mx-auto lg:max-w-none lg:h-full"
         />
 
 
         {/* Right Side - File Configuration — מובייל בלבד: רוחב מלא; טאבלט+דסקטופ: כמו דסקטופ (max 319px) */}
-        <div className="rounded-3xl px-2 w-full max-w-full md:max-w-[319px] h-full flex flex-col">
+        <div className="rounded-3xl px-2 w-full max-w-[319px] mx-auto lg:mx-0 lg:max-w-[319px] h-full flex flex-col">
           {/* File Name */}
           <h2 className="text-white text-[40px] leading-[100%] font-bold mb-5">
             {uploadedFile ? uploadedFile.name.toUpperCase() : "YOUR_FILE.STL"}

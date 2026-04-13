@@ -3,24 +3,11 @@ import Button from "../../../components/ui/Button";
 import Turtle from "../../../components/ui/Turtle";
 import MainSectionGlow from "./MainSectionGlow";
 import GlobalSupplierScene from "./GlobalSupplierScene/GlobalSupplierScene";
+import "./MainSection.css";
 
 export default function MainSection() {
   return (
-    <section className="relative w-full min-h-[calc(100svh-72px)] overflow-hidden bg-dark">
-      {/* אנימציה אחידה: עלייה מלמטה למעלה */}
-      <style>{`
-        @keyframes riseUp {
-          from { opacity: 0; transform: translateY(36px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes riseUpTurtle {
-          from { opacity: 0; transform: translate(-50%, 37%) translateY(36px); }
-          to   { opacity: 0.7; transform: translate(-50%, 37%) translateY(0); }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .anim-riseUp { animation: none !important; }
-        }
-      `}</style>
+    <section className="relative w-full min-h-[calc(100svh-var(--nav-h))] overflow-hidden bg-dark">
 
       {/* ===== GLOW BACKGROUND ===== */}
 
@@ -51,13 +38,16 @@ export default function MainSection() {
             font-staatliches font-normal text-white
             text-[clamp(23px,3.2vw,34px)]
             leading-[clamp(27px,3.8vw,40px)]
+            md:text-[clamp(27px,4.2vw,40px)]
+            md:leading-[clamp(32px,4.9vw,46px)]
             tracking-[0.015em]
             px-4 sm:px-8 xl:px-16
           "
         >
           CONNECT YOUR STORE TO{" "}
-          <span className="text-green">3DFLY&apos;S</span> GLOBAL SUPPLIER
-          NETWORK!{" "}
+          <span className="text-green">3DFLY&apos;S</span> GLOBAL{" "}
+          {/* non-breaking space: NETWORK! never wraps alone on the previous line */}
+          SUPPLIER{"\u00A0"}NETWORK!{" "}
           {/* ── gap after NETWORK! on mobile/tablet only ── */}
           <span className="block mt-5 xl:hidden" />
           YOU SELL, WE HANDLE THE REST.

@@ -1,6 +1,5 @@
 import React from "react";
-import { motion, useTransform } from "framer-motion";
-import type { MotionValue } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 type Props = {
   imageSrc: string;
@@ -11,14 +10,17 @@ type Props = {
   iconHeight?: number;
   iconWidthPercent?: number;
   iconPadding?: string;
-  /** Global section scroll progress (0–1) from useScroll */
-  scrollYProgress: MotionValue<number>;
-  /** The [start, end] slice of scrollYProgress that drives this step */
-  progressRange: [number, number];
+  /** true once the section has enough visibility (see HowDoesItWork observer) */
+  reveal: boolean;
+  stepIndex: number;
+  staggerSeconds?: number;
+  durationSeconds?: number;
 };
 
 const TITLE_STYLE = { fontSize: "clamp(28px, 8.5vw, 52px)" };
 const TEXT_STYLE  = { fontSize: "clamp(12px, 3.5vw, 24px)" };
+
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 export default function HowItWorksStepMobile({
   imageSrc,
@@ -29,17 +31,25 @@ export default function HowItWorksStepMobile({
   iconHeight = 180,
   iconWidthPercent = 80,
   iconPadding,
-  scrollYProgress,
-  progressRange,
+  reveal,
+  stepIndex,
+  staggerSeconds = 0.52,
+  durationSeconds = 0.72,
 }: Props) {
-  const p      = useTransform(scrollYProgress, progressRange, [0, 1], { clamp: true });
-  const opacity = p;
-  const scale   = useTransform(p, [0, 1], [0.85, 1]);
-  const filter  = useTransform(p, (v) => `blur(${(1 - v) * 6}px)`);
+  const reduceMotion = useReducedMotion();
+
+  const delay    = reduceMotion ? 0 : stepIndex * staggerSeconds;
+  const duration = reduceMotion ? 0 : durationSeconds;
 
   return (
     <motion.div
-      style={{ opacity, scale, filter }}
+      initial={{ opacity: 0, scale: 0.85, filter: "blur(6px)" }}
+      animate={
+        reveal
+          ? { opacity: 1, scale: 1, filter: "blur(0px)" }
+          : { opacity: 0, scale: 0.85, filter: "blur(6px)" }
+      }
+      transition={{ delay, duration, ease: EASE }}
       className="w-full flex flex-col items-center text-center"
     >
       <div className={`flex justify-center w-full ${iconPadding ? "pr-4" : ""}`}>
