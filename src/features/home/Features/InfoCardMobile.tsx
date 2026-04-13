@@ -71,7 +71,7 @@ export default function InfoCardMobile({
             {title}
           </h3>
 
-          <p
+          <div
             className="uppercase font-bold text-gray m-0 p-0 text-left w-full leading-[1.1]"
             style={{
               fontSize: "clamp(6px, 1.94vw, 11px)",
@@ -82,7 +82,7 @@ export default function InfoCardMobile({
             }}
           >
             {text}
-          </p>
+          </div>
         </div>
 
         {/* אייקון */}
