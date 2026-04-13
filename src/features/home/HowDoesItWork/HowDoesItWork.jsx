@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useScroll, useMotionValue, useMotionValueEvent } from "framer-motion";
 import Button from "../../../components/ui/Button";
 import HowItWorksStep from "./HowItWorksStep";
 import HowDoesItWorkGlow from "./HowDoesItWorkGlow";
@@ -10,52 +9,30 @@ import HowItWorksStepMobile from "./HowItWorksStepMobile";
 // desktop animation delay
 const STEP_DELAY_MS = 450;
 
-// ─── Scroll-progress ranges (mobile) ─────────────────────────────────────────
-// All animations complete by MAX_PROGRESS so the last step is fully revealed
-// while the section is still well inside the viewport (not near-exited).
-const SCROLL_WINDOW = 0.35;
-const MAX_PROGRESS  = 0.65;
-
-function getStepRange(index, total) {
-  const stride = total > 1 ? (MAX_PROGRESS - SCROLL_WINDOW) / (total - 1) : 0;
-  const start  = index * stride;
-  return /** @type {[number, number]} */ ([start, start + SCROLL_WINDOW]);
-}
-
-// Arrow i fades in while step i is completing and step i+1 is starting
-function getArrowRange(arrowIndex, totalSteps) {
-  const stride = totalSteps > 1 ? (MAX_PROGRESS - SCROLL_WINDOW) / (totalSteps - 1) : 0;
-  const start  = arrowIndex * stride + SCROLL_WINDOW * 0.5;
-  return /** @type {[number, number]} */ ([start, start + SCROLL_WINDOW * 0.4]);
-}
-// ─────────────────────────────────────────────────────────────────────────────
+// mobile / tablet: time-based step reveal (not scroll-linked)
+const MOBILE_STEP_STAGGER_S   = 0.52;
+const MOBILE_STEP_DURATION_S  = 0.72;
+const MOBILE_ARROW_DURATION_S = 0.48;
+/** intersectionRatio ≥ this ⇒ start mobile animations (~15% of section visible in viewport) */
+const MOBILE_REVEAL_THRESHOLD = 0.15;
 
 export default function HowDoesItWork() {
   const [inView, setInView] = useState(false); // desktop trigger
+  const [mobileReveal, setMobileReveal] = useState(false); // mobile time-based steps
   const sectionRef = useRef(null);
-
-  // Scroll progress for mobile scroll-driven animation.
-  // offset "end 0.3": progress reaches 1 when section bottom is at 30% viewport height
-  // (before section fully exits), so the last step completes while still in view.
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start 0.9", "end 0.1"],
-  });
-
-  // One-way progress: only ever increases so elements stay revealed on scroll-back
-  const committedProgress = useMotionValue(0);
-  useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    if (latest > committedProgress.get()) {
-      committedProgress.set(latest);
-    }
-  });
 
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
+    const thresholds = [0, 0.05, 0.1, 0.12, 0.15, 0.2, 0.3, 0.5, 0.75, 1];
     const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setInView(true); },
-      { threshold: 0.12 }
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        const r = entry.intersectionRatio;
+        if (r >= 0.12) setInView(true);
+        if (r >= MOBILE_REVEAL_THRESHOLD) setMobileReveal(true);
+      },
+      { threshold: thresholds }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -67,12 +44,12 @@ export default function HowDoesItWork() {
   return (
     <section
       ref={sectionRef}
-      className="px-0 bg-dark overflow-hidden relative min-h-0 lg:min-h-[calc(100vh-72px)] flex flex-col justify-center"
+      className="relative flex w-full min-h-[calc(100dvh-var(--nav-h))] flex-col justify-center overflow-hidden bg-dark px-0 lg:h-full lg:min-h-0"
       style={{ fontFamily: "Montserrat, sans-serif" }}
     >
       <HowDoesItWorkGlow />
 
-      <div className="w-full max-w-[1300px] mx-auto px-4 lg:px-0 py-10 lg:py-16 flex flex-col justify-around min-h-0 lg:min-h-[calc(100vh-72px-104px)] lg:h-full">
+      <div className="mx-auto flex min-h-0 w-full max-w-[1300px] flex-col justify-around px-4 py-10 lg:h-full lg:min-h-0 lg:flex-1 lg:px-0 lg:py-16">
         {/* Title */}
         <h2
           className="flex flex-nowrap justify-evenly lg:justify-center items-baseline gap-1 text-left font-extrabold italic text-gray pt-10 pb-10 lg:flex-initial lg:block lg:text-center lg:pt-0 lg:pb-0"
@@ -107,7 +84,7 @@ export default function HowDoesItWork() {
 
         {/* =========================
             MOBILE + TABLET (< lg)
-            Scroll-driven reveal via Framer Motion
+            Time-based reveal after ~15% of section is visible
             ========================= */}
         <div className="lg:hidden flex flex-col gap-10 w-full mx-auto">
           {steps.map((step, index) => {
@@ -124,8 +101,9 @@ export default function HowDoesItWork() {
                     <IconArrowAnimated
                       direction="left"
                       className="w-10 h-7"
-                      scrollYProgress={committedProgress}
-                      progressRange={getArrowRange(index, N)}
+                      reveal={mobileReveal}
+                      transitionDelay={(index + 0.5) * MOBILE_STEP_STAGGER_S}
+                      duration={MOBILE_ARROW_DURATION_S}
                     />
                   </div>
                 )}
@@ -140,8 +118,10 @@ export default function HowDoesItWork() {
                     iconHeight={step.iconHeight}
                     iconWidthPercent={step.iconWidthPercent}
                     iconPadding={step.iconPadding}
-                    scrollYProgress={committedProgress}
-                    progressRange={getStepRange(index, N)}
+                    reveal={mobileReveal}
+                    stepIndex={index}
+                    staggerSeconds={MOBILE_STEP_STAGGER_S}
+                    durationSeconds={MOBILE_STEP_DURATION_S}
                   />
                 </div>
 
@@ -150,8 +130,9 @@ export default function HowDoesItWork() {
                     <IconArrowAnimated
                       direction="right"
                       className="w-10 h-7"
-                      scrollYProgress={committedProgress}
-                      progressRange={getArrowRange(index, N)}
+                      reveal={mobileReveal}
+                      transitionDelay={(index + 0.5) * MOBILE_STEP_STAGGER_S}
+                      duration={MOBILE_ARROW_DURATION_S}
                     />
                   </div>
                 )}

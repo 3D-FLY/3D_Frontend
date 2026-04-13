@@ -36,6 +36,8 @@ export type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
    * "password" and "text".
    */
   password?: boolean;
+  /** Rendered inside the field row (e.g. info icon); use `max-md:` / `md:hidden` in parent to scope to mobile */
+  endAccessory?: React.ReactNode;
   /** Extra className applied to the outer wrapper div */
   wrapperClassName?: string;
 };
@@ -59,6 +61,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     type,
     className = "",
     wrapperClassName = "",
+    endAccessory,
     ...props
   },
   ref,
@@ -80,51 +83,68 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         </label>
       )}
 
-      <div className="relative pl-5">
-        <input
-          id={id}
-          ref={ref}
-          type={resolvedType}
+      <div className="flex flex-col gap-0.5 pl-5">
+        <div className="relative">
+          <input
+            id={id}
+            ref={ref}
+            type={resolvedType}
+            className={[
+              "w-full py-2 ",
+              "bg-[rgba(33,33,33,0.9)]",
+              "text-[#dfdfdf] font-medium tracking-widest",
+              "placeholder:text-gray placeholder:uppercase placeholder:tracking-widest",
+              "rounded-[18px] px-2",
+              "border border-transparent",
+              "outline-none transition-[border-color] duration-200",
+              "[&:-webkit-autofill]:![box-shadow:0_0_0_1000px_#212121_inset]",
+              "[&:-webkit-autofill]:![-webkit-text-fill-color:#dfdfdf]",
+              "[&:-webkit-autofill]:!border-transparent",
+              error
+                ? "border-rose-400 focus:border-rose-400/45"
+                : "focus:border-gray/50 focus-visible:border-gray/50",
+              isPassword
+              ? endAccessory
+                ? "pr-12 max-md:pr-[4.25rem]"
+                : "pr-12"
+              : "",
+              className,
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            {...props}
+          />
+
+          {isPassword && endAccessory && (
+            <div className="pointer-events-auto absolute right-[2.65rem] top-1/2 z-[1] flex -translate-y-1/2 items-center max-md:flex md:hidden">
+              {endAccessory}
+            </div>
+          )}
+
+          {isPassword && (
+            <button
+              type="button"
+              onClick={() => setVisible((v) => !v)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-[#959595] transition-colors hover:text-white"
+              tabIndex={-1}
+              aria-label={visible ? "Hide password" : "Show password"}
+            >
+              {visible ? <EyeVisibleIcon /> : <EyeHiddenIcon />}
+            </button>
+          )}
+        </div>
+
+        <p
           className={[
-            "w-full py-2 ",
-            "bg-[rgba(33,33,33,0.9)]",
-            "text-[#dfdfdf] font-medium tracking-widest",
-            "placeholder:text-gray placeholder:uppercase placeholder:tracking-widest",
-            "rounded-[18px] px-2",
-            "border border-transparent",
-            "outline-none transition-colors duration-200",
-            "[&:-webkit-autofill]:![box-shadow:0_0_0_1000px_#212121_inset]",
-            "[&:-webkit-autofill]:![-webkit-text-fill-color:#dfdfdf]",
-            "[&:-webkit-autofill]:!border-transparent",
-            error
-              ? "border-red-500/30"
-              : "focus:border-white/20",
-            isPassword ? "pr-12" : "",
-            className,
-          ]
-            .filter(Boolean)
-            .join(" ")}
-          {...props}
-        />
-
-        {isPassword && (
-          <button
-            type="button"
-            onClick={() => setVisible((v) => !v)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-[#959595] hover:text-white transition-colors cursor-pointer"
-            tabIndex={-1}
-            aria-label={visible ? "Hide password" : "Show password"}
-          >
-            {visible ? <EyeVisibleIcon /> : <EyeHiddenIcon />}
-          </button>
-        )}
-      </div>
-
-      {error && (
-        <p className="text-red-400 text-[10px] uppercase tracking-wide leading-tight">
-          {error}
+            "min-h-[14px] text-[10px] uppercase tracking-wide leading-tight",
+            error ? "text-rose-400" : "text-transparent",
+          ].join(" ")}
+          aria-live={error ? "polite" : undefined}
+          {...(!error ? { "aria-hidden": true as const } : {})}
+        >
+          {error ? error : "\u00a0"}
         </p>
-      )}
+      </div>
     </div>
   );
 });

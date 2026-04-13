@@ -1,5 +1,5 @@
 import React from "react";
-import { motion, useTransform } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 const ARROW_PATHS = {
   right:
@@ -8,21 +8,23 @@ const ARROW_PATHS = {
 };
 
 const FILL_COLOR = "#DADADA";
+const EASE = [0.22, 1, 0.36, 1];
 
 /**
- * חץ מלא — מתגלה בהדרגה לפי scroll progress.
+ * חץ מלא — נחשף לפי זמן אחרי שהסקשן נכנס למספיק visibility (מנהל ההורה).
  *
  * @param {"left"|"right"} direction
- * @param {import("framer-motion").MotionValue<number>} scrollYProgress
- * @param {[number, number]} progressRange  — [start, end] slice of scrollYProgress for this arrow
  */
 export default function IconArrowAnimated({
   direction = "right",
   className = "",
-  scrollYProgress,
-  progressRange,
+  reveal = false,
+  transitionDelay = 0,
+  duration = 0.48,
 }) {
-  const opacity = useTransform(scrollYProgress, progressRange, [0, 1], { clamp: true });
+  const reduceMotion = useReducedMotion();
+  const delay = reduceMotion ? 0 : transitionDelay;
+  const dur = reduceMotion ? 0 : duration;
   const d = ARROW_PATHS[direction] ?? ARROW_PATHS.right;
 
   return (
@@ -34,7 +36,9 @@ export default function IconArrowAnimated({
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden
       className={className}
-      style={{ opacity }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: reveal ? 1 : 0 }}
+      transition={{ delay, duration: dur, ease: EASE }}
     >
       <path d={d} fill={FILL_COLOR} />
     </motion.svg>

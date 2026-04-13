@@ -127,18 +127,27 @@ export default function Footer() {
       </div>
 
       {/* ================== DESKTOP ================== */}
-      <div className="hidden md:flex flex-col relative h-[40dvh] min-h-[300px]">
+      <div className="hidden md:flex flex-col relative h-[20dvh] md:min-h-[300px] lg:h-[40dvh]">
 
-        {/* Turtle centered background */}
-        <Turtle
-          bottom="0%"
-          left="50%"
-          translateX="-50%"
-          translateY="28%"
-          opacity={0.3}
-          zIndex={0}
-          className="absolute bottom-0 w-[40vw] max-w-[650px]"
-        />
+        {/* Turtle centered background — עיגול הארה בדיוק מאחור, רוחב שליש מרוחב הצב */}
+        <div
+          className="pointer-events-none absolute bottom-0 left-1/2 z-0 "
+          style={{ height: "120%",
+            aspectRatio: "2475 / 1683.7",
+            transform: "translate(-50%, 30%)" }}
+        >
+          <div
+            aria-hidden
+            className="absolute left-1/2 top-1/2 z-0 aspect-square rounded-full bg-[#8f8f8f]"
+            style={{
+              width: "33.333%",
+              opacity: 0.46,
+              filter: "blur(600px)",
+              transform: "translate(-50%, -50%)",
+            }}
+          />
+          <Turtle icon className="relative z-10 w-full h-auto opacity-30" />
+        </div>
 
         {/* CONTENT */}
         <div className="relative z-10 w-full flex-1 flex items-center px-[5%] xl:px-[15%]">

@@ -54,31 +54,6 @@
   background: rgba(90, 196, 34, 0.12);
 }
 
-.partner-map-counter-block {
-  text-align: center;
-}
-
-.partner-map-counter {
-  margin: 0;
-  font-size: clamp(2.5rem, 10vw, 4.75rem);
-  font-weight: 800;
-  line-height: 1;
-  color: #5ac422;
-  font-family: system-ui, "Segoe UI", sans-serif;
-  font-style: italic;
-  letter-spacing: 0.02em;
-}
-
-.partner-map-counter-label {
-  margin: 0.5rem 0 0;
-  font-size: clamp(0.7rem, 2vw, 0.95rem);
-  letter-spacing: 0.2em;
-  font-weight: 700;
-  font-style: italic;
-  color: #dbdada;
-  text-transform: uppercase;
-}
-
 .partner-map-bottom {
   --pm-border: #1a3320;
   --pm-green: #5ac422;

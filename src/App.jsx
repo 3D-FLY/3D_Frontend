@@ -16,8 +16,12 @@ import FAQ from "./pages/FAQ";
 import Store from "./pages/Store";
 import Blog from "./pages/Blog";
 import STLPricing from "./pages/STLPricing";
+import JoinAsPartnerPage from "./pages/JoinAsPartnerPage.jsx";
 import RegistrationForm from "./features/auth/RegistrationForm.tsx";
 import LoginForm from "./features/auth/LoginForm.tsx";
+import ScrollToTop from "./components/ui/ScrollToTop.tsx";
+import SellerDashboard from "./pages/SellerDashboard.tsx";
+import AdminDashboard from "./pages/AdminDashboard.tsx";
 
 const PartnerMapPage = lazy(() => import("./pages/PartnerMapPage.jsx"));
 const PartnerLocationsPage = lazy(() =>
@@ -54,7 +58,12 @@ function MainLayout() {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
+        {/* Dashboard routes — no landing Navbar/Footer */}
+        <Route path="/dashboard/seller/*" element={<SellerDashboard />} />
+        <Route path="/dashboard/admin/*" element={<AdminDashboard />} />
+
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
@@ -63,6 +72,7 @@ function App() {
           <Route path="/store" element={<Store />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/stl-pricing" element={<STLPricing />} />
+          <Route path="/join-as-partner" element={<JoinAsPartnerPage />} />
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/login" element={<LoginForm />} />
           <Route element={<PartnerLocationsLayout />}>

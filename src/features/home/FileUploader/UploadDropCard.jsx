@@ -3,9 +3,9 @@ import UploadFile from "./icons/UploadFile";
 
 export default function UploadDropCard({ accept, onFile, className = "" }) {
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative lg:h-full ${className}`}>
       <div
-        className="h-full min-h-[min(36vh,320px)] lg:min-h-0 bg-dark rounded-3xl w-full text-center flex flex-col items-center transition-colors relative overflow-hidden"
+        className="aspect-[4/3] lg:aspect-auto lg:h-full bg-dark rounded-3xl w-full text-center flex flex-col items-center transition-colors relative overflow-hidden"
         style={{
           background:
             "radial-gradient(circle at center, #353535 10%, #222222 70%, #1a1a1a 100%)",

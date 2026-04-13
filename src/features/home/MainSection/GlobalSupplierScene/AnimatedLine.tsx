@@ -27,8 +27,8 @@ export default function AnimatedLine({
   // ease: "linear" keeps the reveal speed constant so the line visually
   // reaches its pin at exactly t = delay + duration (before the pin drops).
   const common = {
-    initial:    { clipPath: "inset(0 0 100% 0)" as const },
-    animate:    { clipPath: "inset(0 0 0% 0)"   as const },
+    initial:    { clipPath: "inset(0 0 100% 0)", opacity: 0 },  // ← הוסיפי opacity: 0
+    animate:    { clipPath: "inset(0 0 0% 0)",   opacity: 1 },
     transition: { delay, duration, ease: "linear" as const },
     className,
   };

@@ -41,11 +41,10 @@ export default function Features() {
     <section
       ref={triggerRef}
       className="
-        flex flex-col relative text-center items-center
-        w-full max-w-full min-w-0
-        min-h-0 lg:min-h-[calc(100vh-72px)] lg:justify-center
-        overflow-hidden
-        bg-gray
+        relative flex flex-col items-center text-center
+        w-full max-w-full min-w-0 min-h-0
+        overflow-hidden bg-gray
+        lg:min-h-[calc(100dvh-var(--nav-h))] lg:justify-center
       "
       style={{ fontFamily: "Montserrat, sans-serif" }}
     >

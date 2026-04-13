@@ -23,6 +23,11 @@
   }
 }
 
+/* גובה נבר ל־hero sections (Home וכו') */
+:root {
+  --nav-h: 72px;
+}
+
 /* כללים בסיסיים */
 * {
   box-sizing: border-box;
