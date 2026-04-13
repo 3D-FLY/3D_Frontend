@@ -1,28 +1,31 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PrintFarmImage from "./assets/images/PrintFarm3D-Fly2.png";
 import Button from "../../components/ui/Button";
 import GlowCircle from "../../components/ui/GlowCircle";
 
 export default function PrintFarmSection() {
   const sectionRef = useRef<HTMLElement | null>(null);
+  const [innerHeight, setInnerHeight] = useState<number | null>(null);
 
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
 
-    const setHeight = () => {
-      // Only apply fixed px height on mobile/tablet (below 2xl = 1536px)
+    const applyHeight = () => {
+      const h = window.innerHeight;
       if (window.innerWidth < 1536) {
-        el.style.height = `${Math.round(window.innerHeight * 0.9)}px`;
+        el.style.height = `${Math.round(h * 0.9)}px`;
+        setInnerHeight(h);
       } else {
         el.style.height = "";
+        setInnerHeight(null);
       }
     };
 
-    setHeight();
+    applyHeight();
 
     // Update only on orientation change — never on scroll (toolbar show/hide)
-    const onOrientationChange = () => setTimeout(setHeight, 150);
+    const onOrientationChange = () => setTimeout(applyHeight, 150);
     window.addEventListener("orientationchange", onOrientationChange);
     return () => window.removeEventListener("orientationchange", onOrientationChange);
   }, []);
@@ -49,7 +52,7 @@ export default function PrintFarmSection() {
         {/* כרטיס תוכן (~50%) + חפיפה (svh — לא אחוז margin, שב־CSS יחסי לרוחב) */}
         <div
           className="relative z-10 flex h-[50%] min-h-0 shrink-0 flex-col items-center justify-between rounded-tr-[60px] bg-dark px-6 pt-8 pb-3"
-          style={{ marginTop: `${Math.round(window.innerHeight * -0.05)}px` }}
+          style={{ marginTop: innerHeight ? `${Math.round(innerHeight * -0.05)}px` : "-5svh" }}
         >
           {/* כותרת */}
           <h3 className="text-gray italic font-extrabold leading-tight text-left m-0 text-[clamp(38px,11vw,60px)]">
