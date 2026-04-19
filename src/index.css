@@ -1,5 +1,6 @@
 /* ייבוא פונטים מ-Google Fonts */
 @import "tailwindcss";
+@config "../tailwind.config.js";
 
 @theme {
   --color-dark: #222222;
@@ -65,4 +66,18 @@ h1, h2, h3, h4, h5, h6 {
 footer h3,
 footer a {
   font-family: inherit;
+}
+
+/* הסתרת פס גלילה מובנה — משתמשים בפס מותאם ב־ScrollableContent */
+@layer components {
+  .scrollbar-native-hidden {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-native-hidden::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
 }

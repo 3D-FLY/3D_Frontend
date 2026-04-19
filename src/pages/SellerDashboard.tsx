@@ -39,6 +39,11 @@ const notifications = [
   "#3008 - Order delivered",
   "#3007 - Order delivered",
   "#3005 - New order received",
+  "#3012 - Supplier rejected order",
+  "#3010 - Shipping delay",
+  "#3008 - Order delivered",
+  "#3007 - Order delivered",
+  "#3005 - New order received",
 ];
 
 export default function SellerDashboard() {
@@ -46,7 +51,7 @@ export default function SellerDashboard() {
     <DashboardLayout role="seller">
       <div className="w-full space-y-6 box-border">
         {/* Welcome */}
-        <h1 className="text-2xl font-bold text-white">Welcome, Raz</h1>
+        <h1 className="text-[clamp(22px,2.5vw,32px)] font-semibold text-white">Welcome, Raz</h1>
 
         {/* Analytics */}
         <DashboardCard title="Analytics">

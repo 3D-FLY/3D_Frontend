@@ -1,5 +1,5 @@
 import Background from "../components/ui/Background.jsx";
-import SectionTitle from "../components/ui/sectionTitle/SectionTitle.js";
+import SectionTitle from "../components/ui/SectionTitle.js";
 
 /** עמוד יעד ל־"Join as a partner" — ניתן להרחיב בתוכן טפסים / מידע. */
 export default function JoinAsPartnerPage() {
