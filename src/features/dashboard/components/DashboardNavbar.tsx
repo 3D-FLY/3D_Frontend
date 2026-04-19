@@ -1,4 +1,4 @@
-import LogoSvg from "../../../../assets/icons/logo.svg?react";
+import LogoSvg from "../../../assets/icons/logo.svg?react";
 
 function GlobalIcon() {
   return (

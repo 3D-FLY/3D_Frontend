@@ -1,4 +1,4 @@
-import HamburgerSvg from "../../../assets/icons/HamburgerMenu.svg?react";
+import HamburgerSvg from "../assets/icons/HamburgerMenu.svg?react";
 
 /**
  * אייקון תפריט ניווט (המבורגר) — לשימוש בנבבר במובייל/טאבלט.
