@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import Button from "../../../components/ui/Button";
 import HowItWorksStep from "./HowItWorksStep";
-import HowDoesItWorkGlow from "./HowDoesItWorkGlow";
-import IconArrowAnimated from "./icons/arrows/IconArrowAnimated.jsx";
-import { howDoesItWorkSteps } from "./howDoesItWorkData";
+import HowDoesItWorkGlow from "./HowItWorksGlow";
+import IconArrowAnimated from "./icons/IconArrowAnimated.jsx";
+import { howDoesItWorkSteps } from "./howItWorksData";
 import HowItWorksStepMobile from "./HowItWorksStepMobile";
 
 // desktop animation delay

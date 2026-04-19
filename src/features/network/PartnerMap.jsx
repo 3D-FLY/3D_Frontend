@@ -8,7 +8,7 @@ import {
   ZoomableGroup,
   useZoomPanContext,
 } from "react-simple-maps";
-import SectionTitle from "../../components/ui/sectionTitle/SectionTitle.js";
+import SectionTitle from "../../components/ui/SectionTitle.js";
 import Button from "../../components/ui/Button.jsx";
 import AmbientGlowBackdrop from "../../components/ui/AmbientGlowBackdrop.jsx";
 import Turtle from "../../components/ui/Turtle.jsx";

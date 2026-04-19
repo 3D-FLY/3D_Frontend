@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import Button from "../../components/ui/Button";
-import Turtle from "../../components/ui/Turtle";
-import ShellsStepper from "./FileUploader/ShellsStepper";
-import FieldLabel from "./FileUploader/FieldLabel";
-import OptionGroup from "./FileUploader/OptionGroup";
-import LabeledSlider from "./FileUploader/LabeledSlider";
-import UploadDropCard from "./FileUploader/UploadDropCard";
+import Button from "../../../components/ui/Button";
+import Turtle from "../../../components/ui/Turtle";
+import ShellsStepper from "./ShellsStepper";
+import FieldLabel from "./FieldLabel";
+import OptionGroup from "./OptionGroup";
+import LabeledSlider from "./LabeledSlider";
+import UploadDropCard from "./UploadDropCard";
 
 export default function FileUploader() {
   const [uploadedFile, setUploadedFile] = useState(null);

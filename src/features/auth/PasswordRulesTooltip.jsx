@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
-import IconTooltipBubble from "../../../components/ui/input/IconTooltipBubble.jsx";
-import Turtle from "../../../components/ui/Turtle.jsx";
+import IconTooltipBubble from "../../components/ui/IconTooltipBubble.jsx";
+import Turtle from "../../components/ui/Turtle.jsx";
 
 /**
  * Floating tooltip that shows password requirements.

@@ -1,4 +1,4 @@
-import XSvg from "../../../assets/icons/X.svg?react";
+import XSvg from "../assets/icons/X.svg?react";
 
 /**
  * אייקון סגירה (X) — לשימוש בכפתור סגירת תפריט/פופאפ במובייל.

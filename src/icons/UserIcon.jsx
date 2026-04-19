@@ -1,4 +1,4 @@
-import userUrl from "../../../assets/icons/user.svg?url";
+import userUrl from "../assets/icons/user.svg?url";
 
 /**
  * Reusable user / profile icon.

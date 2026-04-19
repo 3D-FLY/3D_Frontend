@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import Button from "../ui/Button";
 import Turtle from "../ui/Turtle";
-import UserIcon from "./icons/UserIcon";
-import IconNavMenu from "./icons/IconNavMenu";
-import IconClose from "./icons/IconClose";
+import UserIcon from "../../icons/UserIcon";
+import IconNavMenu from "../../icons/IconNavMenu";
+import IconClose from "../../icons/IconClose";
 
 const navItems = [
   { label: "Home", to: "/" },

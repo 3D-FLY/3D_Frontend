@@ -1,7 +1,7 @@
 import React from "react";
-import PrintFarmImage from "./assets/images/PrintFarm3D-Fly2.png";
-import Button from "../../components/ui/Button";
-import GlowCircle from "../../components/ui/GlowCircle";
+import PrintFarmImage from "../assets/images/PrintFarm3D-Fly2.png";
+import Button from "../../../components/ui/Button";
+import GlowCircle from "../../../components/ui/GlowCircle";
 
 export default function PrintFarmSection() {
   return (

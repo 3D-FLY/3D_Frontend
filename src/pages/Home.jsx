@@ -2,10 +2,10 @@ import React, { lazy, Suspense } from "react";
 import MainSection from "../features/home/MainSection/MainSection";
 
 const Features = lazy(() => import("../features/home/Features/Features"));
-const HowDoesItWork = lazy(() => import("../features/home/HowDoesItWork/HowDoesItWork"));
-const FileUploader = lazy(() => import("../features/home/FileUploader"));
-const PrintFarmSection = lazy(() => import("../features/home/PrintFarmSection"));
-const WhatCanYouSell = lazy(() => import("../features/home/Photo-carousel/WhatCanYouSell"));
+const HowDoesItWork = lazy(() => import("../features/home/HowItWorks/HowItWorks"));
+const FileUploader = lazy(() => import("../features/home/FileUploader/FileUploader"));
+const PrintFarmSection = lazy(() => import("../features/home/PrintFarmSection/PrintFarmSection"));
+const WhatCanYouSell = lazy(() => import("../features/home/WhatCanYouSell/WhatCanYouSell"));
 
 export default function Home() {
   return (

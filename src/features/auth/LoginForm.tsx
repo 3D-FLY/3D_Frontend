@@ -3,13 +3,13 @@ import { Link } from "react-router-dom";
 import "./registration-form.css";
 // @ts-expect-error js module
 import IconGoogle from "./icons/IconGoogle.jsx";
-import IconTitleUnderline from "../../components/ui/sectionTitle/IconTitleUnderline.js";
-import Input from "../../components/ui/input/Input.js";
+import IconTitleUnderline from "../../components/ui/IconTitleUnderline.js";
+import Input from "../../components/ui/Input.js";
 import Button from "../../components/ui/Button.jsx";
 import Turtle from "../../components/ui/Turtle.jsx";
 // @ts-expect-error js module
 import AmbientGlowBackdrop from "../../components/ui/AmbientGlowBackdrop.jsx";
-import SectionTitle from "../../components/ui/sectionTitle/SectionTitle.js";
+import SectionTitle from "../../components/ui/SectionTitle.js";
 
 type FormState = {
   usernameOrEmail: string;
