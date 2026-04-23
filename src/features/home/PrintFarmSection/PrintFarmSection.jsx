@@ -6,8 +6,7 @@ import GlowCircle from "../../../components/ui/GlowCircle";
 export default function PrintFarmSection() {
   return (
     <section
-      className="relative w-full overflow-hidden min-h-0 2xl:h-auto 2xl:min-h-[calc(100dvh-var(--nav-h))]"
-      style={{ height: "90svh" }}
+      className="relative h-[90svh] w-full overflow-hidden min-h-0 2xl:h-auto 2xl:min-h-[calc(100dvh-var(--nav-h))]"
     >
 
       {/* ========== MOBILE + TABLET (עד מסכים רחבים — כולל אייפדים בכל הכיוונים) ========== */}

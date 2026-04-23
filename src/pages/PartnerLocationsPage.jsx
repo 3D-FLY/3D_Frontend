@@ -1,24 +1,46 @@
 import { useCallback, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import AmbientGlowBackdrop from "../components/ui/AmbientGlowBackdrop.jsx";
-import Turtle from "../components/ui/Turtle.jsx";
+import Button from "../components/ui/Button.jsx";
+import Input from "../components/ui/Input.tsx";
+import SectionTitle from "../components/ui/SectionTitle.tsx";
 import { usePartnerLocations } from "../features/network/PartnerLocationsContext.jsx";
-import "../features/auth/registration-form.css";
-import "../features/network/partner-map.css";
+
 
 export default function PartnerLocationsPage() {
   const { partners, addPartner, removePartner } = usePartnerLocations();
   const navigate = useNavigate();
-  const [addressInput, setAddressInput] = useState("");
+  const [addressFields, setAddressFields] = useState({
+    country: "",
+    region: "",
+    city: "",
+    street: "",
+    houseNumber: "",
+    postalCode: "",
+  });
   const [geocodeLoading, setGeocodeLoading] = useState(false);
   const [geocodeError, setGeocodeError] = useState("");
 
   const partnerCount = partners.length;
 
+  const setAddressField = useCallback((field, value) => {
+    setAddressFields((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
   const handleGeocode = useCallback(async () => {
-    const q = addressInput.trim();
+    const q = [
+      `${addressFields.street} ${addressFields.houseNumber}`.trim(),
+      addressFields.city,
+      addressFields.region,
+      addressFields.postalCode,
+      addressFields.country,
+    ]
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .join(", ");
+
     if (!q) {
-      setGeocodeError("Enter an address or place name.");
+      setGeocodeError("Enter at least one location field.");
       return;
     }
     setGeocodeError("");
@@ -56,7 +78,14 @@ export default function PartnerLocationsPage() {
           : `p-${Date.now()}`;
       const partner = { id, name, lat, lng };
       addPartner(partner);
-      setAddressInput("");
+      setAddressFields({
+        country: "",
+        region: "",
+        city: "",
+        street: "",
+        houseNumber: "",
+        postalCode: "",
+      });
       navigate("/partner-map", {
         state: { mapFocus: { lng: partner.lng, lat: partner.lat } },
       });
@@ -68,94 +97,141 @@ export default function PartnerLocationsPage() {
     } finally {
       setGeocodeLoading(false);
     }
-  }, [addressInput, addPartner, navigate]);
+  }, [addressFields, addPartner, navigate]);
 
   return (
-    <div className="partner-map-page relative flex min-h-0 w-full flex-1 flex-col items-center overflow-x-hidden overflow-y-auto bg-dark">
+    <div className="relative flex min-h-0 w-full flex-1 flex-col items-center overflow-x-hidden overflow-y-auto bg-dark">
       <AmbientGlowBackdrop />
-      <Turtle
-        bottom="0"
-        left="50%"
-        height="50vh"
-        translateX="-50%"
-        translateY="0"
-        opacity={0.1}
-        zIndex={0}
-      />
 
-      <div className="reg-form-content-in partner-map-content relative z-10 flex w-full max-w-[1440px] flex-col items-center gap-8 px-6 py-8 pb-16">
-        <div className="flex w-full max-w-[720px] flex-col gap-4">
-          <Link
-            to="/partner-map"
-            className="font-mono text-sm font-bold tracking-wide text-[#5AC422] underline-offset-4 hover:underline"
-          >
-            ← Back to map
-          </Link>
-          <h2 className="text-center font-mono text-xl font-bold uppercase tracking-tight text-[#DBDADA]">
-            Add &amp; manage locations
-          </h2>
+      <div className="relative z-10 flex w-full max-w-[1440px] flex-col items-center gap-8 px-6 py-8 pb-16">
+        <div className="flex w-full flex-col gap-4">
+          
+          <SectionTitle className="w-full">Add &amp; manage locations</SectionTitle>
           <p className="text-center font-mono text-xs text-[#9ca3af]">
             New locations appear on the map immediately. Open the map to see
             them.
           </p>
         </div>
 
-        <div className="partner-map-bottom w-full max-w-[720px] font-mono">
-          <div className="partner-map-geocode">
-            <label htmlFor="partner-locations-address">
-              Add location (Nominatim)
-            </label>
-            <div className="partner-map-geocode-row flex flex-col gap-2 sm:flex-row">
-              <input
-                id="partner-locations-address"
-                className="partner-map-input sm:min-w-0 sm:flex-1"
-                type="text"
-                value={addressInput}
-                placeholder="City, street, or coordinates…"
-                onChange={(e) => setAddressInput(e.target.value)}
+        <div className="w-full max-w-[720px]">
+          <div className="flex flex-col gap-3">
+            <p className="text-center text-white font-semibold uppercase tracking-wide py-4">
+              Add location
+            </p>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <Input
+                label="Country"
+                value={addressFields.country}
+                placeholder="Country"
+                autoComplete="country-name"
+                onChange={(e) => setAddressField("country", e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") void handleGeocode();
                 }}
-                autoComplete="off"
+                wrapperClassName="sm:col-span-2"
               />
-              <button
+              <Input
+                label="Region / State"
+                value={addressFields.region}
+                placeholder="State / Region"
+                autoComplete="address-level1"
+                onChange={(e) => setAddressField("region", e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void handleGeocode();
+                }}
+              />
+              <Input
+                label="City"
+                value={addressFields.city}
+                placeholder="City"
+                autoComplete="address-level2"
+                onChange={(e) => setAddressField("city", e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void handleGeocode();
+                }}
+              />
+              <Input
+                label="Street"
+                value={addressFields.street}
+                placeholder="Street"
+                autoComplete="street-address"
+                onChange={(e) => setAddressField("street", e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void handleGeocode();
+                }}
+              />
+              <Input
+                label="House Number"
+                value={addressFields.houseNumber}
+                placeholder="House number"
+                autoComplete="address-line2"
+                onChange={(e) => setAddressField("houseNumber", e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void handleGeocode();
+                }}
+              />
+              <Input
+                label="Postal Code"
+                value={addressFields.postalCode}
+                placeholder="Postal code (optional)"
+                autoComplete="postal-code"
+                onChange={(e) => setAddressField("postalCode", e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void handleGeocode();
+                }}
+                wrapperClassName="sm:col-span-2"
+              />
+            </div>
+            <div className="mt-3 flex justify-center sm:justify-start">
+              <Button
                 type="button"
-                className="partner-map-btn sm:mt-0 sm:w-auto sm:shrink-0 sm:px-6"
+                variant="primary"
+                hovering="darkBg"
+                size="md"
+                className="min-w-[170px] px-8 py-2 text-sm font-extrabold italic"
                 disabled={geocodeLoading}
                 onClick={() => void handleGeocode()}
               >
-                {geocodeLoading ? "Searching…" : "Geocode & add"}
-              </button>
+                {geocodeLoading ? "Searching..." : "Geocode & add"}
+              </Button>
             </div>
             {geocodeError ? (
-              <p className="partner-map-geocode-msg" role="alert">
+              <p className="mt-1 text-center text-sm text-rose-400 sm:text-left" role="alert">
                 {geocodeError}
               </p>
             ) : null}
           </div>
 
-          <div className="partner-map-list-header">
+          <div className="pt-4 text-xs font-bold uppercase tracking-[0.15em] text-[#3d7a18]">
             Partners ({partnerCount})
           </div>
-          <p className="partner-map-list-hint">
+          <p className="mb-2 text-[10px] uppercase tracking-[0.18em] text-[rgba(90,196,34,0.55)]">
             Remove partners from the list only — not on the map. Use &quot;Show on
             map&quot; to focus the map.
           </p>
-          <ul className="partner-map-list" aria-label="Partner locations">
+          <ul
+            className="max-h-[min(40vh,420px)] overflow-y-auto border border-[#1a3320] bg-[rgba(5,10,7,0.35)]"
+            aria-label="Partner locations"
+          >
             {partners.map((p) => (
-              <li key={p.id} className="partner-map-list__row">
-                <div className="partner-map-list__item partner-map-list__item--static flex-1 cursor-default">
-                  <span className="partner-map-list__body">
-                    <span className="partner-map-list__name">{p.name}</span>
-                    <span className="partner-map-list__coords">
+              <li
+                key={p.id}
+                className="flex items-stretch border-b border-[rgba(26,51,32,0.6)] last:border-b-0 hover:bg-[rgba(90,196,34,0.06)]"
+              >
+                <div className="flex flex-1 items-start gap-2 px-4 py-3">
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-bold tracking-[0.02em] text-[#e8f5e8]">{p.name}</span>
+                    <span className="mt-1 block text-xs text-[#3d7a18]">
                       {p.lat.toFixed(4)}°, {p.lng.toFixed(4)}°
                     </span>
                   </span>
                 </div>
-                <div className="partner-map-list__row-actions">
-                  <button
+                <div className="flex items-stretch gap-1 p-1">
+                  <Button
                     type="button"
-                    className="partner-map-btn self-center px-3 py-1 text-xs"
+                    size="sm"
+                    variant="outline"
+                    className="self-center px-3 py-1 text-xs"
                     onClick={() =>
                       navigate("/partner-map", {
                         state: { mapFocus: { lng: p.lng, lat: p.lat } },
@@ -163,10 +239,10 @@ export default function PartnerLocationsPage() {
                     }
                   >
                     Show on map
-                  </button>
+                  </Button>
                   <button
                     type="button"
-                    className="partner-map-list__remove"
+                    className="w-9 min-h-11 border-l border-[#1a3320] bg-[rgba(5,10,7,0.6)] text-[#5ac422] transition-colors hover:border-[#5a2222] hover:bg-[rgba(90,34,34,0.2)] hover:text-[#ff6b6b]"
                     aria-label={`Remove ${p.name}`}
                     onClick={() => removePartner(p.id)}
                   >

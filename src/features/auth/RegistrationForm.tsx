@@ -50,6 +50,8 @@ const INITIAL_FORM: FormState = {
   confirmPassword: "",
 };
 
+const compactInputClass = "py-1.5 text-sm";
+
 export default function RegistrationForm() {
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [tooltipVisible, setTooltipVisible] = useState(false);
@@ -111,7 +113,7 @@ export default function RegistrationForm() {
     
 
       {/* Main content container — enter animation in registration-form.css */}
-      <div className="reg-form-content-in relative z-10 flex flex-col items-center justify-start gap-6 w-full max-w-[850px] h-full my-18 px-6 py-8">
+      <div className="reg-form-content-in relative z-10 flex flex-col items-center justify-start gap-4 w-full max-w-[850px] h-full my-18 px-6 py-8">
         {/* Title + underline */}
         <SectionTitle className="w-full mb-7">SIGN UP</SectionTitle>
 
@@ -120,7 +122,7 @@ export default function RegistrationForm() {
 
         {/* OR separator */}
         <div className="flex items-center justify-center py-0.5">
-          <span className="text-[#DBDADA] text-[clamp(1.2rem,4vw,2rem)] font-semibold italic tracking-widest">
+          <span className="text-[#DBDADA] text-[clamp(0.9rem,2.4vw,1.2rem)] font-semibold italic tracking-widest">
             OR
           </span>
         </div>
@@ -129,10 +131,10 @@ export default function RegistrationForm() {
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="flex flex-col w-full max-w-[450px]"
+          className="flex flex-col w-full max-w-[380px]"
         >
           {/* Inputs group */}
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-1.5">
             <Input
               label="Username"
               placeholder="Choose a username"
@@ -140,6 +142,7 @@ export default function RegistrationForm() {
               onChange={setField("username")}
               error={errors.username}
               autoComplete="username"
+              className={compactInputClass}
             />
 
             <Input
@@ -150,6 +153,7 @@ export default function RegistrationForm() {
               onChange={setField("email")}
               error={errors.email}
               autoComplete="email"
+              className={compactInputClass}
             />
 
             <div className="relative overflow-visible">
@@ -161,6 +165,7 @@ export default function RegistrationForm() {
                 onChange={setField("password")}
                 error={errors.password}
                 autoComplete="new-password"
+                className={compactInputClass}
                 endAccessory={
                   <div
                     className="flex items-center"
@@ -212,6 +217,7 @@ export default function RegistrationForm() {
               onChange={setField("confirmPassword")}
               error={errors.confirmPassword}
               autoComplete="new-password"
+              className={compactInputClass}
             />
           </div>
 
