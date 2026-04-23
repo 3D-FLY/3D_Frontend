@@ -10,12 +10,12 @@ export default function SectionTitle({
   variant?: "tall" | "flat";
 }) {
   return (
-    <div className={`relative flex items-center justify-center ${className}`}>
+    <div className={`relative mx-auto flex w-full items-center justify-center ${className}`}>
       <IconTitleUnderline
         variant={variant}
-        className="absolute inset-0"
+        className="inset-x-0 top-1/2 -translate-y-1/2"
       />
-      <h1 className="relative z-10 text-[#DBDADA] italic font-extrabold text-[clamp(1.8rem,8vw,5.5rem)] leading-none tracking-tight uppercase px-10">
+      <h1 className="relative z-10 text-[#DBDADA] italic font-extrabold text-[clamp(1.8rem,8.4vw,3.2rem)] leading-none tracking-tight uppercase px-10">
         {children}
       </h1>
     </div>

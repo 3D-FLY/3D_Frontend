@@ -17,8 +17,6 @@ const navItems = [
 
 const mobileMenuItems = [
   { label: "Home", to: "/" },
-  { label: "Log In", to: "/login" },
-  { label: "Sign Up", to: "/register" },
   { label: "Explore", to: "/explore" },
   { label: "FAQ", to: "/faq" },
   { label: "Store", to: "/store" },
@@ -197,8 +195,8 @@ export default function Navbar() {
                       onClick={closeMenu}
                       className={({ isActive }) =>
                         [
-                          "block w-full text-center font-medium italic uppercase tracking-[0.08em] transition-colors",
-                          "py-[clamp(14px,4.2vw,26px)] text-[clamp(18px,5vw,28px)] leading-tight",
+                          "block w-full text-center font-normal italic uppercase tracking-[0.08em] transition-colors",
+                          "py-[clamp(14px,4.2vw,26px)] text-[clamp(18px,5vw,30px)] leading-tight",
                           isActive
                             ? "bg-[#d4d4d4] text-[#1a1a1a]"
                             : "text-[#DADADA] hover:bg-[#2a2a2a]",

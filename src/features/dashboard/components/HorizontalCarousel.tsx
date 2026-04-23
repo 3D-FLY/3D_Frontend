@@ -64,7 +64,7 @@ export default function HorizontalCarousel({
         ref={scrollRef}
         className="
           h-full flex gap-3 overflow-x-auto scroll-smooth
-          px-1
+          px-1 justify-center
           [&::-webkit-scrollbar]:hidden
           [-ms-overflow-style:none]
           [scrollbar-width:none]

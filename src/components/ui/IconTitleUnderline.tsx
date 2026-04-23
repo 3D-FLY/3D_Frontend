@@ -20,8 +20,8 @@ export default function IconTitleUnderline({
       xmlns="http://www.w3.org/2000/svg"
       preserveAspectRatio="none"
       aria-hidden
-      className="absolute w-full"  // הסירי את inset-0, תני רק w-full
-      style={{ height: "50%" }}    // שלטי על הגובה ידנית
+      className={`absolute w-full ${className}`}
+      style={{ height: "50%" }}
     >
       <path d={path} fill="#5AC422" fillOpacity="0.4" />
     </svg>

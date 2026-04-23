@@ -30,7 +30,7 @@ export default function Home() {
           <FileUploader />
         </section>
 
-        <section className="relative isolate z-0 flex h-[calc(100dvh-var(--nav-h))] w-full items-stretch overflow-hidden bg-dark">
+        <section className="relative isolate z-0 flex h-[90svh] w-full items-stretch overflow-hidden bg-dark 2xl:h-[calc(100dvh-var(--nav-h))]">
           <PrintFarmSection />
         </section>
 

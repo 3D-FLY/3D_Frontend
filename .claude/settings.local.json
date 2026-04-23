@@ -19,7 +19,8 @@
       "Bash(cp -r src/features/home/HowDoesItWork src/features/home/HowItWorks)",
       "Bash(git add:*)",
       "Bash(git rm:*)",
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }
