@@ -6,6 +6,10 @@ interface DashboardCardProps {
   children: ReactNode;
   withBackground?: boolean;
   className?: string;
+  autoHeight?: boolean;
+  headerAction?: ReactNode;
+  titleSize?: string;
+  clipContent?: boolean;
 }
 
 export default function DashboardCard({
@@ -13,23 +17,42 @@ export default function DashboardCard({
   children,
   withBackground = true,
   className = "",
+  autoHeight = false,
+  headerAction,
+  titleSize,
+  clipContent = false,
 }: DashboardCardProps) {
   return (
     <div
-      className={`relative w-full h-[300px] rounded-2xl bg-gray overflow-hidden flex flex-col ${className}`}
+      className={`relative w-full rounded-2xl bg-gray overflow-visible flex flex-col ${
+        autoHeight
+          ? ""
+          : "h-[clamp(170px,20vw,300px)]"
+      } ${className}`}
     >
       {/* Header */}
-      <div className="px-5 pt-5 pb-0 shrink-0">
-        <h2 className="text-[24px] font-semibold uppercase tracking-[0.1em] text-black not-italic m-0">
+      <div className="px-5 pt-5 pb-0 shrink-0 flex items-center justify-between gap-2">
+        <h2
+          className={`${
+            titleSize ?? "text-[clamp(16px,1.6vw,24px)]"
+          } font-semibold uppercase tracking-[0.1em] text-black not-italic m-0`}
+        >
           {title}
         </h2>
+        {headerAction && <div className="shrink-0">{headerAction}</div>}
       </div>
 
-      {/* Divider — מקצה לקצה */}
+      {/* Divider */}
       <div className="h-[2px] bg-black/50 mx-0 mt-3 mb-0 shrink-0" />
 
-      {/* אזור תוכן — הצב רק כאן */}
-      <div className="relative flex flex-col flex-1 overflow-hidden p-5 pt-4">
+      {/* Content area */}
+      <div
+        className={`relative z-10 w-full ${
+          withBackground || clipContent ? "overflow-hidden " : ""
+        }${
+          autoHeight ? "" : "h-full flex min-h-0 flex-1 flex-col"
+        }`}
+      >
         {withBackground && (
           <Turtle
             right="0"
@@ -41,7 +64,11 @@ export default function DashboardCard({
             zIndex={0}
           />
         )}
-        <div className="relative z-10 flex min-h-0 flex-1 w-full flex-col justify-center">
+        <div
+          className={`relative z-10 w-full px-5 py-3 ${
+            autoHeight ? "" : "flex min-h-0 flex-1 flex-col justify-center"
+          }`}
+        >
           {children}
         </div>
       </div>

@@ -31,6 +31,8 @@ const INITIAL_FORM: FormState = {
   password: "",
 };
 
+const compactInputClass = "py-1.5 text-sm";
+
 export default function LoginForm() {
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
@@ -89,13 +91,13 @@ export default function LoginForm() {
     <div className="relative flex flex-1 flex-col w-full min-h-0 bg-dark items-center overflow-y-auto overflow-x-hidden">
       <AmbientGlowBackdrop />
 
-      <div className="reg-form-content-in relative z-10 flex flex-col items-center justify-start gap-6 w-full max-w-[850px] h-full my-18 px-6 py-8">
+      <div className="reg-form-content-in relative z-10 flex flex-col items-center justify-start gap-4 w-full max-w-[850px] h-full my-18 px-6 py-8">
       <SectionTitle className="w-full mb-7">SIGN IN</SectionTitle>
 
         <IconGoogle onClick={() => {}} className="w-[clamp(150px,60vw,280px)]" />
 
         <div className="flex items-center justify-center py-0.5">
-          <span className="text-[#DBDADA] text-[clamp(1.2rem,4vw,2rem)] font-semibold italic tracking-widest">
+          <span className="text-[#DBDADA] text-[clamp(0.9rem,2.4vw,1.2rem)] font-semibold italic tracking-widest">
             OR
           </span>
         </div>
@@ -103,9 +105,9 @@ export default function LoginForm() {
         <form
           onSubmit={handleSubmit}
           noValidate
-          className="flex flex-col w-full max-w-[450px]"
+          className="flex flex-col w-full max-w-[380px]"
         >
-          <div className="flex flex-col gap-2.5">
+          <div className="flex flex-col gap-1.5">
             <Input
               label="USERNAME OR EMAIL"
               placeholder="ENTER YOUR USERNAME"
@@ -113,6 +115,7 @@ export default function LoginForm() {
               onChange={setField("usernameOrEmail")}
               error={errors.usernameOrEmail}
               autoComplete="username"
+              className={compactInputClass}
             />
 
             <Input
@@ -123,6 +126,7 @@ export default function LoginForm() {
               onChange={setField("password")}
               error={errors.password}
               autoComplete="current-password"
+              className={compactInputClass}
             />
           </div>
 

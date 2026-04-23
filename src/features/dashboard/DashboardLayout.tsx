@@ -21,6 +21,7 @@ const MAIN_PL         = 50;
 const SKEW_DEG        = 20;
 const BANNER_OVERFLOW = 100; // extends off-screen to the left
 const BANNER_PAD_R    = 48;  // right padding after text
+const BANNER_MIN_W_COLLAPSED = 320;
 const BANNER_TRANSITION = "width 0.55s cubic-bezier(0.4,0,0.2,1), padding-left 0.55s cubic-bezier(0.4,0,0.2,1), transform 0.55s cubic-bezier(0.4,0,0.2,1), border-radius 0.55s cubic-bezier(0.4,0,0.2,1)";
 
 const roleLabels: Record<SidebarRole, string> = {
@@ -42,8 +43,8 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
   }, [handleScroll]);
 
   const textPaddingL = collapsed ? BANNER_OVERFLOW + 20 : SIDEBAR_W + MAIN_PL + BANNER_OVERFLOW;
-  const skewNow      = collapsed ? 0                          : SKEW_DEG;
-  const radiusNow    = collapsed ? 0                          : 5;
+  const skewNow      = SKEW_DEG;
+  const radiusNow    = 5;
 
   return (
     <div className="bg-dark font-sans text-white">
@@ -59,6 +60,7 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
           top: NAVBAR_H + BANNER_MT,
           left: -BANNER_OVERFLOW,
           width: "fit-content",
+          minWidth: collapsed ? BANNER_MIN_W_COLLAPSED : undefined,
           height: BANNER_H,
           zIndex: 950,
           borderRadius: radiusNow,
@@ -97,7 +99,7 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
         }}
       >
         <div style={{ paddingTop: BANNER_SLOT, flexShrink: 0 }} />
-        <Sidebar role={role} bannerHeight={0} />
+        <Sidebar role={role} />
       </aside>
 
       {/* MAIN — normal page flow, pushed right of sidebar and below navbar */}
@@ -129,7 +131,15 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
           <Turtle right="0" bottom="0" width="100vw" translateX="50%" translateY="25%" opacity={0.15} zIndex={0} />
         </div>
 
-        <div style={{ position: "relative", zIndex: 1 }}>
+        <div
+          style={{
+            position: "relative",
+            zIndex: 1,
+            width: "100%",
+            maxWidth: 1320,
+            marginInline: "auto",
+          }}
+        >
           {children ?? <Outlet />}
         </div>
       </main>

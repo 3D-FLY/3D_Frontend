@@ -13,8 +13,6 @@ import Button from "../../components/ui/Button.jsx";
 import AmbientGlowBackdrop from "../../components/ui/AmbientGlowBackdrop.jsx";
 import Turtle from "../../components/ui/Turtle.jsx";
 import { usePartnerLocations } from "./PartnerLocationsContext.jsx";
-import "../auth/registration-form.css";
-import "./partner-map.css";
 import locationMarkerUrl from "./Group 82.svg?url";
 
 const GEO_URL =
@@ -60,26 +58,39 @@ function PartnerMapMarkerLayer({ partners, locationMarkerUrl }) {
     <Marker key={p.id} coordinates={[p.lng, p.lat]}>
       <g transform={`scale(${invScale})`}>
         <g
-          className="partner-map-marker-pin-root"
+          className="group"
           onMouseDown={(e) => e.stopPropagation()}
           onTouchStart={(e) => e.stopPropagation()}
         >
           <circle
-            className="partner-map-pulse"
             r={12}
             cx={0}
             cy={0}
             fill="#39e75f"
-            opacity={0.28}
+            opacity={0.55}
             style={{ pointerEvents: "none" }}
-          />
+          >
+            <animate
+              attributeName="opacity"
+              values="0.55;0;0.55"
+              dur="1.8s"
+              repeatCount="indefinite"
+            />
+            <animateTransform
+              attributeName="transform"
+              type="scale"
+              values="1;2.4;1"
+              dur="1.8s"
+              repeatCount="indefinite"
+            />
+          </circle>
           <g transform="translate(-12.5, -34)">
-            <g className="partner-map-location-scale">
+            <g className="origin-[12.5px_34px] transition-transform duration-200 group-hover:scale-110">
               <image
                 href={locationMarkerUrl}
                 width={25}
                 height={35}
-                className="partner-map-location-icon"
+                className="pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.45)]"
               />
             </g>
           </g>
@@ -184,16 +195,31 @@ export default function PartnerMap() {
    * preventing any top-clipping regardless of aspect ratio.
    */
   const projectionConfig = useMemo(() => {
-    const scale = (Math.min(mapWidth, mapHeight) / (2 * Math.PI)) * 1.25;
+    const scaleMultiplier =
+      mapWidth <= 768 ? 0.92 : mapWidth <= 1024 ? 1.05 : 1.25;
+    const scale = (Math.min(mapWidth, mapHeight) / (2 * Math.PI)) * scaleMultiplier;
+    const translateYMultiplier = mapWidth <= 768 ? 1.22 : 1.35;
     return {
       scale,
       center: [...DEFAULT_CENTER],
-      translate: [mapWidth / 2, scale * Math.PI * 1.35],
+      translate: [mapWidth / 2, scale * Math.PI * translateYMultiplier],
     };
   }, [mapWidth, mapHeight]);
 
+  /**
+   * Restrict drag area so the map cannot be panned too far outside viewport.
+   * Keep bounds strict so blank space cannot replace the map.
+   */
+  const mapTranslateExtent = useMemo(() => {
+    const verticalInset = Math.max(40, Math.round(mapHeight * 0.18));
+    return [
+      [0, verticalInset],
+      [mapWidth, mapHeight - verticalInset],
+    ];
+  }, [mapWidth, mapHeight]);
+
   return (
-    <div className="partner-map-page relative flex min-h-0 w-full flex-1 flex-col items-center overflow-x-hidden overflow-y-auto bg-dark">
+    <div className="relative flex min-h-0 w-full flex-1 flex-col items-center overflow-x-hidden overflow-y-auto bg-dark">
       <AmbientGlowBackdrop />
       <Turtle
         bottom="0"
@@ -205,26 +231,27 @@ export default function PartnerMap() {
         zIndex={0}
       />
 
-      <div className="reg-form-content-in partner-map-content relative z-10 flex w-full max-w-[1440px] flex-col items-center gap-8 mt-18 px-6 py-8 pb-[50vh]">
+      <div className="relative z-10 mt-10 flex w-full max-w-[1440px] flex-col items-center gap-8 px-6 py-8 pb-[50vh]">
       <SectionTitle className="w-full mb-7">3D-FLY GLOBAL NETWORK</SectionTitle>
 
-        <div className="partner-map-map-column flex w-full flex-col items-center gap-3">
+        <div className="flex w-full flex-col items-center gap-3">
           <div
             ref={mapFrameRef}
-            className="partner-map-map-frame"
+            className="relative h-[88vh] min-h-[280px] w-full max-w-[1440px] overflow-hidden border-none bg-transparent box-border max-[1024px]:h-[56vh] max-[1024px]:min-h-[240px] max-[768px]:h-[42vh] max-[768px]:min-h-[190px]"
           >
             <ComposableMap
               projection="geoMercator"
               projectionConfig={projectionConfig}
               width={mapWidth}
               height={mapHeight}
-              className="partner-map-svg"
+              className="h-full w-full bg-transparent"
             >
               <ZoomableGroup
                 center={mapCenter}
                 zoom={mapZoom}
                 minZoom={MIN_ZOOM}
                 maxZoom={MAX_ZOOM}
+                translateExtent={mapTranslateExtent}
                 filterZoomEvent={(e) => e.type !== "wheel"}
                 onMoveEnd={handleMapMoveEnd}
               >
@@ -259,20 +286,20 @@ export default function PartnerMap() {
             >
               {partnerCount}
             </p>
-            <p className="text-gray font-extrabold uppercase tracking-wide leading-tight text-[clamp(12px,4.2vw,85px)]">
+            <p className="text-gray font-extrabold uppercase tracking-wide leading-tight text-[clamp(12px,4.2vw,70px)]">
               Worldwide partners!
             </p>
           </div>
           <Button
             hovering="darkBg"
-            className="rounded-[28px] text-[clamp(14px,2vw,32px)] font-extrabold px-[clamp(16px,3vw,32px)] py-[clamp(8px,1.5vw,16px)] italic"
+            className="rounded-[28px] text-[clamp(14px,2vw,30px)] font-extrabold px-[clamp(16px,3vw,30px)] py-[clamp(8px,1.5vw,16px)] italic"
             onClick={() => navigate("/join-as-partner")}
           >
             Join As a Partner!
           </Button>
           <Link
             to="/partner-locations"
-            className="partner-map-manage-link font-mono text-sm font-bold uppercase tracking-wide text-[#5AC422] underline-offset-4 hover:underline"
+            className="font-mono text-sm font-bold uppercase tracking-wide text-[#5AC422] underline-offset-4 hover:underline"
           >
             Add / manage locations
           </Link>

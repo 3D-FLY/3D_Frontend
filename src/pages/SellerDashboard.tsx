@@ -3,7 +3,32 @@ import DashboardCard from "../features/dashboard/components/DashboardCard.js";
 import StatBlock from "../features/dashboard/components/StatBlock.js";
 import StatusBadge from "../features/dashboard/components/StatusBadge.js";
 import NotificationList from "../features/dashboard/components/NotificationList.js";
+import type { Notification } from "../features/dashboard/components/NotificationList.js";
 import ProductionCarousel from "../features/dashboard/components/ProductionCarousel.js";
+import AnalyticsBar from "../features/dashboard/components/AnalyticsBar.js";
+import type { AnalyticBlock } from "../features/dashboard/components/AnalyticsBar.js";
+
+const analytics: AnalyticBlock[] = [
+  {
+    id: "1",
+    value: "12",
+    label: "Orders This Month",
+    change: { percent: 12, label: "from last month" },
+  },
+  {
+    id: "2",
+    value: "17",
+    label: "Products",
+  },
+  {
+    id: "3",
+    value: "$1,084",
+    label: "Revenues",
+    change: { percent: 76, label: "from last month" },
+  },
+];
+
+const clipAnalyticsCard = analytics.length > 0;
 
 const productionItems = [
   {
@@ -33,17 +58,12 @@ const productionItems = [
   },
 ];
 
-const notifications = [
-  "#3012 - Supplier rejected order",
-  "#3010 - Shipping delay",
-  "#3008 - Order delivered",
-  "#3007 - Order delivered",
-  "#3005 - New order received",
-  "#3012 - Supplier rejected order",
-  "#3010 - Shipping delay",
-  "#3008 - Order delivered",
-  "#3007 - Order delivered",
-  "#3005 - New order received",
+const notifications: Notification[] = [
+  { id: "1", orderId: "3012", message: "Supplier rejected order", type: "error", timestamp: new Date(Date.now() - 5 * 60000).toISOString(), link: "/seller/orders/3012" },
+  { id: "2", orderId: "3010", message: "Shipping delay", type: "warning", timestamp: new Date(Date.now() - 18 * 60000).toISOString(), link: "/seller/orders/3010" },
+  { id: "3", orderId: "3008", message: "Order delivered", type: "success", timestamp: new Date(Date.now() - 1 * 3600000).toISOString(), link: "/seller/orders/3008" },
+  { id: "4", orderId: "3007", message: "Order delivered", type: "success", timestamp: new Date(Date.now() - 2 * 3600000).toISOString(), link: "/seller/orders/3007" },
+  { id: "5", orderId: "3005", message: "New order received", type: "info", timestamp: new Date(Date.now() - 3 * 3600000).toISOString(), link: "/seller/orders/3005" },
 ];
 
 export default function SellerDashboard() {
@@ -54,26 +74,12 @@ export default function SellerDashboard() {
         <h1 className="text-[clamp(22px,2.5vw,32px)] font-semibold text-white">Welcome, Raz</h1>
 
         {/* Analytics */}
-        <DashboardCard title="Analytics">
-          <div className="grid grid-cols-3 divide-x divide-zinc-700">
-            <StatBlock
-              value={12}
-              label="Orders this month"
-              subLabel="+12% from last month"
-              accentColor="white"
-            />
-            <StatBlock
-              value={17}
-              label="Products"
-              accentColor="white"
-            />
-            <StatBlock
-              value="$1084"
-              label="Revenues"
-              subLabel="+76% from last month"
-              accentColor="white"
-            />
-          </div>
+        <DashboardCard
+          title="Analytics"
+          withBackground={false}
+          clipContent={clipAnalyticsCard}
+        >
+          <AnalyticsBar items={analytics} />
         </DashboardCard>
 
         {/* Order Status */}

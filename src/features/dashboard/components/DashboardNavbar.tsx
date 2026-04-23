@@ -1,4 +1,5 @@
 import LogoSvg from "../../../assets/icons/logo.svg?react";
+import { Link } from "react-router-dom";
 
 function GlobalIcon() {
   return (
@@ -77,9 +78,13 @@ export default function DashboardNavbar() {
 
       {/* Right icons */}
       <div className="flex flex-shrink-0 items-center gap-2 pr-3">
-        <button className="flex items-center justify-center rounded-full p-1 transition-opacity hover:opacity-70" aria-label="Language">
+        <Link
+          to="/partner-map"
+          className="flex items-center justify-center rounded-full p-1 transition-opacity hover:opacity-70"
+          aria-label="Open partner map"
+        >
           <GlobalIcon />
-        </button>
+        </Link>
         <button className="flex items-center justify-center rounded-full p-1 transition-opacity hover:opacity-70" aria-label="Notifications">
           <BellIcon />
         </button>

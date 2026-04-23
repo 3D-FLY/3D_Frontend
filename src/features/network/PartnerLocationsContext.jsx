@@ -21,6 +21,7 @@ const PartnerLocationsContext = createContext(null);
 
 export function PartnerLocationsProvider({ children }) {
   const [partners, setPartners] = useState(INITIAL_PARTNERS);
+  console.log("partners:", partners);
 
   const addPartner = useCallback((partner) => {
     setPartners((prev) => [...prev, partner]);
