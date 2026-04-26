@@ -11,7 +11,7 @@ export default function Home() {
   return (
     <div className="font-sans w-full max-w-full overflow-x-hidden">
       {/* HERO — נטען מיד */}
-      <section className="relative isolate z-0 flex h-[calc(100dvh-var(--nav-h))] w-full items-center justify-center overflow-hidden bg-dark">
+      <section className="relative isolate z-0 flex h-[calc(100svh-var(--nav-h))] w-full items-center justify-center overflow-hidden bg-dark lg:h-[calc(100dvh-var(--nav-h))]">
         <MainSection />
       </section>
 
@@ -22,11 +22,11 @@ export default function Home() {
         </section>
 
         {/* מובייל: min-h כדי שהתוכן לא ייחתך; דסקטופ: גובה מסך + clip לזוהר */}
-        <section className="relative isolate z-0 w-full min-h-[calc(100dvh-var(--nav-h))] overflow-x-hidden bg-dark lg:h-[calc(100dvh-var(--nav-h))] lg:overflow-hidden">
+        <section className="relative isolate z-0 w-full min-h-[calc(100svh-var(--nav-h))] overflow-x-hidden bg-dark lg:min-h-0 lg:h-[calc(100dvh-var(--nav-h))] lg:overflow-hidden">
           <HowDoesItWork />
         </section>
 
-        <section className="relative isolate z-0 w-full min-h-[calc(100dvh-var(--nav-h))] overflow-x-hidden bg-gray lg:h-[calc(100dvh-var(--nav-h))] lg:overflow-hidden">
+        <section className="relative isolate z-0 w-full min-h-[calc(100svh-var(--nav-h))] overflow-x-hidden bg-gray lg:min-h-0 lg:h-[calc(100dvh-var(--nav-h))] lg:overflow-hidden">
           <FileUploader />
         </section>
 
