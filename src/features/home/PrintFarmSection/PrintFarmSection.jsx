@@ -25,7 +25,7 @@ export default function PrintFarmSection() {
         {/* כרטיס תוכן (~50%) + חפיפה (svh — לא אחוז margin, שב־CSS יחסי לרוחב) */}
         <div
           className="relative z-10 flex h-[50%] min-h-0 shrink-0 flex-col items-center justify-between rounded-tr-[60px] bg-dark px-6 pt-8 pb-3"
-          style={{ marginTop: "-5svh" }}
+          style={{ marginTop: "-2rem" }}
         >
           {/* כותרת */}
           <h3 className="text-gray italic font-extrabold leading-tight text-left m-0 text-[clamp(38px,11vw,60px)]">
