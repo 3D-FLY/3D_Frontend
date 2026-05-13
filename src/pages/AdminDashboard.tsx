@@ -52,8 +52,8 @@ export default function AdminDashboard() {
         <h1 className="text-[clamp(22px,2.5vw,32px)] font-semibold text-white">Welcome, Raz</h1>
 
         {/* Status */}
-        <DashboardCard title="Status">
-          <div className="grid h-full grid-cols-4">
+        <DashboardCard title="Status" className="status-container">
+          <div className="grid h-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {statusCards.map((card) => (
               <div key={card.label} className="h-full">
                 <StatusBadge
@@ -68,7 +68,7 @@ export default function AdminDashboard() {
         </DashboardCard>
 
         {/* Notifications */}
-        <DashboardCard title="Orders Needing Attention">
+        <DashboardCard title="Orders Needing Attention" className="attention-container" autoHeight>
           <OrderAttentionList items={attentionOrders} />
         </DashboardCard>
 
@@ -78,7 +78,7 @@ export default function AdminDashboard() {
           headerAction={
             <button
               onClick={() => navigate("/admin/orders")}
-              className="text-[11px] font-bold uppercase tracking-wide text-black/50 hover:text-black transition-colors"
+              className="text-[11px] font-bold uppercase tracking-wide text-zinc-200 hover:text-white transition-colors"
             >
               View All →
             </button>
