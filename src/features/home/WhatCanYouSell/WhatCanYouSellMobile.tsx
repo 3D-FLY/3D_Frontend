@@ -149,7 +149,7 @@ export default function WhatCanYouSellMobile() {
     <section
       className="relative bg-gray italic overflow-hidden"
       // svh = small viewport height — קבוע גם כשסרגל הדפדפן עולה/יורד
-      style={{ fontFamily: "Montserrat, sans-serif", height: "100svh" }}
+      style={{ fontFamily: "Montserrat, sans-serif", height: "110svh" }}
     >
       <div className="flex flex-col h-full">
 

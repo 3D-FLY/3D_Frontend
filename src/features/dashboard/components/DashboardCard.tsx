@@ -24,18 +24,18 @@ export default function DashboardCard({
 }: DashboardCardProps) {
   return (
     <div
-      className={`relative w-full rounded-2xl bg-gray overflow-visible flex flex-col ${
+      className={`relative w-full rounded-2xl overflow-visible flex flex-col border border-white/10 bg-[rgba(149,149,149,0.1)] backdrop-blur-[12px] ${
         autoHeight
           ? ""
           : "h-[clamp(170px,20vw,300px)]"
       } ${className}`}
     >
       {/* Header */}
-      <div className="px-5 pt-5 pb-0 shrink-0 flex items-center justify-between gap-2">
+      <div className="px-6 pt-6 pb-0 shrink-0 flex items-center justify-between gap-2">
         <h2
           className={`${
             titleSize ?? "text-[clamp(16px,1.6vw,24px)]"
-          } font-semibold uppercase tracking-[0.1em] text-black not-italic m-0`}
+          } font-semibold uppercase tracking-[0.1em] text-zinc-100 not-italic m-0`}
         >
           {title}
         </h2>
@@ -43,7 +43,7 @@ export default function DashboardCard({
       </div>
 
       {/* Divider */}
-      <div className="h-[2px] bg-black/50 mx-0 mt-3 mb-0 shrink-0" />
+      <div className="h-px bg-white/10 mx-0 mt-4 mb-0 shrink-0" />
 
       {/* Content area */}
       <div
@@ -65,7 +65,7 @@ export default function DashboardCard({
           />
         )}
         <div
-          className={`relative z-10 w-full px-5 py-3 ${
+          className={`relative z-10 w-full px-6 py-6 ${
             autoHeight ? "" : "flex min-h-0 flex-1 flex-col justify-center"
           }`}
         >
