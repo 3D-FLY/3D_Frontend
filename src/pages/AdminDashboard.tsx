@@ -1,10 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../features/dashboard/components/DashboardCard.js";
-import StatBlock from "../features/dashboard/components/StatBlock.js";
 import StatusBadge from "../features/dashboard/components/StatusBadge.js";
-import NotificationList from "../features/dashboard/components/NotificationList.js";
-import type { Notification } from "../features/dashboard/components/NotificationList.js";
 import type { OrderAttention } from "../features/dashboard/components/OrderAttentionList.js";
 import OrderAttentionList from "../features/dashboard/components/OrderAttentionList.js";
 import RecentOrdersTable, { type RecentOrder } from "../features/dashboard/components/RecentOrdersTable.js";
@@ -52,7 +49,7 @@ export default function AdminDashboard() {
         <h1 className="text-[clamp(22px,2.5vw,32px)] font-semibold text-white">Welcome, Raz</h1>
 
         {/* Status */}
-        <DashboardCard title="Status" className="status-container">
+        <DashboardCard index={0} title="Status" className="status-container">
           <div className="grid h-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {statusCards.map((card) => (
               <div key={card.label} className="h-full">
@@ -67,17 +64,40 @@ export default function AdminDashboard() {
           </div>
         </DashboardCard>
 
-        {/* Notifications */}
-        <DashboardCard title="Orders Needing Attention" className="attention-container" autoHeight>
-          <OrderAttentionList items={attentionOrders} />
-        </DashboardCard>
+        {/* Action Required + quick search side by side */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+          {/* Left — 50% — Action Required */}
+          <DashboardCard index={1} title="Action Required" autoHeight>
+            <OrderAttentionList items={attentionOrders} />
+          </DashboardCard>
+
+          {/* Right — 50% — two stacked cards */}
+          <div className="flex flex-col gap-6">
+            <DashboardCard index={2} title="Find an Order" autoHeight>
+              <input
+                type="text"
+                placeholder="Order # or customer name…"
+                className="w-full rounded-md border border-white/10 bg-[rgba(5,10,7,0.7)] px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-[#5ac422] transition-colors"
+              />
+            </DashboardCard>
+
+            <DashboardCard index={3} title="Find a Supplier" autoHeight>
+              <input
+                type="text"
+                placeholder="Supplier name or city…"
+                className="w-full rounded-md border border-white/10 bg-[rgba(5,10,7,0.7)] px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-[#5ac422] transition-colors"
+              />
+            </DashboardCard>
+          </div>
+        </div>
 
         <DashboardCard
+          index={4}
           title="Recent Orders"
           autoHeight
           headerAction={
             <button
-              onClick={() => navigate("/admin/orders")}
+              onClick={() => navigate("/dashboard/admin/orders")}
               className="text-[11px] font-bold uppercase tracking-wide text-zinc-200 hover:text-white transition-colors"
             >
               View All →
@@ -86,28 +106,6 @@ export default function AdminDashboard() {
         >
           <RecentOrdersTable items={recentOrders} />
         </DashboardCard>
-
-          <DashboardCard title="Find an Order">
-            <div className="space-y-3">
-              <input
-                type="text"
-                placeholder="Order # or customer name…"
-                className="w-full rounded-md border border-zinc-600 bg-zinc-900 px-4 py-2 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-green-400 transition-colors"
-              />
-              <div className="grid grid-cols-2 gap-2">
-                <StatBlock
-                  value="30,125"
-                  label="Total Orders"
-                  accentColor="white"
-                />
-                <StatBlock
-                  value="37"
-                  label="Open Issues"
-                  accentColor="yellow"
-                />
-              </div>
-            </div>
-          </DashboardCard>
       </div>
     </DashboardLayout>
   );

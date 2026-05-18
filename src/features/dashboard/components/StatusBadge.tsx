@@ -1,4 +1,25 @@
+import { useState, useEffect } from "react";
+
 type AccentColor = "green" | "yellow" | "orange" | "blue" | "red";
+
+function useCountUp(target: number, duration = 800): number {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    let current = 0;
+    const step = target / (duration / 16);
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= target) {
+        setCount(target);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(current));
+      }
+    }, 16);
+    return () => clearInterval(timer);
+  }, [target, duration]);
+  return count;
+}
 
 interface StatusBadgeProps {
   count: string | number;
@@ -21,6 +42,12 @@ export default function StatusBadge({
   accentColor = "green",
   className = "",
 }: StatusBadgeProps) {
+  const numericTarget = typeof count === "number" ? count : NaN;
+  const animated = useCountUp(isNaN(numericTarget) ? 0 : numericTarget);
+  const display = isNaN(numericTarget)
+    ? count
+    : animated.toLocaleString("en-US");
+
   return (
     <div
       className={`flex h-full w-full flex-col items-center justify-center gap-2 p-2 text-center ${className}`}
@@ -29,7 +56,7 @@ export default function StatusBadge({
         <span
           className={`text-[clamp(20px,2.6vw,48px)] font-extrabold leading-none ${accentClasses[accentColor]}`}
         >
-          {count}
+          {display}
         </span>
       </div>
       <span className="text-[clamp(11px,1vw,20px)] font-semibold uppercase tracking-[0.05em] text-zinc-100">

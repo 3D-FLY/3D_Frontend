@@ -8,7 +8,6 @@ import {
 } from "react-router-dom";
 import Navbar from "./components/layout/Navbar.jsx";
 import Footer from "./components/layout/Footer.jsx";
-import { PartnerLocationsProvider } from "./features/network/PartnerLocationsContext.jsx";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Explore from "./pages/Explore";
@@ -22,25 +21,18 @@ import LoginForm from "./features/auth/LoginForm.tsx";
 import ScrollToTop from "./components/ui/ScrollToTop.tsx";
 import SellerDashboard from "./pages/SellerDashboard.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
+import { PartnerLocationsProvider } from "./features/network/PartnerLocationsContext.jsx";
 
 const PartnerMapPage = lazy(() => import("./pages/PartnerMapPage.jsx"));
-const PartnerLocationsPage = lazy(() =>
-  import("./pages/PartnerLocationsPage.jsx"),
-);
+const SupplierMapPage = lazy(() => import("./pages/admin/SupplierMapPage.jsx"));
+const SuppliersPage = lazy(() => import("./pages/admin/SuppliersPage.jsx"));
+const OrdersPage = lazy(() => import("./pages/admin/OrdersPage.jsx"));
 
 const partnerNetworkFallback = (
   <div className="flex min-h-[50vh] flex-1 items-center justify-center bg-[#0d1a10] font-mono text-sm font-bold tracking-[0.2em] text-[#5AC422]">
     LOADING…
   </div>
 );
-
-function PartnerLocationsLayout() {
-  return (
-    <PartnerLocationsProvider>
-      <Outlet />
-    </PartnerLocationsProvider>
-  );
-}
 
 /** Layout wrapper for pages that include the global Navbar + Footer. */
 function MainLayout() {
@@ -62,6 +54,30 @@ function App() {
       <Routes>
         {/* Dashboard routes — no landing Navbar/Footer */}
         <Route path="/dashboard/seller/*" element={<SellerDashboard />} />
+        <Route
+          path="/dashboard/admin/suppliers"
+          element={
+            <Suspense fallback={partnerNetworkFallback}>
+              <SuppliersPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/admin/supplier-map"
+          element={
+            <Suspense fallback={partnerNetworkFallback}>
+              <SupplierMapPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/admin/orders"
+          element={
+            <Suspense fallback={partnerNetworkFallback}>
+              <OrdersPage />
+            </Suspense>
+          }
+        />
         <Route path="/dashboard/admin/*" element={<AdminDashboard />} />
 
         <Route element={<MainLayout />}>
@@ -75,24 +91,16 @@ function App() {
           <Route path="/join-as-partner" element={<JoinAsPartnerPage />} />
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/login" element={<LoginForm />} />
-          <Route element={<PartnerLocationsLayout />}>
-            <Route
-              path="/partner-map"
-              element={
+          <Route
+            path="/partner-map"
+            element={
+              <PartnerLocationsProvider>
                 <Suspense fallback={partnerNetworkFallback}>
                   <PartnerMapPage />
                 </Suspense>
-              }
-            />
-            <Route
-              path="/partner-locations"
-              element={
-                <Suspense fallback={partnerNetworkFallback}>
-                  <PartnerLocationsPage />
-                </Suspense>
-              }
-            />
-          </Route>
+              </PartnerLocationsProvider>
+            }
+          />
         </Route>
       </Routes>
     </Router>
