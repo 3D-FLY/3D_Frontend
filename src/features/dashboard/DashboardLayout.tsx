@@ -1,5 +1,6 @@
 import { type ReactNode, useState, useEffect, useCallback } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import DashboardNavbar from "./components/DashboardNavbar.js";
 import Sidebar from "./components/Sidebar.js";
 import type { SidebarRole } from "./components/Sidebar.js";
@@ -30,7 +31,8 @@ const roleLabels: Record<SidebarRole, string> = {
 };
 
 export default function DashboardLayout({ role, children }: DashboardLayoutProps) {
-  const label = roleLabels[role];
+  const label    = roleLabels[role];
+  const { pathname } = useLocation();
   const [collapsed, setCollapsed] = useState(false);
 
   const handleScroll = useCallback(() => {
@@ -140,7 +142,17 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
             marginInline: "auto",
           }}
         >
-          {children ?? <Outlet />}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+            >
+              {children ?? <Outlet />}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </main>
 

@@ -1,4 +1,5 @@
 import { type ReactNode } from "react";
+import { motion } from "framer-motion";
 import Turtle from "../../../components/ui/Turtle.jsx";
 
 interface DashboardCardProps {
@@ -10,6 +11,7 @@ interface DashboardCardProps {
   headerAction?: ReactNode;
   titleSize?: string;
   clipContent?: boolean;
+  index?: number;
 }
 
 export default function DashboardCard({
@@ -21,9 +23,13 @@ export default function DashboardCard({
   headerAction,
   titleSize,
   clipContent = false,
+  index = 0,
 }: DashboardCardProps) {
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: "easeOut", delay: index * 0.05 }}
       className={`relative w-full rounded-2xl overflow-visible flex flex-col border border-white/10 bg-[rgba(149,149,149,0.1)] backdrop-blur-[12px] ${
         autoHeight
           ? ""
@@ -53,7 +59,7 @@ export default function DashboardCard({
           autoHeight ? "" : "h-full flex min-h-0 flex-1 flex-col"
         }`}
       >
-        {withBackground && (
+        {/* withBackground && (
           <Turtle
             right="0"
             top="50%"
@@ -63,7 +69,7 @@ export default function DashboardCard({
             opacity={0.12}
             zIndex={0}
           />
-        )}
+        ) */}
         <div
           className={`relative z-10 w-full px-6 py-6 ${
             autoHeight ? "" : "flex min-h-0 flex-1 flex-col justify-center"
@@ -72,6 +78,6 @@ export default function DashboardCard({
           {children}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
