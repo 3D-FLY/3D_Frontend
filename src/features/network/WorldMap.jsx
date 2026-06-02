@@ -22,6 +22,7 @@ import {
   useZoomPanContext,
 } from "react-simple-maps";
 import locationMarkerUrl from "./Group 82.svg?url";
+import LogoLoader from "../../components/ui/LogoLoader.js";
 
 // ─── Public constants (re-exported for consumers) ─────────────────────────────
 export const GEO_URL       = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -96,11 +97,18 @@ export default function WorldMap({
   onMoveEnd,
   height,
   className = "",
+  onLoad,
+  hideLoadingOverlay = false,
 }) {
   const frameRef  = useRef(null);
   const [mapWidth,  setMapWidth]  = useState(800);
   const [mapHeight, setMapHeight] = useState(height ?? 440);
   const [geoLoaded, setGeoLoaded] = useState(false);
+
+  // Notify parent once geo is ready (stable ref avoids stale closure)
+  const onLoadRef = useRef(onLoad);
+  useEffect(() => { onLoadRef.current = onLoad; }, [onLoad]);
+  useEffect(() => { if (geoLoaded) onLoadRef.current?.(); }, [geoLoaded]);
 
   // Stable refs so the wheel handler never captures stale props
   const centerRef    = useRef(center);
@@ -182,11 +190,9 @@ export default function WorldMap({
       style={height != null ? { height } : undefined}
     >
       {/* Loading overlay — shown until the world atlas GeoJSON is fetched */}
-      {!geoLoaded && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center">
-          <p className="font-mono text-sm font-bold tracking-[0.2em] text-[#5AC422]">
-            LOADING…
-          </p>
+      {!hideLoadingOverlay && !geoLoaded && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-dark">
+          <LogoLoader size={90} gap={28} />
         </div>
       )}
 

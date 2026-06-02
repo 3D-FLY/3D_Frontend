@@ -14,12 +14,6 @@ const attentionOrders: OrderAttention[] = [
   { id: "5", orderId: "3001", reason: "production_delay",  detail: "Supplier B — 2 days overdue", timestamp: new Date(Date.now() - 5  * 3600000).toISOString() },
 ];
 
-const topSellers = [
-  { name: "Soldier", units: 48, revenue: "$2,400" },
-  { name: "Spider Soldier", units: 36, revenue: "$1,800" },
-  { name: "Dragon Figurine", units: 29, revenue: "$1,450" },
-];
-
 const statusCards = [
   { count: 30125, label: "Total Orders", accentColor: "green" as const },
   { count: 57, label: "Pending Match", accentColor: "orange" as const },
@@ -38,6 +32,8 @@ const recentOrders: RecentOrder[] = [
   { id: "8",  orderId: "3008", store: "Mini World",     status: "delivered",     date: new Date(Date.now() - 30 * 3600000).toISOString() },
 ];
 
+const searchInputClass =
+  "w-full rounded-md border border-white/10 bg-[rgba(5,10,7,0.7)] px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-[#5ac422] transition-colors";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -45,10 +41,8 @@ export default function AdminDashboard() {
   return (
     <DashboardLayout role="admin">
       <div className="w-full space-y-6 box-border">
-        {/* Welcome */}
         <h1 className="text-[clamp(22px,2.5vw,32px)] font-semibold text-white">Welcome, Raz</h1>
 
-        {/* Status */}
         <DashboardCard index={0} title="Status" className="status-container">
           <div className="grid h-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {statusCards.map((card) => (
@@ -64,28 +58,25 @@ export default function AdminDashboard() {
           </div>
         </DashboardCard>
 
-        {/* Action Required + quick search side by side */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-          {/* Left — 50% — Action Required */}
-          <DashboardCard index={1} title="Action Required" autoHeight>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          <DashboardCard index={1} title="Action Required" autoHeight className="h-full">
             <OrderAttentionList items={attentionOrders} />
           </DashboardCard>
 
-          {/* Right — 50% — two stacked cards */}
-          <div className="flex flex-col gap-6">
-            <DashboardCard index={2} title="Find an Order" autoHeight>
+          <div className="flex h-full min-h-0 flex-col gap-6">
+            <DashboardCard index={2} title="Find an Order" autoHeight fill withBackground={false}>
               <input
                 type="text"
                 placeholder="Order # or customer name…"
-                className="w-full rounded-md border border-white/10 bg-[rgba(5,10,7,0.7)] px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-[#5ac422] transition-colors"
+                className={searchInputClass}
               />
             </DashboardCard>
 
-            <DashboardCard index={3} title="Find a Supplier" autoHeight>
+            <DashboardCard index={3} title="Find a Supplier" autoHeight fill withBackground={false}>
               <input
                 type="text"
                 placeholder="Supplier name or city…"
-                className="w-full rounded-md border border-white/10 bg-[rgba(5,10,7,0.7)] px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-[#5ac422] transition-colors"
+                className={searchInputClass}
               />
             </DashboardCard>
           </div>
