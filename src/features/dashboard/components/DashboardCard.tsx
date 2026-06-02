@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 import { motion } from "framer-motion";
-import Turtle from "../../../components/ui/Turtle.jsx";
+import SectionLoader from "../../../components/ui/SectionLoader";
 
 interface DashboardCardProps {
   title: string;
@@ -8,10 +8,12 @@ interface DashboardCardProps {
   withBackground?: boolean;
   className?: string;
   autoHeight?: boolean;
+  fill?: boolean;
   headerAction?: ReactNode;
   titleSize?: string;
   clipContent?: boolean;
   index?: number;
+  loading?: boolean;
 }
 
 export default function DashboardCard({
@@ -20,10 +22,12 @@ export default function DashboardCard({
   withBackground = true,
   className = "",
   autoHeight = false,
+  fill = false,
   headerAction,
   titleSize,
   clipContent = false,
   index = 0,
+  loading = false,
 }: DashboardCardProps) {
   return (
     <motion.div
@@ -31,9 +35,11 @@ export default function DashboardCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "easeOut", delay: index * 0.05 }}
       className={`relative w-full rounded-2xl overflow-visible flex flex-col border border-white/10 bg-[rgba(149,149,149,0.1)] backdrop-blur-[12px] ${
-        autoHeight
+        autoHeight && !fill
           ? ""
-          : "h-[clamp(170px,20vw,300px)]"
+          : fill
+            ? "flex-1 min-h-0"
+            : "h-[clamp(170px,20vw,300px)]"
       } ${className}`}
     >
       {/* Header */}
@@ -56,26 +62,21 @@ export default function DashboardCard({
         className={`relative z-10 w-full ${
           withBackground || clipContent ? "overflow-hidden " : ""
         }${
-          autoHeight ? "" : "h-full flex min-h-0 flex-1 flex-col"
+          fill || !autoHeight ? "h-full flex min-h-0 flex-1 flex-col" : ""
         }`}
       >
-        {/* withBackground && (
-          <Turtle
-            right="0"
-            top="50%"
-            height="80%"
-            translateX="50%"
-            translateY="-50%"
-            opacity={0.12}
-            zIndex={0}
-          />
-        ) */}
         <div
           className={`relative z-10 w-full px-6 py-6 ${
-            autoHeight ? "" : "flex min-h-0 flex-1 flex-col justify-center"
+            fill
+              ? "flex min-h-0 flex-1 flex-col"
+              : autoHeight
+                ? ""
+                : "flex min-h-0 flex-1 flex-col justify-center"
           }`}
         >
-          {children}
+          <SectionLoader loading={loading} minHeight={180}>
+            {children}
+          </SectionLoader>
         </div>
       </div>
     </motion.div>

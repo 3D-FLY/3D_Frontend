@@ -19,11 +19,7 @@ const BANNER_MT       = 50;
 const BANNER_MB       = 40;
 const BANNER_SLOT     = BANNER_MT + BANNER_H + BANNER_MB;
 const MAIN_PL         = 50;
-const SKEW_DEG        = 20;
 const BANNER_OVERFLOW = 100; // extends off-screen to the left
-const BANNER_PAD_R    = 48;  // right padding after text
-const BANNER_MIN_W_COLLAPSED = 320;
-const BANNER_TRANSITION = "width 0.55s cubic-bezier(0.4,0,0.2,1), padding-left 0.55s cubic-bezier(0.4,0,0.2,1), transform 0.55s cubic-bezier(0.4,0,0.2,1), border-radius 0.55s cubic-bezier(0.4,0,0.2,1)";
 
 const roleLabels: Record<SidebarRole, string> = {
   admin: "ADMIN",
@@ -40,13 +36,10 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
   }, []);
 
   useEffect(() => {
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
-
-  const textPaddingL = collapsed ? BANNER_OVERFLOW + 20 : SIDEBAR_W + MAIN_PL + BANNER_OVERFLOW;
-  const skewNow      = SKEW_DEG;
-  const radiusNow    = 5;
 
   return (
     <div className="bg-dark font-sans text-white">
@@ -54,38 +47,39 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
       {/* NAVBAR — fixed, full width */}
       <DashboardNavbar />
 
-      {/* BANNER — parallelogram, left side hidden off-screen */}
-      <div
-        className="flex items-center bg-green"
+      {/* BANNER — fixed, expands/collapses on scroll */}
+      <motion.div
+        className="flex items-center bg-green overflow-hidden"
+        initial={false}
         style={{
           position: "fixed",
           top: NAVBAR_H + BANNER_MT,
           left: -BANNER_OVERFLOW,
-          width: "fit-content",
-          minWidth: collapsed ? BANNER_MIN_W_COLLAPSED : undefined,
           height: BANNER_H,
           zIndex: 950,
-          borderRadius: radiusNow,
-          transform: `skewX(-${skewNow}deg)`,
-          transformOrigin: "left top",
-          transition: BANNER_TRANSITION,
+          justifyContent: collapsed ? "center" : "flex-end",
         }}
+        animate={{
+          width: collapsed ? SIDEBAR_W + BANNER_OVERFLOW : SIDEBAR_W + MAIN_PL + BANNER_OVERFLOW + 220,
+          clipPath: collapsed
+            ? "polygon(0 0, 100% 0, 100% 100%, 0 100%)"
+            : "polygon(0 0, calc(100% - 20px) 0, 100% 100%, 0 100%)",
+          borderRadius: collapsed ? "0 8px 8px 0" : "0 4px 4px 0",
+        }}
+        transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
       >
-        <span
-          className="font-sans text-3xl font-extrabold italic text-black"
-          style={{
-            paddingLeft: textPaddingL,
-            paddingRight: BANNER_PAD_R,
-            whiteSpace: "nowrap",
-            display: "inline-block",
-            transform: `skewX(${skewNow}deg)`,
-            transition: BANNER_TRANSITION,
+        <motion.div
+          className="flex items-center font-sans text-3xl font-extrabold italic text-black"
+          initial={false}
+          animate={{
+            paddingLeft: collapsed ? BANNER_OVERFLOW + 24 : BANNER_OVERFLOW + 8,
+            paddingRight: collapsed ? 0 : 36,
           }}
+          transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
         >
-          {label}
-        </span>
-      </div>
-
+          <span className="whitespace-nowrap">{label}</span>
+        </motion.div>
+      </motion.div>
       {/* SIDEBAR — fixed, always visible, z:100 */}
       <aside
         className="flex flex-col bg-dark"
