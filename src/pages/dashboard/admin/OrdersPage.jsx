@@ -1,8 +1,9 @@
 import { useState, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { X, Package, MapPin, Truck, AlertTriangle, User, Store } from "lucide-react";
-import DashboardLayout from "../../features/dashboard/DashboardLayout.js";
-import DashboardCard from "../../features/dashboard/components/DashboardCard.js";
-import ScrollableContent from "../../features/dashboard/components/ScrollableContent.js";
+import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
+import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
+import ScrollableContent from "../../../features/dashboard/components/ScrollableContent.js";
 
 // ─── Status config ────────────────────────────────────────────────────────────
 
@@ -297,11 +298,21 @@ function OrderModal({ order, onClose }) {
   const cfg = STATUS_CONFIG[order.status];
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
       className="fixed inset-0 z-[2000] flex items-center justify-center bg-[rgba(149,149,149,0.08)] backdrop-blur-[12px] p-4"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="relative w-full max-w-2xl rounded-2xl border border-white/10 bg-[rgba(5,10,7,0.97)] shadow-2xl flex flex-col max-h-[90vh]">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.93, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.93, y: 20 }}
+        transition={{ duration: 0.25, ease: "easeOut" }}
+        className="relative w-full max-w-2xl rounded-2xl border border-white/10 bg-[rgba(5,10,7,0.97)] shadow-2xl flex flex-col max-h-[90vh]"
+      >
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-white/10 shrink-0">
@@ -434,8 +445,8 @@ function OrderModal({ order, onClose }) {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -511,9 +522,10 @@ export default function OrdersPage() {
                 {filtered.map((order, index) => (
                   <div
                     key={order.id}
+                    onClick={() => setSelected(order)}
                     className={`
                       grid grid-cols-[0.8fr_1.4fr_1.4fr_1.2fr_1fr_0.8fr_32px] gap-3 items-center py-3 px-2
-                      hover:bg-[rgba(149,149,149,0.1)] transition-colors rounded-2xl
+                      hover:bg-[rgba(149,149,149,0.1)] transition-colors rounded-2xl cursor-pointer
                       ${index < filtered.length - 1 ? "border-b-[0.5px] border-white/10" : ""}
                     `}
                   >
@@ -549,9 +561,11 @@ export default function OrdersPage() {
         </DashboardCard>
       </div>
 
-      {selected && (
-        <OrderModal order={selected} onClose={() => setSelected(null)} />
-      )}
+      <AnimatePresence>
+        {selected && (
+          <OrderModal key="order-modal" order={selected} onClose={() => setSelected(null)} />
+        )}
+      </AnimatePresence>
     </DashboardLayout>
   );
 }

@@ -1,23 +1,25 @@
 import {
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 import Select from "react-select";
+import { CheckCircle } from "lucide-react";
 import { City, Country } from "country-state-city";
-import DashboardLayout from "../../features/dashboard/DashboardLayout.js";
-import DashboardCard from "../../features/dashboard/components/DashboardCard.js";
-import ScrollableContent from "../../features/dashboard/components/ScrollableContent.js";
+import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
+import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
+import ScrollableContent from "../../../features/dashboard/components/ScrollableContent.js";
 import {
   PartnerLocationsProvider,
   usePartnerLocations,
-} from "../../features/network/PartnerLocationsContext.jsx";
+} from "../../../features/network/PartnerLocationsContext.jsx";
 import WorldMap, {
   DEFAULT_CENTER,
   DEFAULT_ZOOM,
   FOCUS_ZOOM,
-} from "../../features/network/WorldMap.jsx";
+} from "../../../features/network/WorldMap.jsx";
 
 // ─── react-select dark theme ──────────────────────────────────────────────────
 const selectStyles = {
@@ -111,11 +113,23 @@ function splitPartnerName(name) {
   return { city: name.slice(0, idx), country: name.slice(idx + 2) };
 }
 
+function matchSupplierName(city, suppliers) {
+  const q = city.toLowerCase();
+  const match = suppliers.find((s) => s.city.toLowerCase().includes(q));
+  return match?.name ?? "—";
+}
+
 // ─── City selector ────────────────────────────────────────────────────────────
 function CitySelector({ onAdd }) {
   const [inputValue,   setInputValue]   = useState("");
   const [selectedCity, setSelectedCity] = useState(null);
   const [error,        setError]        = useState("");
+  const [success,      setSuccess]      = useState(false);
+  const successTimerRef = useRef(null);
+
+  useEffect(() => () => {
+    if (successTimerRef.current) clearTimeout(successTimerRef.current);
+  }, []);
 
   const visibleOptions = useMemo(() => {
     if (inputValue.length < 2) return INITIAL_100;
@@ -137,15 +151,19 @@ function CitySelector({ onAdd }) {
   const handleAdd = () => {
     if (!selectedCity) { setError("Select a city first."); return; }
     setError("");
+    setSuccess(false);
     const id = crypto?.randomUUID?.() ?? `p-${Date.now()}`;
     onAdd({ id, name: selectedCity.label, lat: selectedCity.lat, lng: selectedCity.lng });
     setSelectedCity(null);
     setInputValue("");
+    setSuccess(true);
+    if (successTimerRef.current) clearTimeout(successTimerRef.current);
+    successTimerRef.current = setTimeout(() => setSuccess(false), 2000);
   };
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-1">
+    <div className="flex items-end gap-4">
+      <div className="flex-1 flex flex-col gap-1">
         <label className="text-[11px] font-bold uppercase tracking-[0.12em] text-zinc-400">
           Search city
         </label>
@@ -166,7 +184,7 @@ function CitySelector({ onAdd }) {
           styles={selectStyles}
         />
       </div>
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-1 shrink-0">
         <button
           type="button"
           disabled={!selectedCity}
@@ -175,7 +193,12 @@ function CitySelector({ onAdd }) {
         >
           Add to Map
         </button>
-        {error && <p className="text-sm text-rose-400">{error}</p>}
+        {error && !success && <p className="text-sm text-rose-400">{error}</p>}
+        {success && (
+          <p className="text-sm font-semibold text-[#5ac422] flex items-center gap-1.5">
+            <CheckCircle size={14} /> Location added to map!
+          </p>
+        )}
       </div>
     </div>
   );
@@ -185,14 +208,23 @@ function CitySelector({ onAdd }) {
 const TH = "text-[11px] font-semibold uppercase tracking-wide text-zinc-300";
 const TD = "text-[clamp(12px,1vw,13px)] text-zinc-200 truncate";
 
-function LocationsTable({ partners, onShowOnMap, onRemove }) {
+function LocationsTable({ partners, suppliers, onShowOnMap, onReset, onRemove }) {
   const [search, setSearch] = useState("");
 
   const filtered = useMemo(() => {
     if (!search.trim()) return partners;
     const q = search.toLowerCase();
-    return partners.filter((p) => p.name.toLowerCase().includes(q));
-  }, [partners, search]);
+    return partners.filter((p) => {
+      const { city, country } = splitPartnerName(p.name);
+      const supplierName = matchSupplierName(city, suppliers);
+      return (
+        p.name.toLowerCase().includes(q) ||
+        city.toLowerCase().includes(q) ||
+        country.toLowerCase().includes(q) ||
+        supplierName.toLowerCase().includes(q)
+      );
+    });
+  }, [partners, suppliers, search]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -206,10 +238,10 @@ function LocationsTable({ partners, onShowOnMap, onRemove }) {
       />
 
       {/* Header */}
-      <div className="grid grid-cols-[1.4fr_1.3fr_1.4fr_auto] gap-3 px-2 pb-2 border-b border-white/20">
-        <span className={TH}>City</span>
+      <div className="grid grid-cols-[1.2fr_1fr_1fr_auto] gap-3 px-2 pb-2 border-b border-white/20">
+        <span className={TH}>Supplier Name</span>
         <span className={TH}>Country</span>
-        <span className={TH}>Coordinates</span>
+        <span className={TH}>City</span>
         <span className={TH}>Actions</span>
       </div>
 
@@ -221,25 +253,31 @@ function LocationsTable({ partners, onShowOnMap, onRemove }) {
           ) : (
             filtered.map((p, i) => {
               const { city, country } = splitPartnerName(p.name);
+              const supplierName = matchSupplierName(city, suppliers);
               return (
                 <div
                   key={p.id}
-                  className={`grid grid-cols-[1.4fr_1.3fr_1.4fr_auto] gap-3 items-center py-2.5 px-2 rounded-2xl hover:bg-[rgba(149,149,149,0.1)] transition-colors ${
+                  className={`grid grid-cols-[1.2fr_1fr_1fr_auto] gap-3 items-center py-2.5 px-2 rounded-2xl hover:bg-[rgba(149,149,149,0.1)] transition-colors ${
                     i < filtered.length - 1 ? "border-b border-white/10" : ""
                   }`}
                 >
-                  <span className={`${TD} font-semibold text-zinc-100`}>{city}</span>
+                  <span className={`${TD} font-semibold text-zinc-100`}>{supplierName}</span>
                   <span className={TD}>{country}</span>
-                  <span className="text-[11px] text-zinc-400 tabular-nums">
-                    {p.lat.toFixed(3)}°, {p.lng.toFixed(3)}°
-                  </span>
+                  <span className={TD}>{city}</span>
                   <div className="flex items-center gap-1.5 shrink-0">
                     <button
                       type="button"
                       onClick={() => onShowOnMap(p)}
-                      className="rounded px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#5ac422] border border-[#5ac422]/40 hover:bg-[#5ac422]/10 transition-colors whitespace-nowrap"
+                      className="rounded px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-[#22a8c4] border border-[#22a8c4]/40 hover:bg-[#22a8c4]/10 transition-colors whitespace-nowrap"
                     >
                       Focus
+                    </button>
+                    <button
+                      type="button"
+                      onClick={onReset}
+                      className="rounded px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-zinc-300 border border-zinc-600/50 hover:bg-zinc-700/40 transition-colors whitespace-nowrap"
+                    >
+                      Reset
                     </button>
                     <button
                       type="button"
@@ -260,69 +298,22 @@ function LocationsTable({ partners, onShowOnMap, onRemove }) {
   );
 }
 
-// ─── Supplier search panel ────────────────────────────────────────────────────
-function SupplierSearchPanel() {
-  const [query, setQuery] = useState("");
-
-  const results = useMemo(() => {
-    if (!query.trim()) return MOCK_SUPPLIERS;
-    const q = query.toLowerCase();
-    return MOCK_SUPPLIERS.filter(
-      (s) =>
-        s.name.toLowerCase().includes(q) ||
-        s.city.toLowerCase().includes(q) ||
-        s.email.toLowerCase().includes(q),
-    );
-  }, [query]);
-
-  return (
-    <div className="flex flex-col gap-3">
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search by name, city, or email…"
-        className="w-full rounded-md border border-white/10 bg-[rgba(5,10,7,0.7)] px-3 py-2 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-[#5ac422] transition-colors"
-      />
-
-      <div className="flex min-h-0 flex-col" style={{ maxHeight: 272 }}>
-        <ScrollableContent scrollbarSide="right">
-          {results.length === 0 ? (
-            <p className="py-6 text-center text-sm text-zinc-500">No suppliers found.</p>
-          ) : (
-            results.map((s, i) => (
-              <div
-                key={s.id}
-                className={`flex flex-col gap-0.5 py-3 px-2 rounded-2xl hover:bg-[rgba(149,149,149,0.1)] transition-colors ${
-                  i < results.length - 1 ? "border-b border-white/10" : ""
-                }`}
-              >
-                <span className="text-[13px] font-semibold text-zinc-100">{s.name}</span>
-                <span className="text-[11px] text-[#5ac422]">{s.city}</span>
-                <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-0.5">
-                  <span className="text-[11px] text-zinc-400">{s.email}</span>
-                  <span className="text-[11px] text-zinc-500">{s.phone}</span>
-                </div>
-              </div>
-            ))
-          )}
-        </ScrollableContent>
-      </div>
-    </div>
-  );
-}
-
 // ─── Inner page (needs PartnerLocations context) ──────────────────────────────
 function SupplierMapContent() {
   const { partners, addPartner, removePartner } = usePartnerLocations();
   const mapSectionRef = useRef(null);
 
-  const [mapCenter, setMapCenter] = useState([0, 10]);
-  const [mapZoom,   setMapZoom]   = useState(1.15);
+  const [mapCenter, setMapCenter] = useState(DEFAULT_CENTER);
+  const [mapZoom,   setMapZoom]   = useState(DEFAULT_ZOOM);
 
   const handleMoveEnd = useCallback(({ coordinates, zoom: z }) => {
     setMapCenter(coordinates);
     setMapZoom(z);
+  }, []);
+
+  const handleReset = useCallback(() => {
+    setMapCenter(DEFAULT_CENTER);
+    setMapZoom(DEFAULT_ZOOM);
   }, []);
 
   const handleShowOnMap = useCallback((p) => {
@@ -340,41 +331,29 @@ function SupplierMapContent() {
           Supplier Map
         </h1>
 
-        {/* ── Row 1: Map (70%) + Add Location (30%) ────────────────────────── */}
-        <div className="grid grid-cols-[70fr_30fr] gap-3 items-center">
-
-          {/* Left: bare map */}
-          <div ref={mapSectionRef} className="mt-10">
-            <WorldMap
-              partners={partners}
-              center={mapCenter}
-              zoom={mapZoom}
-              onMoveEnd={handleMoveEnd}
-              height={700}
-            />
-          </div>
-
-          {/* Right: Add Location */}
-          <DashboardCard title="Add Location" autoHeight>
-            <CitySelector onAdd={(partner) => addPartner(partner)} />
-          </DashboardCard>
-
+        <div ref={mapSectionRef} className="w-full">
+          <WorldMap
+            partners={partners}
+            center={mapCenter}
+            zoom={mapZoom}
+            onMoveEnd={handleMoveEnd}
+            height={500}
+          />
         </div>
 
-        {/* ── Row 2: Locations (50%) + Supplier Search (50%) ───────────────── */}
-        <div className="grid grid-cols-2 gap-6">
-          <DashboardCard title={`Locations (${partners.length})`} autoHeight>
-            <LocationsTable
-              partners={partners}
-              onShowOnMap={handleShowOnMap}
-              onRemove={removePartner}
-            />
-          </DashboardCard>
+        <DashboardCard title="Add Location" autoHeight>
+          <CitySelector onAdd={(partner) => addPartner(partner)} />
+        </DashboardCard>
 
-          <DashboardCard title="Supplier Search" autoHeight>
-            <SupplierSearchPanel />
-          </DashboardCard>
-        </div>
+        <DashboardCard title={`Locations (${partners.length})`} autoHeight>
+          <LocationsTable
+            partners={partners}
+            suppliers={MOCK_SUPPLIERS}
+            onShowOnMap={handleShowOnMap}
+            onReset={handleReset}
+            onRemove={removePartner}
+          />
+        </DashboardCard>
 
       </div>
     </DashboardLayout>

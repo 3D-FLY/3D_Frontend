@@ -1,7 +1,8 @@
 import { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { Printer, Pencil, Trash2, ArrowRight, X } from "lucide-react";
-import DashboardLayout from "../../features/dashboard/DashboardLayout.js";
-import Input from "../../components/ui/Input.tsx";
+import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
+import Input from "../../../components/ui/Input.tsx";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 const INITIAL_SUPPLIERS = [
@@ -115,14 +116,20 @@ function SupplierModal({ mode, initial, onSave, onClose }) {
 }
 
 // ─── Supplier card ────────────────────────────────────────────────────────────
-function SupplierCard({ supplier, onEdit, onDelete, onViewOrders }) {
+function SupplierCard({ supplier, onEdit, onDelete, onView, onViewOrders }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   return (
     <div className="flex flex-col rounded-2xl border border-white/10 bg-[rgba(149,149,149,0.1)] backdrop-blur-[12px] hover:border-[#5ac422]/50 hover:brightness-110 transition-all">
 
-      {/* Top */}
-      <div className="flex flex-col gap-2 px-5 pt-5 pb-4">
+      {/* Top — click to open detail page */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => onView(supplier.id)}
+        onKeyDown={(e) => e.key === "Enter" && onView(supplier.id)}
+        className="flex flex-col gap-2 px-5 pt-5 pb-4 cursor-pointer"
+      >
         <Printer size={32} color="#5ac422" strokeWidth={1.5} />
 
         <div className="flex flex-col gap-0.5 mt-1">
@@ -172,7 +179,7 @@ function SupplierCard({ supplier, onEdit, onDelete, onViewOrders }) {
           <>
             <button
               type="button"
-              onClick={() => onEdit(supplier)}
+              onClick={(e) => { e.stopPropagation(); onEdit(supplier); }}
               title="Edit"
               className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
             >
@@ -180,7 +187,7 @@ function SupplierCard({ supplier, onEdit, onDelete, onViewOrders }) {
             </button>
             <button
               type="button"
-              onClick={() => setConfirmDelete(true)}
+              onClick={(e) => { e.stopPropagation(); setConfirmDelete(true); }}
               title="Delete"
               className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-400/10 transition-colors"
             >
@@ -188,7 +195,7 @@ function SupplierCard({ supplier, onEdit, onDelete, onViewOrders }) {
             </button>
             <button
               type="button"
-              onClick={() => onViewOrders(supplier.id)}
+              onClick={(e) => { e.stopPropagation(); onViewOrders(supplier.id); }}
               title="View Orders"
               className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-[#5ac422] hover:bg-[#5ac422]/10 transition-colors"
             >
@@ -203,6 +210,7 @@ function SupplierCard({ supplier, onEdit, onDelete, onViewOrders }) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function SuppliersPage() {
+  const navigate = useNavigate();
   const [suppliers, setSuppliers] = useState(INITIAL_SUPPLIERS);
   const [search, setSearch]       = useState("");
   const [modal, setModal]         = useState(null); // null | {mode:"add"} | {mode:"edit", supplier}
@@ -275,6 +283,7 @@ export default function SuppliersPage() {
                 supplier={supplier}
                 onEdit={(s) => setModal({ mode: "edit", supplier: s })}
                 onDelete={handleDelete}
+                onView={(id) => navigate(`/dashboard/admin/suppliers/${id}`)}
                 onViewOrders={handleViewOrders}
               />
             ))}

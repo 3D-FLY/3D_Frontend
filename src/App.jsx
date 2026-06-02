@@ -21,16 +21,33 @@ import LoginForm from "./features/auth/LoginForm.tsx";
 import ScrollToTop from "./components/ui/ScrollToTop.tsx";
 import SellerDashboard from "./pages/SellerDashboard.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
+import LoadingPage from "./pages/LoadingPage.tsx";
 import { PartnerLocationsProvider } from "./features/network/PartnerLocationsContext.jsx";
+import LogoLoader from "./components/ui/LogoLoader.js";
 
-const PartnerMapPage = lazy(() => import("./pages/PartnerMapPage.jsx"));
-const SupplierMapPage = lazy(() => import("./pages/admin/SupplierMapPage.jsx"));
-const SuppliersPage = lazy(() => import("./pages/admin/SuppliersPage.jsx"));
-const OrdersPage = lazy(() => import("./pages/admin/OrdersPage.jsx"));
+const PartnerMapPage  = lazy(() => import("./pages/PartnerMapPage.jsx"));
+const SuppliersPage   = lazy(() => import("./pages/dashboard/admin/SuppliersPage.jsx"));
+const OrdersPage      = lazy(() => import("./pages/dashboard/admin/OrdersPage.jsx"));
+const SettingsPage    = lazy(() => import("./pages/dashboard/admin/SettingsPage.jsx"));
+const UsersPage       = lazy(() => import("./pages/dashboard/admin/UsersPage.tsx"));
+const UserDetailPage    = lazy(() => import("./pages/dashboard/admin/UserDetailPage.tsx"));
+const SupplierDetailPage = lazy(() => import("./pages/dashboard/admin/SupplierDetailPage.jsx"));
+const StoresPage         = lazy(() => import("./pages/dashboard/admin/StoresPage.tsx"));
+const StoreDetailPage    = lazy(() => import("./pages/dashboard/admin/StoreDetailPage.tsx"));
+const SupplierMapPage    = lazy(() => import("./pages/dashboard/admin/SupplierMapPage.jsx"));
 
 const partnerNetworkFallback = (
   <div className="flex min-h-[50vh] flex-1 items-center justify-center bg-[#0d1a10] font-mono text-sm font-bold tracking-[0.2em] text-[#5AC422]">
     LOADING…
+  </div>
+);
+
+/** Map-area loader while PartnerMap chunk loads (not full-page). */
+const partnerMapChunkFallback = (
+  <div className="relative flex w-full flex-1 flex-col items-center bg-dark">
+    <div className="relative mt-10 flex h-[88vh] min-h-[280px] w-full max-w-[1440px] items-center justify-center px-6 max-[1024px]:h-[56vh] max-[768px]:h-[42vh]">
+      <LogoLoader size={90} gap={28} />
+    </div>
   </div>
 );
 
@@ -55,6 +72,14 @@ function App() {
         {/* Dashboard routes — no landing Navbar/Footer */}
         <Route path="/dashboard/seller/*" element={<SellerDashboard />} />
         <Route
+          path="/dashboard/admin/suppliers/:id"
+          element={
+            <Suspense fallback={partnerNetworkFallback}>
+              <SupplierDetailPage />
+            </Suspense>
+          }
+        />
+        <Route
           path="/dashboard/admin/suppliers"
           element={
             <Suspense fallback={partnerNetworkFallback}>
@@ -78,7 +103,49 @@ function App() {
             </Suspense>
           }
         />
+        <Route
+          path="/dashboard/admin/settings"
+          element={
+            <Suspense fallback={partnerNetworkFallback}>
+              <SettingsPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/admin/users"
+          element={
+            <Suspense fallback={partnerNetworkFallback}>
+              <UsersPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/admin/users/:id"
+          element={
+            <Suspense fallback={partnerNetworkFallback}>
+              <UserDetailPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/admin/stores"
+          element={
+            <Suspense fallback={partnerNetworkFallback}>
+              <StoresPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/admin/stores/:id"
+          element={
+            <Suspense fallback={partnerNetworkFallback}>
+              <StoreDetailPage />
+            </Suspense>
+          }
+        />
         <Route path="/dashboard/admin/*" element={<AdminDashboard />} />
+
+        <Route path="/loading-preview" element={<LoadingPage />} />
 
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
@@ -95,7 +162,7 @@ function App() {
             path="/partner-map"
             element={
               <PartnerLocationsProvider>
-                <Suspense fallback={partnerNetworkFallback}>
+                <Suspense fallback={partnerMapChunkFallback}>
                   <PartnerMapPage />
                 </Suspense>
               </PartnerLocationsProvider>

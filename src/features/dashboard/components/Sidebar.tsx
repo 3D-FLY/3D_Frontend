@@ -19,7 +19,7 @@ const adminItems: NavItem[] = [
   { label: "Suppliers",    to: "/dashboard/admin/suppliers",    icon: Truck           },
   { label: "Supplier Map", to: "/dashboard/admin/supplier-map", icon: MapPin          },
   { label: "Orders",       to: "/dashboard/admin/orders",       icon: ShoppingCart    },
-  { label: "Store",        to: "/dashboard/admin/store",        icon: Store           },
+  { label: "Store",        to: "/dashboard/admin/stores",        icon: Store           },
   { label: "Settings",     to: "/dashboard/admin/settings",     icon: Settings        },
 ];
 

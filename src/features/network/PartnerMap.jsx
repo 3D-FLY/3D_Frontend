@@ -4,6 +4,7 @@ import SectionTitle from "../../components/ui/SectionTitle.js";
 import Button from "../../components/ui/Button.jsx";
 import AmbientGlowBackdrop from "../../components/ui/AmbientGlowBackdrop.jsx";
 import Turtle from "../../components/ui/Turtle.jsx";
+import LogoLoader from "../../components/ui/LogoLoader.js";
 import { usePartnerLocations } from "./PartnerLocationsContext.jsx";
 import WorldMap, { DEFAULT_CENTER, DEFAULT_ZOOM, FOCUS_ZOOM } from "./WorldMap.jsx";
 
@@ -15,6 +16,7 @@ export default function PartnerMap() {
 
   const [mapCenter, setMapCenter] = useState(() => [...DEFAULT_CENTER]);
   const [mapZoom,   setMapZoom]   = useState(DEFAULT_ZOOM);
+  const [mapReady,  setMapReady]  = useState(false);
 
   // Focus on a location passed via router state (e.g. from "Show on map" button)
   useEffect(() => {
@@ -54,11 +56,22 @@ export default function PartnerMap() {
         <div className="flex w-full flex-col items-center gap-3">
           {/* Responsive container — WorldMap fills it via className="h-full" */}
           <div className="relative h-[88vh] min-h-[280px] w-full max-w-[1440px] overflow-hidden border-none bg-transparent box-border max-[1024px]:h-[56vh] max-[1024px]:min-h-[240px] max-[768px]:h-[42vh] max-[768px]:min-h-[190px]">
+            {!mapReady && (
+              <div
+                className="absolute inset-0 z-20 flex items-center justify-center bg-dark"
+                aria-busy="true"
+                aria-label="Loading map"
+              >
+                <LogoLoader size={90} gap={28} />
+              </div>
+            )}
             <WorldMap
               partners={partners}
               center={mapCenter}
               zoom={mapZoom}
               onMoveEnd={handleMapMoveEnd}
+              onLoad={() => setMapReady(true)}
+              hideLoadingOverlay
               className="h-full"
             />
           </div>
