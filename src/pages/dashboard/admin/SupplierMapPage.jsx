@@ -7,14 +7,16 @@ import {
 } from "react";
 import Select from "react-select";
 import { CheckCircle } from "lucide-react";
-import { City, Country } from "country-state-city";
-import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
+import DashboardPage from "../../../features/dashboard/components/DashboardPage.js";
 import ScrollableContent from "../../../features/dashboard/components/ScrollableContent.js";
 import {
   PartnerLocationsProvider,
   usePartnerLocations,
 } from "../../../features/network/PartnerLocationsContext.jsx";
+import LogoLoaderOverlay from "../../../components/ui/LogoLoaderOverlay.tsx";
+import { loadCityOptions } from "../../../features/network/cityOptionsLoader.js";
+import { isWorldGeoReady } from "../../../features/network/worldGeoCache.js";
 import WorldMap, {
   DEFAULT_CENTER,
   DEFAULT_ZOOM,
@@ -68,32 +70,6 @@ const selectStyles = {
   noOptionsMessage:   (base) => ({ ...base, color: "#6b7280", fontSize: 12 }),
 };
 
-// ─── Global city list (module-level, built once) ──────────────────────────────
-const countryMap = Object.fromEntries(
-  Country.getAllCountries().map((c) => [c.isoCode, c.name]),
-);
-
-const ALL_CITY_OPTIONS = City.getAllCities()
-  .filter((c) => c.latitude && c.longitude)
-  .map((c) => {
-    const countryName = countryMap[c.countryCode] ?? c.countryCode;
-    const lat = parseFloat(c.latitude);
-    const lng = parseFloat(c.longitude);
-    return { lat, lng, countryName, cityName: c.name };
-  })
-  .filter((c) => !Number.isNaN(c.lat) && !Number.isNaN(c.lng))
-  .map((c) => ({
-    value: `${c.cityName}||${c.countryName}||${c.lat}||${c.lng}`,
-    label: `${c.cityName}, ${c.countryName}`,
-    searchKey: `${c.cityName} ${c.countryName}`.toLowerCase(),
-    lat: c.lat,
-    lng: c.lng,
-    cityName: c.cityName,
-    countryName: c.countryName,
-  }));
-
-const INITIAL_100 = ALL_CITY_OPTIONS.slice(0, 100);
-
 // ─── Mock supplier data ───────────────────────────────────────────────────────
 const MOCK_SUPPLIERS = [
   { id: "sup1", name: "PrintHub TLV",      city: "Tel Aviv, Israel",         email: "contact@printhub.io",     phone: "+972-3-555-0100" },
@@ -119,41 +95,71 @@ function matchSupplierName(city, suppliers) {
   return match?.name ?? "—";
 }
 
+function getSupplierName(partner, suppliers) {
+  const custom = partner.supplierName?.trim();
+  if (custom) return custom;
+  const { city } = splitPartnerName(partner.name);
+  return matchSupplierName(city, suppliers);
+}
+
+const inputClassName =
+  "w-full rounded-md border border-white/10 bg-[rgba(5,10,7,0.7)] px-3 py-2 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-[#5ac422] transition-colors h-10";
+
 // ─── City selector ────────────────────────────────────────────────────────────
 function CitySelector({ onAdd }) {
+  const [supplierName, setSupplierName] = useState("");
   const [inputValue,   setInputValue]   = useState("");
   const [selectedCity, setSelectedCity] = useState(null);
   const [error,        setError]        = useState("");
   const [success,      setSuccess]      = useState(false);
+  const [allCities,    setAllCities]    = useState(null);
   const successTimerRef = useRef(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadCityOptions().then((opts) => {
+      if (!cancelled) setAllCities(opts);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => () => {
     if (successTimerRef.current) clearTimeout(successTimerRef.current);
   }, []);
 
   const visibleOptions = useMemo(() => {
-    if (inputValue.length < 2) return INITIAL_100;
+    if (!allCities?.length) return [];
+    if (inputValue.length < 2) return allCities.slice(0, 100);
     const q = inputValue.toLowerCase();
     const out = [];
-    for (const opt of ALL_CITY_OPTIONS) {
+    for (const opt of allCities) {
       if (opt.searchKey.includes(q)) {
         out.push(opt);
         if (out.length === 100) break;
       }
     }
     return out;
-  }, [inputValue]);
+  }, [allCities, inputValue]);
 
   const handleInputChange = (val, { action }) => {
     if (action !== "input-blur" && action !== "menu-close") setInputValue(val);
   };
 
   const handleAdd = () => {
+    const trimmedName = supplierName.trim();
+    if (!trimmedName) { setError("Enter a supplier name."); return; }
     if (!selectedCity) { setError("Select a city first."); return; }
     setError("");
     setSuccess(false);
     const id = crypto?.randomUUID?.() ?? `p-${Date.now()}`;
-    onAdd({ id, name: selectedCity.label, lat: selectedCity.lat, lng: selectedCity.lng });
+    onAdd({
+      id,
+      name: selectedCity.label,
+      lat: selectedCity.lat,
+      lng: selectedCity.lng,
+      supplierName: trimmedName,
+    });
+    setSupplierName("");
     setSelectedCity(null);
     setInputValue("");
     setSuccess(true);
@@ -162,12 +168,25 @@ function CitySelector({ onAdd }) {
   };
 
   return (
-    <div className="flex items-end gap-4">
-      <div className="flex-1 flex flex-col gap-1">
-        <label className="text-[11px] font-bold uppercase tracking-[0.12em] text-zinc-400">
-          Search city
-        </label>
-        <Select
+    <div className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="flex flex-col gap-1">
+          <label className="text-[11px] font-bold uppercase tracking-[0.12em] text-zinc-400">
+            Supplier name
+          </label>
+          <input
+            type="text"
+            value={supplierName}
+            onChange={(e) => { setSupplierName(e.target.value); setError(""); }}
+            placeholder="e.g. PrintHub TLV"
+            className={inputClassName}
+          />
+        </div>
+        <div className="flex flex-col gap-1">
+          <label className="text-[11px] font-bold uppercase tracking-[0.12em] text-zinc-400">
+            Search city
+          </label>
+          <Select
           options={visibleOptions}
           value={selectedCity}
           inputValue={inputValue}
@@ -179,15 +198,19 @@ function CitySelector({ onAdd }) {
           menuPortalTarget={document.body}
           menuPosition="fixed"
           menuPlacement="auto"
-          placeholder="Type to search… (e.g. Tel Aviv, London)"
-          noOptionsMessage={() => "No cities found"}
+          placeholder={
+            allCities ? "Type to search… (e.g. Tel Aviv, London)" : "Loading cities…"
+          }
+          isLoading={!allCities}
+          noOptionsMessage={() => (allCities ? "No cities found" : "Loading cities…")}
           styles={selectStyles}
         />
+        </div>
       </div>
-      <div className="flex flex-col gap-1 shrink-0">
+      <div className="flex flex-col gap-1 shrink-0 md:flex-row md:items-center md:gap-4">
         <button
           type="button"
-          disabled={!selectedCity}
+          disabled={!selectedCity || !supplierName.trim()}
           onClick={handleAdd}
           className="h-10 min-w-[130px] rounded-md bg-[#5ac422] px-5 text-[13px] font-extrabold uppercase italic tracking-wide text-black transition-opacity disabled:opacity-40 hover:brightness-110"
         >
@@ -216,7 +239,7 @@ function LocationsTable({ partners, suppliers, onShowOnMap, onReset, onRemove })
     const q = search.toLowerCase();
     return partners.filter((p) => {
       const { city, country } = splitPartnerName(p.name);
-      const supplierName = matchSupplierName(city, suppliers);
+      const supplierName = getSupplierName(p, suppliers);
       return (
         p.name.toLowerCase().includes(q) ||
         city.toLowerCase().includes(q) ||
@@ -253,7 +276,7 @@ function LocationsTable({ partners, suppliers, onShowOnMap, onReset, onRemove })
           ) : (
             filtered.map((p, i) => {
               const { city, country } = splitPartnerName(p.name);
-              const supplierName = matchSupplierName(city, suppliers);
+              const supplierName = getSupplierName(p, suppliers);
               return (
                 <div
                   key={p.id}
@@ -305,6 +328,7 @@ function SupplierMapContent() {
 
   const [mapCenter, setMapCenter] = useState(DEFAULT_CENTER);
   const [mapZoom,   setMapZoom]   = useState(DEFAULT_ZOOM);
+  const [mapReady,  setMapReady]  = useState(isWorldGeoReady);
 
   const handleMoveEnd = useCallback(({ coordinates, zoom: z }) => {
     setMapCenter(coordinates);
@@ -323,40 +347,34 @@ function SupplierMapContent() {
   }, []);
 
   return (
-    <DashboardLayout role="admin">
-      <div className="w-full flex flex-col gap-4 box-border">
-
-        {/* Page title */}
-        <h1 className="text-[clamp(18px,2vw,24px)] font-semibold text-white">
-          Supplier Map
-        </h1>
-
-        <div ref={mapSectionRef} className="w-full">
-          <WorldMap
-            partners={partners}
-            center={mapCenter}
-            zoom={mapZoom}
-            onMoveEnd={handleMoveEnd}
-            height={500}
-          />
-        </div>
-
-        <DashboardCard title="Add Location" autoHeight>
-          <CitySelector onAdd={(partner) => addPartner(partner)} />
-        </DashboardCard>
-
-        <DashboardCard title={`Locations (${partners.length})`} autoHeight>
-          <LocationsTable
-            partners={partners}
-            suppliers={MOCK_SUPPLIERS}
-            onShowOnMap={handleShowOnMap}
-            onReset={handleReset}
-            onRemove={removePartner}
-          />
-        </DashboardCard>
-
+    <DashboardPage title="Supplier Map">
+      <div ref={mapSectionRef} className="relative w-full" style={{ height: 500 }}>
+        {!mapReady && <LogoLoaderOverlay label="Loading map" />}
+        <WorldMap
+          partners={partners}
+          center={mapCenter}
+          zoom={mapZoom}
+          onMoveEnd={handleMoveEnd}
+          onLoad={() => setMapReady(true)}
+          hideLoadingOverlay
+          height={500}
+        />
       </div>
-    </DashboardLayout>
+
+      <DashboardCard title="Add Location" autoHeight>
+        <CitySelector onAdd={(partner) => addPartner(partner)} />
+      </DashboardCard>
+
+      <DashboardCard title={`Locations (${partners.length})`} autoHeight>
+        <LocationsTable
+          partners={partners}
+          suppliers={MOCK_SUPPLIERS}
+          onShowOnMap={handleShowOnMap}
+          onReset={handleReset}
+          onRemove={removePartner}
+        />
+      </DashboardCard>
+    </DashboardPage>
   );
 }
 
