@@ -2,23 +2,20 @@ import React, { useEffect, useRef } from "react";
 import "./whatCanYouSell.css";
 import Button from "../../../components/ui/Button";
 import Turtle from "../../../components/ui/Turtle";
-import Group26 from "./assets/images/Group26.png";
-import Group28 from "./assets/images/Group28.png";
-import Group36 from "./assets/images/image36.png";
 
 /* דוגמת נתונים — החלף בנתונים אמיתיים */
 const itemsTop = [
-  { id: 1, src: Group26, alt: "Product 1" },
-  { id: 2, src: Group28, alt: "Product 2" },
-  { id: 3, src: Group36, alt: "Product 3" },
-  { id: 4, src: Group26, alt: "Product 4" },
+  { id: 1, src: "/images/p1.jpg", alt: "Product 1" },
+  { id: 2, src: "/images/p2.jpg", alt: "Product 2" },
+  { id: 3, src: "/images/p3.jpg", alt: "Product 3" },
+  { id: 4, src: "/images/p4.jpg", alt: "Product 4" },
 ];
 
 const itemsBottom = [
-  { id: 5, src: Group28, alt: "Product 5" },
-  { id: 6, src: Group36, alt: "Product 6" },
-  { id: 7, src: Group26, alt: "Product 7" },
-  { id: 8, src: Group28, alt: "Product 8" },
+  { id: 5, src: "/images/p5.jpg", alt: "Product 5" },
+  { id: 6, src: "/images/p6.jpg", alt: "Product 6" },
+  { id: 7, src: "/images/p7.jpg", alt: "Product 7" },
+  { id: 8, src: "/images/p8.jpg", alt: "Product 8" },
 ];
 
 /* קומפוננטת כרטיס פשוטה */
@@ -117,7 +114,7 @@ function InfiniteCarousel({ items, direction = "left", speed = 0.1 }) {
 
 export default function WhatCanYouSell() {
   return (
-    <section className="italic bg-gray relative overflow-x-hidden overflow-y-visible min-h-screen grid grid-rows-[1.2fr_2.8fr_1fr]">
+    <section className="italic bg-gray relative overflow-x-hidden overflow-y-visible h-screen grid grid-rows-[1.2fr_2.8fr_1fr]">
 
       {/* צב ברקע - צד שמאל, 50% מחוץ, במרכז האנכי */}
       <Turtle

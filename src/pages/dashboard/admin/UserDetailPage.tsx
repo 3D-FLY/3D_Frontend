@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Pencil, Store, X } from "lucide-react";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
-import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
 import Input from "../../../components/ui/Input.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -379,26 +378,28 @@ export default function UserDetailPage() {
 
   return (
     <DashboardLayout role="admin">
-      <DashboardPage
-        header={
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={() => navigate("/dashboard/admin/users")}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-zinc-400 hover:text-white hover:border-white/30 transition-colors shrink-0"
-              title="Back to Stores"
-            >
-              <ArrowLeft size={18} />
-            </button>
-            <div className="flex items-center gap-3 min-w-0">
-              <DashboardPageTitle className="truncate">{store.name}</DashboardPageTitle>
-              <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize shrink-0 ${PLAN_BADGE[store.plan]}`}>
-                {store.plan}
-              </span>
-            </div>
+      <div className="w-full flex flex-col gap-6">
+
+        {/* Page header */}
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard/admin/users")}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-zinc-400 hover:text-white hover:border-white/30 transition-colors shrink-0"
+            title="Back to Stores"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div className="flex items-center gap-3 min-w-0">
+            <h1 className="text-[clamp(18px,2vw,24px)] font-semibold text-white truncate">
+              {store.name}
+            </h1>
+            <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize shrink-0 ${PLAN_BADGE[store.plan]}`}>
+              {store.plan}
+            </span>
           </div>
-        }
-      >
+        </div>
+
         {/* Main 2-column grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
@@ -601,7 +602,7 @@ export default function UserDetailPage() {
             </DashboardCard>
           </div>
         </div>
-      </DashboardPage>
+      </div>
 
       {editOpen && (
         <StoreModal

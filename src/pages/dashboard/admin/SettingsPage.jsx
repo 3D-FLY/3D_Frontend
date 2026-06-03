@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, Eye, EyeOff, Trash2, Check, X } from "lucide-react";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
-import DashboardPage from "../../../features/dashboard/components/DashboardPage.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
 import Input from "../../../components/ui/Input.js";
 
@@ -501,7 +500,11 @@ function RolesPermissionsSection() {
 export default function SettingsPage() {
   return (
     <DashboardLayout role="admin">
-      <DashboardPage title="Settings">
+      <div className="w-full flex flex-col gap-6">
+
+        {/* Page title */}
+        <h1 className="text-[clamp(18px,2vw,24px)] font-semibold text-white">Settings</h1>
+
         {/* Section 1 — no card */}
         <ProfileHeader />
 
@@ -525,7 +528,7 @@ export default function SettingsPage() {
           <RolesPermissionsSection />
         </DashboardCard>
 
-      </DashboardPage>
+      </div>
     </DashboardLayout>
   );
 }

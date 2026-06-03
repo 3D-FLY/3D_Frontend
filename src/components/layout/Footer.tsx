@@ -127,7 +127,7 @@ export default function Footer() {
       </div>
 
       {/* ================== DESKTOP ================== */}
-      <div className="hidden md:flex flex-col relative h-[20dvh] min-h-[330px]">
+      <div className="hidden md:flex flex-col relative h-[20dvh] md:min-h-[300px] lg:h-[40dvh]">
 
         {/* Turtle centered background — עיגול הארה בדיוק מאחור, רוחב שליש מרוחב הצב */}
         <div

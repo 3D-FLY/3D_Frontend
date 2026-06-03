@@ -2,7 +2,6 @@ import { useState, useMemo } from "react";
 import { Store, Pencil, Trash2, ArrowRight, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
-import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
 import Input from "../../../components/ui/Input.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -330,25 +329,27 @@ export default function UsersPage() {
 
   return (
     <DashboardLayout role="admin">
-      <DashboardPage
-        header={
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <DashboardPageTitle>Stores</DashboardPageTitle>
-              <span className="rounded-full bg-[#22a8c4]/15 border border-[#22a8c4]/30 px-2.5 py-0.5 text-[13px] font-bold text-[#22a8c4]">
-                {stores.length}
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setModal({ mode: "add" })}
-              className="h-10 rounded-md bg-[#22a8c4] px-5 text-[13px] font-extrabold uppercase italic tracking-wide text-black hover:brightness-110 transition-all whitespace-nowrap"
-            >
-              Add Store
-            </button>
+      <div className="w-full flex flex-col gap-6">
+
+        {/* Header */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <h1 className="text-[clamp(18px,2vw,24px)] font-semibold text-white">
+              Stores
+            </h1>
+            <span className="rounded-full bg-[#22a8c4]/15 border border-[#22a8c4]/30 px-2.5 py-0.5 text-[13px] font-bold text-[#22a8c4]">
+              {stores.length}
+            </span>
           </div>
-        }
-      >
+          <button
+            type="button"
+            onClick={() => setModal({ mode: "add" })}
+            className="h-10 rounded-md bg-[#22a8c4] px-5 text-[13px] font-extrabold uppercase italic tracking-wide text-black hover:brightness-110 transition-all whitespace-nowrap"
+          >
+            Add Store
+          </button>
+        </div>
+
         {/* Search */}
         <input
           type="text"
@@ -374,7 +375,7 @@ export default function UsersPage() {
             ))}
           </div>
         )}
-      </DashboardPage>
+      </div>
 
       {modal && (
         modal.mode === "edit" ? (
