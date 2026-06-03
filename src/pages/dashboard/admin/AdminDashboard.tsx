@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import DashboardLayout from "../features/dashboard/DashboardLayout.js";
-import DashboardCard from "../features/dashboard/components/DashboardCard.js";
-import StatusBadge from "../features/dashboard/components/StatusBadge.js";
-import type { OrderAttention } from "../features/dashboard/components/OrderAttentionList.js";
-import OrderAttentionList from "../features/dashboard/components/OrderAttentionList.js";
-import RecentOrdersTable, { type RecentOrder } from "../features/dashboard/components/RecentOrdersTable.js";
+import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
+import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
+import DashboardPage from "../../../features/dashboard/components/DashboardPage.js";
+import StatusBadge from "../../../features/dashboard/components/StatusBadge.js";
+import type { OrderAttention } from "../../../features/dashboard/components/OrderAttentionList.js";
+import OrderAttentionList from "../../../features/dashboard/components/OrderAttentionList.js";
+import RecentOrdersTable, { type RecentOrder } from "../../../features/dashboard/components/RecentOrdersTable.js";
 
 const attentionOrders: OrderAttention[] = [
   { id: "1", orderId: "3012", reason: "supplier_rejected", detail: "Rejected by: Supplier A",     timestamp: new Date(Date.now() - 5  * 60000).toISOString() },
@@ -40,9 +41,7 @@ export default function AdminDashboard() {
 
   return (
     <DashboardLayout role="admin">
-      <div className="w-full space-y-6 box-border">
-        <h1 className="text-[clamp(22px,2.5vw,32px)] font-semibold text-white">Welcome, Raz</h1>
-
+      <DashboardPage title="Welcome, Raz">
         <DashboardCard index={0} title="Status" className="status-container">
           <div className="grid h-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {statusCards.map((card) => (
@@ -97,7 +96,7 @@ export default function AdminDashboard() {
         >
           <RecentOrdersTable items={recentOrders} />
         </DashboardCard>
-      </div>
+      </DashboardPage>
     </DashboardLayout>
   );
 }

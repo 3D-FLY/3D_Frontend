@@ -17,7 +17,7 @@ export default function Home() {
 
       <Suspense fallback={null}>
         {/* Features: מובייל/טאבלט גובה לפי תוכן; דסקטופ גובה מסך */}
-        <section className="relative isolate z-0 w-full min-h-0 overflow-hidden bg-gray lg:h-[calc(100dvh-var(--nav-h))]">
+        <section className="relative isolate z-0 w-full min-h-0 overflow-hidden bg-gray lg:min-h-[calc(100dvh-var(--nav-h))]">
           <Features />
         </section>
 
@@ -26,7 +26,7 @@ export default function Home() {
           <HowDoesItWork />
         </section>
 
-        <section className="relative isolate z-0 w-full min-h-[calc(100svh-var(--nav-h))] overflow-x-hidden bg-gray lg:min-h-0 lg:h-[calc(100dvh-var(--nav-h))] lg:overflow-hidden">
+        <section className="relative isolate z-0 w-full min-h-[calc(100svh-var(--nav-h))] overflow-x-hidden bg-gray lg:min-h-[calc(100dvh-var(--nav-h))] lg:overflow-x-hidden">
           <FileUploader />
         </section>
 

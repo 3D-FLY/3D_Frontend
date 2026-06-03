@@ -114,7 +114,7 @@ function InfiniteCarousel({ items, direction = "left", speed = 0.1 }) {
 
 export default function WhatCanYouSell() {
   return (
-    <section className="italic bg-gray relative overflow-x-hidden overflow-y-visible h-screen grid grid-rows-[1.2fr_2.8fr_1fr]">
+    <section className="italic bg-gray relative overflow-x-hidden overflow-y-visible min-h-screen grid grid-rows-[1.2fr_2.8fr_1fr]">
 
       {/* צב ברקע - צד שמאל, 50% מחוץ, במרכז האנכי */}
       <Turtle

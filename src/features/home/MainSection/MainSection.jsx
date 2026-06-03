@@ -15,7 +15,7 @@ export default function MainSection() {
 
 
       {/* ===== MOBILE / TABLET SCENE (Earth + Turtle + Lines + Pins) ===== */}
-      <GlobalSupplierScene className="xl:hidden" />
+      <GlobalSupplierScene />
 
       {/* ===== DESKTOP TURTLE (xl and above) ===== */}
       <Turtle

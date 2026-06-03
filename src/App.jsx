@@ -22,10 +22,12 @@ import ScrollToTop from "./components/ui/ScrollToTop.tsx";
 import SellerDashboard from "./pages/SellerDashboard.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import LoadingPage from "./pages/LoadingPage.tsx";
+import AdminDashboardShell from "./features/dashboard/AdminDashboardShell.tsx";
+import SupplierMapPage from "./pages/dashboard/admin/SupplierMapPage.jsx";
+import PaymentsPage from "./pages/dashboard/admin/FinancePage.tsx";
+import PartnerMapPage from "./pages/PartnerMapPage.jsx";
 import { PartnerLocationsProvider } from "./features/network/PartnerLocationsContext.jsx";
-import LogoLoader from "./components/ui/LogoLoader.js";
 
-const PartnerMapPage  = lazy(() => import("./pages/PartnerMapPage.jsx"));
 const SuppliersPage   = lazy(() => import("./pages/dashboard/admin/SuppliersPage.jsx"));
 const OrdersPage      = lazy(() => import("./pages/dashboard/admin/OrdersPage.jsx"));
 const SettingsPage    = lazy(() => import("./pages/dashboard/admin/SettingsPage.jsx"));
@@ -34,23 +36,6 @@ const UserDetailPage    = lazy(() => import("./pages/dashboard/admin/UserDetailP
 const SupplierDetailPage = lazy(() => import("./pages/dashboard/admin/SupplierDetailPage.jsx"));
 const StoresPage         = lazy(() => import("./pages/dashboard/admin/StoresPage.tsx"));
 const StoreDetailPage    = lazy(() => import("./pages/dashboard/admin/StoreDetailPage.tsx"));
-const SupplierMapPage    = lazy(() => import("./pages/dashboard/admin/SupplierMapPage.jsx"));
-
-const partnerNetworkFallback = (
-  <div className="flex min-h-[50vh] flex-1 items-center justify-center bg-[#0d1a10] font-mono text-sm font-bold tracking-[0.2em] text-[#5AC422]">
-    LOADING…
-  </div>
-);
-
-/** Map-area loader while PartnerMap chunk loads (not full-page). */
-const partnerMapChunkFallback = (
-  <div className="relative flex w-full flex-1 flex-col items-center bg-dark">
-    <div className="relative mt-10 flex h-[88vh] min-h-[280px] w-full max-w-[1440px] items-center justify-center px-6 max-[1024px]:h-[56vh] max-[768px]:h-[42vh]">
-      <LogoLoader size={90} gap={28} />
-    </div>
-  </div>
-);
-
 /** Layout wrapper for pages that include the global Navbar + Footer. */
 function MainLayout() {
   return (
@@ -74,7 +59,7 @@ function App() {
         <Route
           path="/dashboard/admin/suppliers/:id"
           element={
-            <Suspense fallback={partnerNetworkFallback}>
+            <Suspense fallback={null}>
               <SupplierDetailPage />
             </Suspense>
           }
@@ -82,7 +67,7 @@ function App() {
         <Route
           path="/dashboard/admin/suppliers"
           element={
-            <Suspense fallback={partnerNetworkFallback}>
+            <Suspense fallback={null}>
               <SuppliersPage />
             </Suspense>
           }
@@ -90,15 +75,15 @@ function App() {
         <Route
           path="/dashboard/admin/supplier-map"
           element={
-            <Suspense fallback={partnerNetworkFallback}>
+            <AdminDashboardShell>
               <SupplierMapPage />
-            </Suspense>
+            </AdminDashboardShell>
           }
         />
         <Route
           path="/dashboard/admin/orders"
           element={
-            <Suspense fallback={partnerNetworkFallback}>
+            <Suspense fallback={null}>
               <OrdersPage />
             </Suspense>
           }
@@ -106,7 +91,7 @@ function App() {
         <Route
           path="/dashboard/admin/settings"
           element={
-            <Suspense fallback={partnerNetworkFallback}>
+            <Suspense fallback={null}>
               <SettingsPage />
             </Suspense>
           }
@@ -114,7 +99,7 @@ function App() {
         <Route
           path="/dashboard/admin/users"
           element={
-            <Suspense fallback={partnerNetworkFallback}>
+            <Suspense fallback={null}>
               <UsersPage />
             </Suspense>
           }
@@ -122,7 +107,7 @@ function App() {
         <Route
           path="/dashboard/admin/users/:id"
           element={
-            <Suspense fallback={partnerNetworkFallback}>
+            <Suspense fallback={null}>
               <UserDetailPage />
             </Suspense>
           }
@@ -130,7 +115,7 @@ function App() {
         <Route
           path="/dashboard/admin/stores"
           element={
-            <Suspense fallback={partnerNetworkFallback}>
+            <Suspense fallback={null}>
               <StoresPage />
             </Suspense>
           }
@@ -138,11 +123,12 @@ function App() {
         <Route
           path="/dashboard/admin/stores/:id"
           element={
-            <Suspense fallback={partnerNetworkFallback}>
+            <Suspense fallback={null}>
               <StoreDetailPage />
             </Suspense>
           }
         />
+        <Route path="/dashboard/admin/payments" element={<PaymentsPage />} />
         <Route path="/dashboard/admin/*" element={<AdminDashboard />} />
 
         <Route path="/loading-preview" element={<LoadingPage />} />
@@ -162,9 +148,9 @@ function App() {
             path="/partner-map"
             element={
               <PartnerLocationsProvider>
-                <Suspense fallback={partnerMapChunkFallback}>
+                <div className="flex min-h-0 flex-1 flex-col bg-dark">
                   <PartnerMapPage />
-                </Suspense>
+                </div>
               </PartnerLocationsProvider>
             }
           />
