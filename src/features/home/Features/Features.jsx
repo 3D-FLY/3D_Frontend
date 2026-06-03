@@ -93,9 +93,9 @@ export default function Features() {
           mx-auto
           w-full max-w-[1400px]
           px-6 md:px-10
-          py-12 md:py-16 lg:py-20
+          py-12 md:py-16 lg:py-[clamp(32px,4vh,80px)]
           hidden md:grid
-          gap-x-[40px] gap-y-[48px]
+          gap-x-[40px] gap-y-[clamp(20px,3vh,48px)]
           justify-items-stretch
           [grid-template-columns:repeat(auto-fit,minmax(min(400px,100%),1fr))]
         "

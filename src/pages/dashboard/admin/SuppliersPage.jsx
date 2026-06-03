@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Printer, Pencil, Trash2, ArrowRight, X } from "lucide-react";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
+import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
 import Input from "../../../components/ui/Input.tsx";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
@@ -242,27 +243,25 @@ export default function SuppliersPage() {
 
   return (
     <DashboardLayout role="admin">
-      <div className="w-full flex flex-col gap-6">
-
-        {/* Header */}
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <h1 className="text-[clamp(18px,2vw,24px)] font-semibold text-white">
-              Suppliers
-            </h1>
-            <span className="rounded-full bg-[#5ac422]/15 border border-[#5ac422]/30 px-2.5 py-0.5 text-[13px] font-bold text-[#5ac422]">
-              {suppliers.length}
-            </span>
+      <DashboardPage
+        header={
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <DashboardPageTitle>Suppliers</DashboardPageTitle>
+              <span className="rounded-full bg-[#5ac422]/15 border border-[#5ac422]/30 px-2.5 py-0.5 text-[13px] font-bold text-[#5ac422]">
+                {suppliers.length}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setModal({ mode: "add" })}
+              className="h-10 rounded-md bg-[#5ac422] px-5 text-[13px] font-extrabold uppercase italic tracking-wide text-black hover:brightness-110 transition-all whitespace-nowrap"
+            >
+              Add Supplier
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={() => setModal({ mode: "add" })}
-            className="h-10 rounded-md bg-[#5ac422] px-5 text-[13px] font-extrabold uppercase italic tracking-wide text-black hover:brightness-110 transition-all whitespace-nowrap"
-          >
-            Add Supplier
-          </button>
-        </div>
-
+        }
+      >
         {/* Search */}
         <input
           type="text"
@@ -289,7 +288,7 @@ export default function SuppliersPage() {
             ))}
           </div>
         )}
-      </div>
+      </DashboardPage>
 
       {modal && (
         <SupplierModal
