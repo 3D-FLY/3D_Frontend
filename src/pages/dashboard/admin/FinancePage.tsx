@@ -165,10 +165,10 @@ export default function FinancePage() {
                   borderRadius: "8px",
                 }}
                 labelStyle={{ color: "white", fontSize: 12, fontWeight: 600 }}
-                formatter={(value: number) => [
-                  `$${value.toLocaleString()}`,
-                  undefined,
-                ]}
+                formatter={(value) => {
+                  const n = typeof value === "number" ? value : Number(value ?? 0);
+                  return [`$${n.toLocaleString()}`, undefined];
+                }}
               />
               <Legend wrapperStyle={{ color: "#a1a1aa", fontSize: 12 }} />
               <Line
