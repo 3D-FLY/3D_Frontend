@@ -1,6 +1,5 @@
 import DashboardLayout from "../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../features/dashboard/components/DashboardCard.js";
-import DashboardPage from "../features/dashboard/components/DashboardPage.js";
 import StatBlock from "../features/dashboard/components/StatBlock.js";
 import StatusBadge from "../features/dashboard/components/StatusBadge.js";
 import NotificationList from "../features/dashboard/components/NotificationList.js";
@@ -70,7 +69,10 @@ const notifications: Notification[] = [
 export default function SellerDashboard() {
   return (
     <DashboardLayout role="seller">
-      <DashboardPage title="Welcome, Raz">
+      <div className="w-full space-y-6 box-border">
+        {/* Welcome */}
+        <h1 className="text-[clamp(22px,2.5vw,32px)] font-semibold text-white">Welcome, Raz</h1>
+
         {/* Analytics */}
         <DashboardCard
           title="Analytics"
@@ -120,7 +122,7 @@ export default function SellerDashboard() {
             <NotificationList items={notifications} />
           </DashboardCard>
         </div>
-      </DashboardPage>
+      </div>
     </DashboardLayout>
   );
 }

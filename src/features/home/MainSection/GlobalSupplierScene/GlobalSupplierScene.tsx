@@ -85,7 +85,7 @@ export default function GlobalSupplierScene({ className = "" }: GlobalSupplierSc
 
   return (
     <div
-      className={`absolute bottom-0 left-1/2 pointer-events-none hidden max-xl:block ${className}`.trim()}
+      className={`absolute bottom-0 left-1/2 pointer-events-none ${className}`.trim()}
       style={{
         width:       "100vw",
         aspectRatio: "41 / 40",
