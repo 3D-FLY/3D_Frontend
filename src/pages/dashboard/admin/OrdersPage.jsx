@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Package, MapPin, Truck, AlertTriangle, User, Store } from "lucide-react";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
+import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
 import ScrollableContent from "../../../features/dashboard/components/ScrollableContent.js";
 
 // ─── Status config ────────────────────────────────────────────────────────────
@@ -472,16 +473,16 @@ export default function OrdersPage() {
 
   return (
     <DashboardLayout role="admin">
-      <div className="w-full flex flex-col gap-6">
-
-        {/* Header */}
-        <div className="flex items-center gap-3">
-          <h1 className="text-[clamp(18px,2vw,24px)] font-semibold text-white">Orders</h1>
-          <span className="rounded-full bg-[#5ac422]/15 border border-[#5ac422]/30 px-2.5 py-0.5 text-[13px] font-bold text-[#5ac422]">
-            {filtered.length}
-          </span>
-        </div>
-
+      <DashboardPage
+        header={
+          <div className="flex items-center gap-3">
+            <DashboardPageTitle>Orders</DashboardPageTitle>
+            <span className="rounded-full bg-[#5ac422]/15 border border-[#5ac422]/30 px-2.5 py-0.5 text-[13px] font-bold text-[#5ac422]">
+              {filtered.length}
+            </span>
+          </div>
+        }
+      >
         {/* Filters */}
         <div className="flex flex-wrap gap-3">
           <input
@@ -559,7 +560,7 @@ export default function OrdersPage() {
             </div>
           )}
         </DashboardCard>
-      </div>
+      </DashboardPage>
 
       <AnimatePresence>
         {selected && (
