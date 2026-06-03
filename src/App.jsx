@@ -20,7 +20,7 @@ import RegistrationForm from "./features/auth/RegistrationForm.tsx";
 import LoginForm from "./features/auth/LoginForm.tsx";
 import ScrollToTop from "./components/ui/ScrollToTop.tsx";
 import SellerDashboard from "./pages/SellerDashboard.tsx";
-import AdminDashboard from "./pages/AdminDashboard.tsx";
+import AdminDashboard from "./pages/dashboard/admin/AdminDashboard.tsx";
 import LoadingPage from "./pages/LoadingPage.tsx";
 import AdminDashboardShell from "./features/dashboard/AdminDashboardShell.tsx";
 import SupplierMapPage from "./pages/dashboard/admin/SupplierMapPage.jsx";
