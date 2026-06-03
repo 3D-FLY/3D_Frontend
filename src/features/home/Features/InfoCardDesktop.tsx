@@ -12,7 +12,7 @@ export default function InfoCardDesktop({ imageSrc, title, text }: Props) {
     <div
       className="
         flex flex-col items-center justify-center text-center
-        w-full min-h-[296px]
+        w-full h-[296px]
         p-[30px]
         rounded-[35px]
         hover:-translate-y-1 transition
