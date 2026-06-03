@@ -1,11 +1,12 @@
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
-import DashboardPage from "../../../features/dashboard/components/DashboardPage.js";
 
 export default function StoreDetailPage() {
   return (
     <DashboardLayout role="admin">
-      <DashboardPage title="Store Detail">
+      <div className="w-full flex flex-col gap-6">
+        <h1 className="text-[clamp(18px,2vw,24px)] font-semibold text-white">Store Detail</h1>
+
         <DashboardCard index={0} title="Store Detail" autoHeight>
           <div className="flex flex-col items-center justify-center py-20 gap-3">
             <span className="text-[32px] font-extrabold uppercase italic tracking-widest text-white/10 select-none">
@@ -14,7 +15,7 @@ export default function StoreDetailPage() {
             <span className="text-sm text-zinc-500">This section is under construction.</span>
           </div>
         </DashboardCard>
-      </DashboardPage>
+      </div>
     </DashboardLayout>
   );
 }

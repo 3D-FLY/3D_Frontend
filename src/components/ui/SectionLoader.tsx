@@ -1,5 +1,5 @@
 import { type ReactNode } from "react";
-import LogoLoader from "./LogoLoader.js";
+import LogoLoader from "./LogoLoader";
 
 interface SectionLoaderProps {
   loading: boolean;

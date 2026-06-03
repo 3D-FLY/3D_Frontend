@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Pencil, Printer, X } from "lucide-react";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
-import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
 import Input from "../../../components/ui/Input.tsx";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
@@ -131,27 +130,26 @@ export default function SupplierDetailPage() {
 
   return (
     <DashboardLayout role="admin">
-      <DashboardPage
-        header={
-          <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={() => navigate("/dashboard/admin/suppliers")}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-zinc-400 hover:text-white hover:border-white/30 transition-colors shrink-0"
-              title="Back to Suppliers"
-            >
-              <ArrowLeft size={18} />
-            </button>
-            <div className="flex items-center gap-3 min-w-0">
-              <Printer size={28} color="#5ac422" strokeWidth={1.5} className="shrink-0" />
-              <DashboardPageTitle className="truncate">{supplier.name}</DashboardPageTitle>
-              <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold shrink-0 ${supplier.active ? "bg-[#5ac422]/15 text-[#5ac422] border border-[#5ac422]/30" : "bg-zinc-700/60 text-zinc-400 border border-zinc-600/40"}`}>
-                {supplier.active ? "Active" : "Inactive"}
-              </span>
-            </div>
+      <div className="w-full flex flex-col gap-6">
+
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard/admin/suppliers")}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-zinc-400 hover:text-white hover:border-white/30 transition-colors shrink-0"
+            title="Back to Suppliers"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div className="flex items-center gap-3 min-w-0">
+            <Printer size={28} color="#5ac422" strokeWidth={1.5} className="shrink-0" />
+            <h1 className="text-[clamp(18px,2vw,24px)] font-semibold text-white truncate">{supplier.name}</h1>
+            <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold shrink-0 ${supplier.active ? "bg-[#5ac422]/15 text-[#5ac422] border border-[#5ac422]/30" : "bg-zinc-700/60 text-zinc-400 border border-zinc-600/40"}`}>
+              {supplier.active ? "Active" : "Inactive"}
+            </span>
           </div>
-        }
-      >
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
           <div className="lg:col-span-2">
@@ -223,7 +221,7 @@ export default function SupplierDetailPage() {
           </DashboardCard>
 
         </div>
-      </DashboardPage>
+      </div>
 
       {editOpen && (
         <SupplierModal
