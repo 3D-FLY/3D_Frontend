@@ -22,8 +22,7 @@ import {
   useZoomPanContext,
 } from "react-simple-maps";
 import locationMarkerUrl from "./Group 82.svg?url";
-import LogoLoaderOverlay from "../../components/ui/LogoLoaderOverlay.tsx";
-import { isWorldGeoReady, setWorldGeoReady } from "./worldGeoCache.js";
+import LogoLoader from "../../components/ui/LogoLoader.js";
 
 // ─── Public constants (re-exported for consumers) ─────────────────────────────
 export const GEO_URL       = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -104,7 +103,7 @@ export default function WorldMap({
   const frameRef  = useRef(null);
   const [mapWidth,  setMapWidth]  = useState(800);
   const [mapHeight, setMapHeight] = useState(height ?? 440);
-  const [geoLoaded, setGeoLoaded] = useState(isWorldGeoReady);
+  const [geoLoaded, setGeoLoaded] = useState(false);
 
   // Notify parent once geo is ready (stable ref avoids stale closure)
   const onLoadRef = useRef(onLoad);
@@ -188,11 +187,13 @@ export default function WorldMap({
     <div
       ref={frameRef}
       className={`relative w-full overflow-hidden bg-transparent ${className}`}
-      style={height != null ? { height } : { height: "100%" }}
+      style={height != null ? { height } : undefined}
     >
       {/* Loading overlay — shown until the world atlas GeoJSON is fetched */}
       {!hideLoadingOverlay && !geoLoaded && (
-        <LogoLoaderOverlay className="z-10" label="Loading map" />
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-dark">
+          <LogoLoader size={90} gap={28} />
+        </div>
       )}
 
       <ComposableMap
@@ -213,10 +214,7 @@ export default function WorldMap({
         >
           <Geographies geography={GEO_URL}>
             {({ geographies }) => {
-              if (geographies.length > 0) {
-                setWorldGeoReady();
-                if (!geoLoaded) setGeoLoaded(true);
-              }
+              if (!geoLoaded && geographies.length > 0) setGeoLoaded(true);
               return geographies
                 .filter((g) => g.properties.name !== "Antarctica")
                 .map((g) => (

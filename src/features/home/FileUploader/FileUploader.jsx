@@ -65,7 +65,7 @@ export default function FileUploader() {
       />
 
         <div className="section4-1 w-full px-4 flex justify-center relative z-10 min-h-[min(85vh,800px)] lg:min-h-0">
-        <div className="w-full max-w-[901px] lg:min-h-[709px] grid grid-cols-1 lg:grid-cols-[minmax(0,582px)_minmax(0,319px)] gap-8 lg:gap-16 items-stretch">
+        <div className="w-full max-w-[901px] lg:h-[709px] grid grid-cols-1 lg:grid-cols-[minmax(0,582px)_minmax(0,319px)] gap-8 lg:gap-16 items-stretch">
         {/* Left Side - File Upload */}
         <UploadDropCard
           accept={acceptedFileTypes}
