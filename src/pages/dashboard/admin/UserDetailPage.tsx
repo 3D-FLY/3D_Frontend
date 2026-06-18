@@ -5,11 +5,16 @@ import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
 import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
 import Input from "../../../components/ui/Input.js";
+import type { OrderStatusKey } from "../../../constants/orderStatusConfig.js";
+import ActiveBadge from "../../../features/dashboard/components/ActiveBadge.js";
+import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
+import StatusBadge from "../../../features/dashboard/components/StatusBadge.js";
+import OrderStatusPill from "../../../features/dashboard/components/OrderStatusPill.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Plan = "basic" | "pro" | "enterprise";
 type ProductStatus = "published" | "draft";
-type OrderStatus = "delivered" | "shipped" | "processing" | "issue";
+type OrderStatus = OrderStatusKey;
 
 interface StoreRecord {
   id: string;
@@ -63,19 +68,6 @@ const PLAN_BADGE: Record<Plan, string> = {
   enterprise: "bg-[#a855f7]/15 text-[#a855f7] border border-[#a855f7]/30",
 };
 
-const ORDER_STATUS_DOT: Record<OrderStatus, string> = {
-  delivered:  "bg-[#22a8c4]",
-  shipped:    "bg-amber-400",
-  processing: "bg-zinc-400",
-  issue:      "bg-rose-400",
-};
-
-const ORDER_STATUS_LABEL: Record<OrderStatus, string> = {
-  delivered:  "Delivered",
-  shipped:    "Shipped",
-  processing: "Processing",
-  issue:      "Issue",
-};
 
 const EMPTY_FORM: StoreForm = { name: "", city: "", email: "", phone: "", plan: "basic", active: true };
 
@@ -152,7 +144,7 @@ const STORE_ORDERS: Record<string, Order[]> = {
   usr1: [
     { id: "#00341", customer: "Alice Johnson",  status: "delivered",  total: 89.97  },
     { id: "#00340", customer: "Bob Martinez",   status: "shipped",    total: 34.99  },
-    { id: "#00339", customer: "Carol White",    status: "processing", total: 54.98  },
+    { id: "#00339", customer: "Carol White",    status: "in_production", total: 54.98  },
     { id: "#00338", customer: "David Lee",      status: "delivered",  total: 149.99 },
     { id: "#00337", customer: "Emma Wilson",    status: "issue",      total: 19.99  },
   ],
@@ -160,49 +152,49 @@ const STORE_ORDERS: Record<string, Order[]> = {
     { id: "#00221", customer: "Yuki Tanaka",    status: "delivered",  total: 79.99  },
     { id: "#00220", customer: "Hiroshi Sato",   status: "shipped",    total: 22.99  },
     { id: "#00219", customer: "Aiko Yamamoto",  status: "delivered",  total: 39.99  },
-    { id: "#00218", customer: "Ken Watanabe",   status: "processing", total: 12.99  },
+    { id: "#00218", customer: "Ken Watanabe",   status: "in_production", total: 12.99  },
     { id: "#00217", customer: "Mei Fujiwara",   status: "issue",      total: 79.99  },
   ],
   usr3: [
     { id: "#00183", customer: "Klaus Müller",   status: "delivered",  total: 44.99  },
     { id: "#00182", customer: "Lena Schmidt",   status: "shipped",    total: 59.99  },
     { id: "#00181", customer: "Hans Weber",     status: "delivered",  total: 29.99  },
-    { id: "#00180", customer: "Greta Fischer",  status: "processing", total: 18.99  },
+    { id: "#00180", customer: "Greta Fischer",  status: "in_production", total: 18.99  },
     { id: "#00179", customer: "Otto Bauer",     status: "delivered",  total: 9.99   },
   ],
   usr4: [
     { id: "#00089", customer: "Sipho Dlamini",  status: "delivered",  total: 34.99  },
     { id: "#00088", customer: "Nomsa Nkosi",    status: "shipped",    total: 12.99  },
     { id: "#00087", customer: "Thabo Mokoena",  status: "issue",      total: 64.99  },
-    { id: "#00086", customer: "Zanele Khumalo", status: "processing", total: 21.99  },
+    { id: "#00086", customer: "Zanele Khumalo", status: "in_production", total: 21.99  },
     { id: "#00085", customer: "Bongani Zulu",   status: "delivered",  total: 34.99  },
   ],
   usr5: [
     { id: "#00267", customer: "Liam Nguyen",    status: "delivered",  total: 42.99  },
     { id: "#00266", customer: "Chloe Smith",    status: "shipped",    total: 74.99  },
     { id: "#00265", customer: "Jack Brown",     status: "delivered",  total: 29.99  },
-    { id: "#00264", customer: "Olivia Taylor",  status: "processing", total: 54.99  },
+    { id: "#00264", customer: "Olivia Taylor",  status: "in_production", total: 54.99  },
     { id: "#00263", customer: "Noah Anderson",  status: "delivered",  total: 19.99  },
   ],
   usr6: [
     { id: "#00045", customer: "Lucas Silva",    status: "delivered",  total: 28.99  },
     { id: "#00044", customer: "Ana Costa",      status: "shipped",    total: 19.99  },
     { id: "#00043", customer: "Pedro Santos",   status: "issue",      total: 39.99  },
-    { id: "#00042", customer: "Maria Oliveira", status: "processing", total: 14.99  },
+    { id: "#00042", customer: "Maria Oliveira", status: "in_production", total: 14.99  },
     { id: "#00041", customer: "Joao Ferreira",  status: "delivered",  total: 28.99  },
   ],
   usr7: [
     { id: "#00519", customer: "Ahmed Al-Rashid", status: "delivered",  total: 149.99 },
     { id: "#00518", customer: "Fatima Al-Zahra", status: "shipped",    total: 124.99 },
     { id: "#00517", customer: "Khalid Al-Farsi", status: "delivered",  total: 89.99  },
-    { id: "#00516", customer: "Layla Hassan",    status: "processing", total: 59.99  },
+    { id: "#00516", customer: "Layla Hassan",    status: "in_production", total: 59.99  },
     { id: "#00515", customer: "Omar Saeed",      status: "delivered",  total: 44.99  },
   ],
   usr8: [
     { id: "#00023", customer: "Camille Dupont",  status: "delivered",  total: 9.99   },
     { id: "#00022", customer: "Pierre Martin",   status: "shipped",    total: 34.99  },
     { id: "#00021", customer: "Sophie Bernard",  status: "issue",      total: 19.99  },
-    { id: "#00020", customer: "Louis Dubois",    status: "processing", total: 24.99  },
+    { id: "#00020", customer: "Louis Dubois",    status: "in_production", total: 24.99  },
     { id: "#00019", customer: "Marie Laurent",   status: "delivered",  total: 9.99   },
   ],
 };
@@ -450,15 +442,7 @@ export default function UserDetailPage() {
                   <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
                     Status
                   </span>
-                  <span
-                    className={`self-start rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
-                      store.active
-                        ? "bg-[#22a8c4]/15 text-[#22a8c4] border border-[#22a8c4]/30"
-                        : "bg-zinc-700/60 text-zinc-400 border border-zinc-600/40"
-                    }`}
-                  >
-                    {store.active ? "Active" : "Inactive"}
-                  </span>
+                  <ActiveBadge active={store.active} color="#22a8c4" className="self-start" />
                 </div>
 
                 <div className="flex flex-col gap-0.5">
@@ -511,61 +495,33 @@ export default function UserDetailPage() {
           {/* ── Section 3: Orders Summary (right column) ───────────────────── */}
           <DashboardCard index={2} title="Orders Summary" autoHeight withBackground={false}>
             {/* Stat row */}
-            <div className="grid grid-cols-3 gap-3 mb-6">
-              <div className="rounded-xl border border-white/10 bg-[rgba(5,10,7,0.5)] p-4 flex flex-col items-center text-center gap-1">
-                <span className="text-[clamp(22px,2.5vw,32px)] font-extrabold text-[#22a8c4]">
-                  {stats.totalOrders}
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
-                  Total Orders
-                </span>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-[rgba(5,10,7,0.5)] p-4 flex flex-col items-center text-center gap-1">
-                <span className="text-[clamp(22px,2.5vw,32px)] font-extrabold text-[#5ac422]">
-                  ${stats.revenue.toLocaleString()}
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
-                  Revenue
-                </span>
-              </div>
-              <div className="rounded-xl border border-white/10 bg-[rgba(5,10,7,0.5)] p-4 flex flex-col items-center text-center gap-1">
-                <span className="text-[clamp(22px,2.5vw,32px)] font-extrabold text-[#f87171]">
-                  {stats.issues}
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
-                  Open Issues
-                </span>
-              </div>
+            <div className="grid grid-cols-3 gap-3 mb-6 h-[120px]">
+              <StatusBadge count={stats.totalOrders} label="Total Orders" color="#22a8c4" />
+              <StatusBadge count={`$${stats.revenue.toLocaleString()}`} label="Revenue" color="#5ac422" />
+              <StatusBadge count={stats.issues} label="Open Issues" color="#f87171" />
             </div>
 
-            {/* Recent orders table */}
-            <div className="flex flex-col gap-0">
-              <div className="grid grid-cols-[auto_1fr_auto_auto] gap-x-3 px-2 pb-2 border-b border-white/10">
-                {["Order", "Customer", "Status", "Total"].map((h) => (
-                  <span key={h} className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                    {h}
-                  </span>
-                ))}
-              </div>
-              {orders.map((o) => (
-                <div
-                  key={o.id}
-                  className="grid grid-cols-[auto_1fr_auto_auto] gap-x-3 px-2 py-2.5 border-b border-white/5 last:border-0 items-center"
-                >
-                  <span className="text-[12px] font-mono text-zinc-400">{o.id}</span>
-                  <span className="text-[12px] text-white truncate">{o.customer}</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className={`w-2 h-2 rounded-full shrink-0 ${ORDER_STATUS_DOT[o.status]}`} />
-                    <span className="text-[11px] text-zinc-300 whitespace-nowrap">
-                      {ORDER_STATUS_LABEL[o.status]}
-                    </span>
-                  </div>
-                  <span className="text-[12px] font-semibold text-white text-right">
-                    ${o.total.toFixed(2)}
-                  </span>
-                </div>
-              ))}
-            </div>
+            <DashboardTable
+              variant="data"
+              scrollable={false}
+              subtle
+              hoverable={false}
+              columns={[
+                { key: "order", header: "Order", cellClassName: "font-mono text-[12px] text-zinc-400" },
+                { key: "customer", header: "Customer", cellClassName: "text-[12px] text-white" },
+                { key: "status", header: "Status" },
+                { key: "total", header: "Total", align: "right", cellClassName: "text-[12px] font-semibold text-white" },
+              ]}
+              rows={orders}
+              getRowKey={(o) => o.id}
+              renderCell={(o, key) => {
+                if (key === "order") return o.id;
+                if (key === "customer") return o.customer;
+                if (key === "status") return <OrderStatusPill status={o.status} />;
+                if (key === "total") return `$${o.total.toFixed(2)}`;
+                return null;
+              }}
+            />
           </DashboardCard>
 
           {/* ── Section 4: Performance (full width) ───────────────────────── */}

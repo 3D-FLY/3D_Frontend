@@ -25,6 +25,7 @@ interface StatusBadgeProps {
   count: string | number;
   label: string;
   accentColor?: AccentColor;
+  color?: string;
   className?: string;
 }
 
@@ -40,6 +41,7 @@ export default function StatusBadge({
   count,
   label,
   accentColor = "green",
+  color,
   className = "",
 }: StatusBadgeProps) {
   const numericTarget = typeof count === "number" ? count : NaN;
@@ -52,14 +54,15 @@ export default function StatusBadge({
     <div
       className={`flex h-full w-full flex-col items-center justify-center gap-2 p-2 text-center ${className}`}
     >
-      <div className="flex h-[80%] w-full items-center justify-center rounded-2xl border border-white/10 bg-[rgba(149,149,149,0.1)] px-3 py-4">
+      <div className="@container flex h-[80%] w-full items-center justify-center rounded-2xl border border-white/10 bg-[rgba(149,149,149,0.1)] px-3 py-4">
         <span
-          className={`text-[clamp(20px,2.6vw,48px)] font-extrabold leading-none ${accentClasses[accentColor]}`}
+          className={`mx-auto block max-w-[90%] min-w-0 text-center text-[clamp(16px,17cqw,48px)] font-extrabold leading-none ${color ? "" : accentClasses[accentColor]}`}
+          style={color ? { color } : undefined}
         >
           {display}
         </span>
       </div>
-      <span className="text-[clamp(11px,1vw,20px)] font-semibold uppercase tracking-[0.05em] text-zinc-100">
+      <span className="text-[clamp(11px,1vw,14px)] font-semibold uppercase tracking-[0.05em] text-zinc-100">
         {label}
       </span>
     </div>

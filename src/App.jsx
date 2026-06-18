@@ -19,7 +19,7 @@ import JoinAsPartnerPage from "./pages/JoinAsPartnerPage.jsx";
 import RegistrationForm from "./features/auth/RegistrationForm.tsx";
 import LoginForm from "./features/auth/LoginForm.tsx";
 import ScrollToTop from "./components/ui/ScrollToTop.tsx";
-import SellerDashboard from "./pages/SellerDashboard.tsx";
+import MyStore from "./pages/dashboard/seller/MyStore.tsx";
 import AdminDashboard from "./pages/dashboard/admin/AdminDashboard.tsx";
 import LoadingPage from "./pages/LoadingPage.tsx";
 import AdminDashboardShell from "./features/dashboard/AdminDashboardShell.tsx";
@@ -28,7 +28,14 @@ import PaymentsPage from "./pages/dashboard/admin/FinancePage.tsx";
 import PartnerMapPage from "./pages/PartnerMapPage.jsx";
 import { PartnerLocationsProvider } from "./features/network/PartnerLocationsContext.jsx";
 
-const SuppliersPage   = lazy(() => import("./pages/dashboard/admin/SuppliersPage.jsx"));
+const SuppliersPage          = lazy(() => import("./pages/dashboard/admin/SuppliersPage.jsx"));
+const SellerOrdersPage        = lazy(() => import("./pages/dashboard/seller/Orders.tsx"));
+const SellerBillingPage       = lazy(() => import("./pages/dashboard/seller/Billing.tsx"));
+const SellerSettingsPage      = lazy(() => import("./pages/dashboard/seller/Settings.tsx"));
+const SellerIntegrationPage   = lazy(() => import("./pages/dashboard/seller/Integration.tsx"));
+const SellerAddProductPage    = lazy(() => import("./pages/dashboard/seller/AddProduct.tsx"));
+const SellerProductsPage      = lazy(() => import("./pages/dashboard/seller/Products.tsx"));
+const SellerProductDetailPage = lazy(() => import("./pages/dashboard/seller/ProductDetail.tsx"));
 const OrdersPage      = lazy(() => import("./pages/dashboard/admin/OrdersPage.jsx"));
 const SettingsPage    = lazy(() => import("./pages/dashboard/admin/SettingsPage.jsx"));
 const UsersPage       = lazy(() => import("./pages/dashboard/admin/UsersPage.tsx"));
@@ -55,7 +62,64 @@ function App() {
       <ScrollToTop />
       <Routes>
         {/* Dashboard routes — no landing Navbar/Footer */}
-        <Route path="/dashboard/seller/*" element={<SellerDashboard />} />
+        <Route
+          path="/dashboard/seller/orders"
+          element={
+            <Suspense fallback={null}>
+              <SellerOrdersPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/seller/billing"
+          element={
+            <Suspense fallback={null}>
+              <SellerBillingPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/seller/settings"
+          element={
+            <Suspense fallback={null}>
+              <SellerSettingsPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/seller/integration"
+          element={
+            <Suspense fallback={null}>
+              <SellerIntegrationPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/seller/products/new"
+          element={
+            <Suspense fallback={null}>
+              <SellerAddProductPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/seller/products/:id"
+          element={
+            <Suspense fallback={null}>
+              <SellerProductDetailPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/seller/products"
+          element={
+            <Suspense fallback={null}>
+              <SellerProductsPage />
+            </Suspense>
+          }
+        />
+        <Route path="/dashboard/seller/*" element={<MyStore />} />
+        <Route path="/dashboard/store" element={<MyStore />} />
         <Route
           path="/dashboard/admin/suppliers/:id"
           element={

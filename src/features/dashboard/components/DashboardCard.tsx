@@ -1,6 +1,6 @@
 import { type ReactNode } from "react";
 import { motion } from "framer-motion";
-import SectionLoader from "../../../components/ui/SectionLoader";
+import SectionLoader from "../../../components/ui/SectionLoader.js";
 
 interface DashboardCardProps {
   title: string;
