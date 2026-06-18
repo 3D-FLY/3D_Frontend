@@ -1,4 +1,5 @@
 import DashboardLayout from "../features/dashboard/DashboardLayout.js";
+import { ORDER_STATUS_CONFIG } from "../constants/orderStatusConfig.js";
 import DashboardCard from "../features/dashboard/components/DashboardCard.js";
 import DashboardPage from "../features/dashboard/components/DashboardPage.js";
 import StatBlock from "../features/dashboard/components/StatBlock.js";
@@ -83,10 +84,10 @@ export default function SellerDashboard() {
         {/* Order Status */}
         <DashboardCard title="Order Status">
           <div className="grid grid-cols-4 gap-4">
-            <StatusBadge count={7} label="Printing" accentColor="green" />
-            <StatusBadge count={4} label="Shipped" accentColor="green" />
-            <StatusBadge count={34} label="Delivered" accentColor="green" />
-            <StatusBadge count={1} label="Issued" accentColor="yellow" />
+            <StatusBadge count={7}  label={ORDER_STATUS_CONFIG.in_production.label} accentColor={ORDER_STATUS_CONFIG.in_production.accentColor} />
+            <StatusBadge count={4}  label={ORDER_STATUS_CONFIG.shipped.label}       accentColor={ORDER_STATUS_CONFIG.shipped.accentColor}       />
+            <StatusBadge count={34} label={ORDER_STATUS_CONFIG.delivered.label}     accentColor={ORDER_STATUS_CONFIG.delivered.accentColor}     />
+            <StatusBadge count={1}  label={ORDER_STATUS_CONFIG.issue.label}         accentColor={ORDER_STATUS_CONFIG.issue.accentColor}         />
           </div>
         </DashboardCard>
 
