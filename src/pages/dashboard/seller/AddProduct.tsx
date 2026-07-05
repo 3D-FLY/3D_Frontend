@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Camera } from "lucide-react";
 import { motion } from "framer-motion";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
@@ -14,7 +14,7 @@ import OptionGroup from "../../../features/home/FileUploader/OptionGroup.jsx";
 import LabeledSlider from "../../../features/home/FileUploader/LabeledSlider.jsx";
 // @ts-ignore
 import ShellsStepper from "../../../features/home/FileUploader/ShellsStepper.jsx";
-import type { Product } from "./mockProducts.js";
+import { getProducts, saveProducts, type Product } from "./mockProducts.js";
 import shopifyIcon     from "../../../assets/icons/shops/shopify-icon.svg?url";
 import ebayIcon        from "../../../assets/icons/shops/ebay-icon.svg?url";
 import woocommerceIcon from "../../../assets/icons/shops/woocommerce-icon.svg?url";
@@ -76,34 +76,38 @@ function ColorSwatch({ color, onRemove }: { color: string; onRemove: () => void 
 
 export default function AddProductPage() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id?: string }>();
+  const isEdit = !!id;
+  const existing = isEdit ? getProducts().find((p) => p.id === id) : undefined;
+  const eps = existing?.printSettings;
 
   // Files
   const [modelFile, setModelFile]       = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(existing?.image ?? null);
   const [comments, setComments]         = useState("");
 
   // Product details
-  const [productName, setProductName]         = useState("");
-  const [sku, setSku]                         = useState("");
-  const [cost, setCost]                       = useState("");
-  const [price, setPrice]                     = useState("");
-  const [colors, setColors]                   = useState<string[]>([]);
-  const [selectedStores, setSelectedStores]   = useState<string[]>([]);
+  const [productName, setProductName]       = useState(existing?.name ?? "");
+  const [sku, setSku]                       = useState(existing?.sku ?? "");
+  const [cost, setCost]                     = useState(existing?.cost != null ? String(existing.cost) : "");
+  const [price, setPrice]                   = useState(existing?.price != null ? String(existing.price) : "");
+  const [colors, setColors]                 = useState<string[]>(existing?.details.colors ?? []);
+  const [selectedStores, setSelectedStores] = useState<string[]>(existing?.stores ?? []);
   const colorPickerRef = useRef<HTMLInputElement>(null);
 
   // Print settings
-  const [tech, setTech]                               = useState("FDM");
-  const [material, setMaterial]                       = useState("PLA");
-  const [layerHeight, setLayerHeight]                 = useState(0.24);
-  const [shells, setShells]                           = useState(2);
-  const [infill, setInfill]                           = useState(15);
-  const [infillPattern, setInfillPattern]             = useState("Grid");
-  const [topShellLayers, setTopShellLayers]           = useState(5);
-  const [bottomShellLayers, setBottomShellLayers]     = useState(3);
-  const [support, setSupport]                         = useState(true);
-  const [brim, setBrim]                               = useState("Auto");
-  const [brimWidth, setBrimWidth]                     = useState(5);
-  const [seam, setSeam]                               = useState("Aligned");
+  const [tech, setTech]                           = useState(eps?.tech ?? "FDM");
+  const [material, setMaterial]                   = useState(eps?.material ?? "PLA");
+  const [layerHeight, setLayerHeight]             = useState(eps?.layerHeight ?? 0.24);
+  const [shells, setShells]                       = useState(eps?.shells ?? 2);
+  const [infill, setInfill]                       = useState(eps?.infill ?? 15);
+  const [infillPattern, setInfillPattern]         = useState(eps?.infillPattern ?? "Grid");
+  const [topShellLayers, setTopShellLayers]       = useState(eps?.topShellLayers ?? 5);
+  const [bottomShellLayers, setBottomShellLayers] = useState(eps?.bottomShellLayers ?? 3);
+  const [support, setSupport]                     = useState(eps?.support ?? true);
+  const [brim, setBrim]                           = useState(eps?.brim ?? "Auto");
+  const [brimWidth, setBrimWidth]                 = useState(eps?.brimWidth ?? 5);
+  const [seam, setSeam]                           = useState(eps?.seam ?? "Aligned");
 
   const estimatedPrice = cost ? (parseFloat(cost) * 1.3).toFixed(2) : null;
 
@@ -120,23 +124,28 @@ export default function AddProductPage() {
 
   const handleSubmit = () => {
     if (!productName.trim()) return;
-    const newProduct: Product = {
-      id: `p_${Date.now()}`,
-      name:  productName,
-      sku,
-      image: imagePreview ?? "",
-      cost:  parseFloat(cost)  || 0,
-      price: parseFloat(price) || 0,
-      stores: selectedStores,
-      printSettings: {
-        tech, material, layerHeight, shells, infill,
-        infillPattern, topShellLayers, bottomShellLayers,
-        support, brim, brimWidth, seam,
-      },
-      details:      { printTime: "—", weight: "—", colors },
-      recentOrders: [],
-    };
-    navigate("/dashboard/seller/products", { state: { newProduct } });
+    const printSettings = { tech, material, layerHeight, shells, infill, infillPattern, topShellLayers, bottomShellLayers, support, brim, brimWidth, seam };
+    const all = getProducts();
+
+    if (isEdit && existing) {
+      const updated = all.map((p) =>
+        p.id === existing.id
+          ? { ...p, name: productName, sku, image: imagePreview ?? p.image, cost: parseFloat(cost) || p.cost, price: parseFloat(price) || p.price, stores: selectedStores, printSettings, details: { ...p.details, colors } }
+          : p,
+      );
+      saveProducts(updated);
+    } else {
+      const newProduct: Product = {
+        id: `p_${Date.now()}`,
+        name: productName, sku, image: imagePreview ?? "",
+        cost: parseFloat(cost) || 0, price: parseFloat(price) || 0,
+        stores: selectedStores, printSettings,
+        details: { printTime: "—", weight: "—", colors },
+        recentOrders: [],
+      };
+      saveProducts([...all, newProduct]);
+    }
+    navigate("/dashboard/seller/products");
   };
 
   const selectCls =
@@ -165,7 +174,7 @@ export default function AddProductPage() {
               >
                 <ArrowLeft size={18} />
               </button>
-              <DashboardPageTitle>ADD PRODUCT</DashboardPageTitle>
+              <DashboardPageTitle>{isEdit ? "EDIT PRODUCT" : "ADD PRODUCT"}</DashboardPageTitle>
             </div>
           }
         >
@@ -458,7 +467,7 @@ export default function AddProductPage() {
               disabled={!productName.trim()}
               className="rounded-md bg-green-500 px-8 py-3 text-sm font-extrabold uppercase italic tracking-wide text-black transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Add Product
+              {isEdit ? "Save Changes" : "Add Product"}
             </button>
           </div>
 

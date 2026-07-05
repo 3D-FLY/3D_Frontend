@@ -1,11 +1,10 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Package } from "lucide-react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Package, ChevronLeft, ChevronRight } from "lucide-react";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
 import DashboardPage from "../../../features/dashboard/components/DashboardPage.js";
 import StatusBadge from "../../../features/dashboard/components/StatusBadge.js";
-import HorizontalCarousel from "../../../features/dashboard/components/HorizontalCarousel.js";
 import ScrollableContent from "../../../features/dashboard/components/ScrollableContent.js";
 import type { AttentionReason } from "../../../features/dashboard/components/OrderAttentionList.js";
 import { getStatusConfig, type OrderStatusKey as OrderStatus } from "../../../constants/orderStatusConfig.js";
@@ -46,37 +45,111 @@ const mockPlatforms = [
   { name: "Wix",         orders: 15,  icon: wixIcon,         isTop: false },
 ];
 
-const mockOrdersInProduction = [
-  { id: 1, name: "SoldierXPT", image: "/mock/soldier.png"  },
-  { id: 2, name: "WarriorX",   image: "/mock/warrior.png"  },
-  { id: 3, name: "DragonFly",  image: "/mock/dragon.png"   },
-  { id: 4, name: "MechBot",    image: "/mock/mech.png"     },
-  { id: 5, name: "PhoenixV2",  image: "/mock/phoenix.png"  },
+// ── Spotlight Carousel ───────────────────────────────────────────────────────
+
+interface ProductionItem {
+  orderId: string;
+  product: string;
+  image:   string;
+}
+
+const inProduction: ProductionItem[] = [
+  { orderId: "#0041", product: "SoldierXPT", image: soldierXPTImg },
+  { orderId: "#0039", product: "DragonMini", image: soldierXPTImg },
+  { orderId: "#0038", product: "RocketBase", image: soldierXPTImg },
+  { orderId: "#0037", product: "SoldierXPT", image: soldierXPTImg },
+  { orderId: "#0036", product: "MechBot",    image: soldierXPTImg },
+  { orderId: "#0035", product: "WarriorX",   image: soldierXPTImg },
+  { orderId: "#0034", product: "DragonMini", image: soldierXPTImg },
 ];
 
-// ── Sub-components ──────────────────────────────────────────────────────────
+function SpotlightCarousel({ items }: { items: ProductionItem[] }) {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const n = items.length;
 
-function ProductionCard({ name, image }: { name: string; image: string }) {
-  const [imgError, setImgError] = useState(false);
+  useEffect(() => {
+    const timer = setInterval(() => setActiveIdx((i) => (i + 1) % n), 3000);
+    return () => clearInterval(timer);
+  }, [n]);
+
+  const advance = () => setActiveIdx((i) => (i + 1) % n);
+  const retreat = () => setActiveIdx((i) => (i - 1 + n) % n);
+
+  const visible = [-2, -1, 0, 1, 2].flatMap((offset) => {
+    const item = items[(activeIdx + offset + n) % n];
+    return item ? [{ item, offset }] : [];
+  });
 
   return (
-    <div
-      className="flex min-w-[130px] flex-col items-center gap-2 rounded-xl border p-3"
-      style={{ background: "rgba(255,255,255,0.05)", borderColor: "rgba(255,255,255,0.08)" }}
-    >
-      <div className="flex h-20 w-full items-center justify-center overflow-hidden rounded-lg bg-zinc-800">
-        {imgError || !image ? (
-          <Package size={32} className="text-zinc-600" />
-        ) : (
-          <img
-            src={image}
-            alt={name}
-            className="h-full w-full object-cover"
-            onError={() => setImgError(true)}
-          />
-        )}
-      </div>
-      <span className="text-xs font-semibold uppercase tracking-wide text-white">{name}</span>
+    <div className="relative flex items-center justify-center gap-3">
+
+      {/* Left arrow */}
+      <button
+        type="button"
+        onClick={retreat}
+        className="absolute left-0 top-1/2 z-10 -translate-y-1/2 text-white/60 transition-colors hover:text-white"
+      >
+        <ChevronLeft size={28} />
+      </button>
+
+      <AnimatePresence mode="popLayout" initial={false}>
+        {visible.map(({ item, offset }) => {
+          const isActive = offset === 0;
+          const absOff   = Math.abs(offset);
+          const opacity  = isActive ? 1 : absOff === 1 ? 0.6 : 0.3;
+          const widthCls = isActive
+            ? "w-[22%] max-w-[160px]"
+            : absOff === 1
+            ? "w-[16%] max-w-[120px]"
+            : "w-[11%] max-w-[80px]";
+          return (
+            <motion.div
+              key={item.orderId}
+              layout
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity, x: 0 }}
+              exit={{ opacity: 0, x: -40 }}
+              transition={{ duration: 0.35, ease: "easeOut" }}
+              className={`relative aspect-square flex-shrink-0 overflow-hidden rounded-xl ${widthCls}`}
+              style={{ ...(isActive && { boxShadow: "0 0 24px rgba(90,196,34,0.2)" }) }}
+            >
+              {/* Full bleed image */}
+              <img
+                src={item.image}
+                alt={item.product}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+
+              {/* Gradient overlay */}
+              <div
+                className="absolute inset-0"
+                style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 30%, transparent 100%)" }}
+              />
+
+              {/* Bottom content */}
+              <div className="absolute bottom-0 left-0 p-3">
+                <div className="mb-1 flex items-center gap-1.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-green-500">
+                    PRINTING
+                  </span>
+                </div>
+                <p className="truncate text-sm font-bold text-white">{item.product}</p>
+                <p className="text-xs text-white/50">{item.orderId}</p>
+              </div>
+            </motion.div>
+          );
+        })}
+      </AnimatePresence>
+
+      {/* Right arrow */}
+      <button
+        type="button"
+        onClick={advance}
+        className="absolute right-0 top-1/2 z-10 -translate-y-1/2 text-white/60 transition-colors hover:text-white"
+      >
+        <ChevronRight size={28} />
+      </button>
     </div>
   );
 }
@@ -146,50 +219,43 @@ export default function MyStore() {
 
             {/* Right: Best Seller card (40%) */}
             <div
-              className={`relative flex flex-[2] flex-col items-center justify-center gap-3 overflow-hidden px-5 py-8 ${dashboardCardSurface}`}
+              className="group relative flex-[2] min-h-[320px] cursor-pointer overflow-hidden rounded-2xl border border-white/10"
+              style={{ boxShadow: "0 0 40px rgba(90, 196, 34, 0.15)" }}
             >
-              {/* Decorative rank badge */}
-              <span
-                className="pointer-events-none absolute right-3 top-2 select-none font-extrabold leading-none"
-                style={{ fontSize: 48, color: "rgba(90,196,34,0.15)" }}
-              >
-                #1
-              </span>
-
-              {/* Label */}
-              <span
-                className="text-[11px] font-semibold uppercase tracking-[2px]"
-                style={{ color: "rgba(255,255,255,0.4)" }}
-              >
-                Best Seller
-              </span>
-
-              {/* Product image */}
-              <div className="relative h-24 w-24 overflow-hidden rounded-2xl bg-zinc-800/50">
+              {/* Full bleed image — scales on hover */}
+              <div className="absolute inset-0 transition-transform duration-[400ms] ease-out group-hover:scale-[1.04]">
                 <img
                   src={soldierXPTImg}
                   alt="SoldierXPT"
-                  className="h-full w-full object-contain drop-shadow-lg"
-                  style={{ filter: "drop-shadow(0 0 12px rgba(90,196,34,0.25))" }}
+                  className="h-full w-full object-cover"
                 />
               </div>
 
-              {/* Product name */}
-              <span
-                className="text-[22px] font-bold leading-tight text-white"
-                style={{ textShadow: "0 0 20px rgba(90,196,34,0.3)" }}
-              >
-                SoldierXPT
-              </span>
-
-              {/* Divider */}
+              {/* Gradient overlay */}
               <div
-                className="w-10"
-                style={{ height: 1, background: "rgba(90,196,34,0.2)" }}
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%, transparent 100%)",
+                }}
               />
 
-              {/* Units */}
-              <span className="text-[13px] text-green">34 units sold</span>
+              {/* BEST SELLER badge — top left */}
+              <span className="absolute left-3 top-3 z-10 rounded-full border border-green-500/40 bg-green-500/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-green-500">
+                BEST SELLER
+              </span>
+
+              {/* Content anchored to bottom */}
+              <div className="absolute bottom-0 left-0 right-0 z-10 p-5">
+                <p className="mb-1.5 font-staatliches text-[34px] uppercase leading-none text-white">
+                  SoldierXPT
+                </p>
+                <div className="flex items-center gap-2 text-[12px] text-white/50">
+                  <span>34 orders</span>
+                  <span className="text-white/25">·</span>
+                  <span>$1,428 revenue</span>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -275,12 +341,8 @@ export default function MyStore() {
           </div>
 
           {/* ── 5. ORDERS IN PRODUCTION ──────────────────────────────────── */}
-          <DashboardCard title="Orders in Production" index={4}>
-            <HorizontalCarousel>
-              {mockOrdersInProduction.map((item) => (
-                <ProductionCard key={item.id} name={item.name} image={item.image} />
-              ))}
-            </HorizontalCarousel>
+          <DashboardCard title="Orders in Production" index={4} autoHeight withBackground={false}>
+            <SpotlightCarousel items={inProduction} />
           </DashboardCard>
 
         </DashboardPage>

@@ -9,7 +9,7 @@ import DashboardTable from "../../../features/dashboard/components/DashboardTabl
 import StatusBadge from "../../../features/dashboard/components/StatusBadge.js";
 import OrderStatusPill from "../../../features/dashboard/components/OrderStatusPill.js";
 import { EditProductModal } from "./Products.js";
-import { mockProducts, type Product, type ProductForm } from "./mockProducts.js";
+import { getProducts, saveProducts, type Product, type ProductForm } from "./mockProducts.js";
 import shopifyIcon     from "../../../assets/icons/shops/shopify-icon.svg?url";
 import ebayIcon        from "../../../assets/icons/shops/ebay-icon.svg?url";
 import woocommerceIcon from "../../../assets/icons/shops/woocommerce-icon.svg?url";
@@ -130,7 +130,7 @@ export default function SellerProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const found = mockProducts.find((p) => p.id === id);
+  const found = getProducts().find((p) => p.id === id);
   const [product, setProduct] = useState<Product | undefined>(found);
   const [imgError, setImgError]   = useState(false);
   const [editOpen, setEditOpen]   = useState(false);
@@ -144,18 +144,17 @@ export default function SellerProductDetailPage() {
   const totalIssues  = product.recentOrders.filter((o) => o.status === "issue").length;
 
   const handleSave = (form: ProductForm) => {
-    setProduct((p) =>
-      p
-        ? {
-            ...p,
-            name:   form.name,
-            sku:    form.sku,
-            cost:   parseFloat(form.cost)  || p.cost,
-            price:  parseFloat(form.price) || p.price,
-            stores: form.stores,
-          }
-        : p,
-    );
+    if (!product) return;
+    const updated: Product = {
+      ...product,
+      name:   form.name,
+      sku:    form.sku,
+      cost:   parseFloat(form.cost)  || product.cost,
+      price:  parseFloat(form.price) || product.price,
+      stores: form.stores,
+    };
+    setProduct(updated);
+    saveProducts(getProducts().map((p) => (p.id === updated.id ? updated : p)));
     setEditOpen(false);
   };
 
