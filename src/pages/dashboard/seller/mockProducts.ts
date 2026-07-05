@@ -55,6 +55,21 @@ const DEFAULT_PRINT_SETTINGS: PrintSettings = {
 
 export { DEFAULT_PRINT_SETTINGS };
 
+const STORAGE_KEY = "seller_products";
+
+export function getProducts(): Product[] {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? (JSON.parse(stored) as Product[]) : mockProducts;
+  } catch {
+    return mockProducts;
+  }
+}
+
+export function saveProducts(products: Product[]): void {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+}
+
 export const mockProducts: Product[] = [
   {
     id: "p001",

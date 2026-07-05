@@ -1,13 +1,13 @@
 import { useState, useMemo, useEffect, type ReactNode } from "react";
 import { motion } from "framer-motion";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { MoreHorizontal, Package } from "lucide-react";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
 import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
 import Modal from "../../../features/dashboard/components/Modal.js";
 import Input from "../../../components/ui/Input.js";
-import { mockProducts as initialProducts, type Product, type ProductForm } from "./mockProducts.js";
+import { getProducts, saveProducts, type Product, type ProductForm } from "./mockProducts.js";
 import shopifyIcon     from "../../../assets/icons/shops/shopify-icon.svg?url";
 import ebayIcon        from "../../../assets/icons/shops/ebay-icon.svg?url";
 import woocommerceIcon from "../../../assets/icons/shops/woocommerce-icon.svg?url";
@@ -305,18 +305,11 @@ function ProductRow({ product, menuOpen, onMenuToggle, onView, onEdit, onDelete 
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-type ModalState = null | { mode: "edit"; product: Product };
-
 export default function SellerProductsPage() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [products, setProducts] = useState<Product[]>(() => {
-    const np = (location.state as { newProduct?: Product } | null)?.newProduct;
-    return np ? [np, ...initialProducts] : initialProducts;
-  });
+  const [products, setProducts] = useState<Product[]>(getProducts);
   const [search, setSearch]       = useState("");
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
-  const [modal, setModal]         = useState<ModalState>(null);
 
   useEffect(() => {
     if (!openMenuId) return;
@@ -333,29 +326,12 @@ export default function SellerProductsPage() {
     );
   }, [products, search]);
 
-  const handleSave = (form: ProductForm) => {
-    if (!modal || modal.mode !== "edit") return;
-    setProducts((prev) =>
-      prev.map((p) =>
-        p.id === modal.product.id
-          ? {
-              ...p,
-              name:   form.name,
-              sku:    form.sku,
-              cost:   parseFloat(form.cost)  || p.cost,
-              price:  parseFloat(form.price) || p.price,
-              stores: form.stores,
-            }
-          : p,
-      ),
-    );
-    setModal(null);
-  };
-
   const handleDelete = (product: Product) => {
     setOpenMenuId(null);
     if (window.confirm(`Delete "${product.name}"?`)) {
-      setProducts((prev) => prev.filter((p) => p.id !== product.id));
+      const updated = products.filter((p) => p.id !== product.id);
+      setProducts(updated);
+      saveProducts(updated);
     }
   };
 
@@ -418,7 +394,7 @@ export default function SellerProductsPage() {
                       }}
                       onEdit={() => {
                         setOpenMenuId(null);
-                        setModal({ mode: "edit", product });
+                        navigate(`/dashboard/seller/products/edit/${product.id}`);
                       }}
                       onDelete={() => handleDelete(product)}
                     />
@@ -429,14 +405,6 @@ export default function SellerProductsPage() {
           </DashboardCard>
         </DashboardPage>
       </motion.div>
-
-      {modal && (
-        <EditProductModal
-          product={modal.mode === "edit" ? modal.product : undefined}
-          onSave={handleSave}
-          onClose={() => setModal(null)}
-        />
-      )}
     </DashboardLayout>
   );
 }

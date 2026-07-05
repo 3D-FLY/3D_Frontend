@@ -35,7 +35,8 @@ const SellerSettingsPage      = lazy(() => import("./pages/dashboard/seller/Sett
 const SellerIntegrationPage   = lazy(() => import("./pages/dashboard/seller/Integration.tsx"));
 const SellerAddProductPage    = lazy(() => import("./pages/dashboard/seller/AddProduct.tsx"));
 const SellerProductsPage      = lazy(() => import("./pages/dashboard/seller/Products.tsx"));
-const SellerProductDetailPage = lazy(() => import("./pages/dashboard/seller/ProductDetail.tsx"));
+const SellerProductDetailPage  = lazy(() => import("./pages/dashboard/seller/ProductDetail.tsx"));
+const SellerOrderDetailPage    = lazy(() => import("./pages/dashboard/seller/OrderDetail.tsx"));
 const OrdersPage      = lazy(() => import("./pages/dashboard/admin/OrdersPage.jsx"));
 const SettingsPage    = lazy(() => import("./pages/dashboard/admin/SettingsPage.jsx"));
 const UsersPage       = lazy(() => import("./pages/dashboard/admin/UsersPage.tsx"));
@@ -62,6 +63,14 @@ function App() {
       <ScrollToTop />
       <Routes>
         {/* Dashboard routes — no landing Navbar/Footer */}
+        <Route
+          path="/dashboard/seller/orders/:id"
+          element={
+            <Suspense fallback={null}>
+              <SellerOrderDetailPage />
+            </Suspense>
+          }
+        />
         <Route
           path="/dashboard/seller/orders"
           element={
@@ -96,6 +105,14 @@ function App() {
         />
         <Route
           path="/dashboard/seller/products/new"
+          element={
+            <Suspense fallback={null}>
+              <SellerAddProductPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/seller/products/edit/:id"
           element={
             <Suspense fallback={null}>
               <SellerAddProductPage />
