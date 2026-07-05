@@ -13,7 +13,8 @@ import { Check } from "lucide-react";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
 import DashboardPage from "../../../features/dashboard/components/DashboardPage.js";
-import ScrollableContent from "../../../features/dashboard/components/ScrollableContent.js";
+import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
+import StatusBadge from "../../../features/dashboard/components/StatusBadge.js";
 
 const monthlyData = [
   { month: "Jan", revenue: 18400, commissions: 1840, payouts: 14200 },
@@ -72,9 +73,6 @@ const txStatusClass: Record<Transaction["status"], string> = {
   failed:  "bg-red-500/15 text-[#f87171] border border-red-500/30",
 };
 
-const TH = "text-[11px] font-semibold uppercase tracking-wide text-zinc-400 px-3 py-2 text-left";
-const TD = "text-[13px] text-zinc-200 px-3 py-2.5";
-
 type Filter = "6M" | "1Y" | "All";
 
 export default function FinancePage() {
@@ -94,21 +92,8 @@ export default function FinancePage() {
         <DashboardCard index={0} title="Overview">
           <div className="grid h-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {statCards.map((card) => (
-              <div
-                key={card.label}
-                className="flex h-full flex-col items-center justify-center gap-2 p-2 text-center"
-              >
-                <div className="flex h-[80%] w-full items-center justify-center rounded-2xl border border-white/10 bg-[rgba(149,149,149,0.1)] px-3 py-4">
-                  <span
-                    className="text-[clamp(20px,2.6vw,40px)] font-extrabold leading-none"
-                    style={{ color: card.color }}
-                  >
-                    {card.value}
-                  </span>
-                </div>
-                <span className="text-[clamp(11px,1vw,13px)] font-semibold uppercase tracking-[0.05em] text-zinc-100">
-                  {card.label}
-                </span>
+              <div key={card.label} className="h-full">
+                <StatusBadge count={card.value} label={card.label} color={card.color} />
               </div>
             ))}
           </div>
@@ -165,10 +150,10 @@ export default function FinancePage() {
                   borderRadius: "8px",
                 }}
                 labelStyle={{ color: "white", fontSize: 12, fontWeight: 600 }}
-                formatter={(value: number) => [
-                  `$${value.toLocaleString()}`,
-                  undefined,
-                ]}
+                formatter={(value) => {
+                  const n = typeof value === "number" ? value : Number(value ?? 0);
+                  return [`$${n.toLocaleString()}`, undefined];
+                }}
               />
               <Legend wrapperStyle={{ color: "#a1a1aa", fontSize: 12 }} />
               <Line
@@ -206,81 +191,68 @@ export default function FinancePage() {
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* LEFT — Recent Transactions */}
           <DashboardCard index={2} title="Recent Transactions" autoHeight>
-            <div style={{ height: 300 }} className="flex min-h-0 flex-col">
-              <ScrollableContent>
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr>
-                      <th className={TH}>Date</th>
-                      <th className={TH}>Store</th>
-                      <th className={TH}>Amount</th>
-                      <th className={TH}>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.map((tx) => (
-                      <tr
-                        key={tx.id}
-                        className="border-b border-white/10 transition-colors hover:bg-[rgba(149,149,149,0.1)]"
-                      >
-                        <td className={TD}>{tx.date}</td>
-                        <td className={TD}>{tx.store}</td>
-                        <td className={TD}>${tx.amount.toLocaleString()}</td>
-                        <td className={TD}>
-                          <span
-                            className={`inline-flex items-center rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${txStatusClass[tx.status]}`}
-                          >
-                            {tx.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </ScrollableContent>
-            </div>
+            <DashboardTable
+              variant="data"
+              scrollable
+              maxHeight={300}
+              columns={[
+                { key: "date", header: "Date" },
+                { key: "store", header: "Store" },
+                { key: "amount", header: "Amount" },
+                { key: "status", header: "Status" },
+              ]}
+              rows={transactions}
+              getRowKey={(tx) => tx.id}
+              renderCell={(tx, key) => {
+                if (key === "date") return tx.date;
+                if (key === "store") return tx.store;
+                if (key === "amount") return `$${tx.amount.toLocaleString()}`;
+                if (key === "status") {
+                  return (
+                    <span className={`inline-flex items-center rounded px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${txStatusClass[tx.status]}`}>
+                      {tx.status}
+                    </span>
+                  );
+                }
+                return null;
+              }}
+            />
           </DashboardCard>
 
           {/* RIGHT — Supplier Payouts */}
           <DashboardCard index={3} title="Supplier Payouts" autoHeight>
-            <div style={{ height: 300 }} className="flex min-h-0 flex-col">
-              <ScrollableContent>
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr>
-                      <th className={TH}>Supplier</th>
-                      <th className={TH}>Orders</th>
-                      <th className={TH}>Amount</th>
-                      <th className={TH}>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {payouts.map((p) => (
-                      <tr
-                        key={p.id}
-                        className="border-b border-white/10 transition-colors hover:bg-[rgba(149,149,149,0.1)]"
-                      >
-                        <td className={TD}>{p.supplier}</td>
-                        <td className={TD}>{p.completedOrders}</td>
-                        <td className={TD}>${p.amount.toLocaleString()}</td>
-                        <td className={TD}>
-                          {p.status === "pending" ? (
-                            <button
-                              onClick={() => markPaid(p.id)}
-                              className="rounded border border-[#5ac422]/40 px-2.5 py-1 text-[11px] font-semibold text-[#5ac422] transition-colors hover:bg-[#5ac422]/10"
-                            >
-                              Mark Paid
-                            </button>
-                          ) : (
-                            <Check size={16} color="#5ac422" />
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </ScrollableContent>
-            </div>
+            <DashboardTable
+              variant="data"
+              scrollable
+              maxHeight={300}
+              columns={[
+                { key: "supplier", header: "Supplier" },
+                { key: "orders", header: "Orders" },
+                { key: "amount", header: "Amount" },
+                { key: "action", header: "Action" },
+              ]}
+              rows={payouts}
+              getRowKey={(p) => p.id}
+              renderCell={(p, key) => {
+                if (key === "supplier") return p.supplier;
+                if (key === "orders") return p.completedOrders;
+                if (key === "amount") return `$${p.amount.toLocaleString()}`;
+                if (key === "action") {
+                  return p.status === "pending" ? (
+                    <button
+                      type="button"
+                      onClick={() => markPaid(p.id)}
+                      className="rounded border border-[#5ac422]/40 px-2.5 py-1 text-[11px] font-semibold text-[#5ac422] transition-colors hover:bg-[#5ac422]/10"
+                    >
+                      Mark Paid
+                    </button>
+                  ) : (
+                    <Check size={16} color="#5ac422" />
+                  );
+                }
+                return null;
+              }}
+            />
           </DashboardCard>
         </div>
       </DashboardPage>

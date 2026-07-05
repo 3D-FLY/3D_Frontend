@@ -5,7 +5,9 @@ import DashboardPage from "../../../features/dashboard/components/DashboardPage.
 import StatusBadge from "../../../features/dashboard/components/StatusBadge.js";
 import type { OrderAttention } from "../../../features/dashboard/components/OrderAttentionList.js";
 import OrderAttentionList from "../../../features/dashboard/components/OrderAttentionList.js";
-import RecentOrdersTable, { type RecentOrder } from "../../../features/dashboard/components/RecentOrdersTable.js";
+import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
+import OrderStatusPill from "../../../features/dashboard/components/OrderStatusPill.js";
+import type { OrderStatusKey } from "../../../constants/orderStatusConfig.js";
 
 const attentionOrders: OrderAttention[] = [
   { id: "1", orderId: "3012", reason: "supplier_rejected", detail: "Rejected by: Supplier A",     timestamp: new Date(Date.now() - 5  * 60000).toISOString() },
@@ -21,6 +23,26 @@ const statusCards = [
   { count: 842, label: "In Production", accentColor: "blue" as const },
   { count: 37, label: "Open Issues", accentColor: "red" as const },
 ];
+
+interface RecentOrder {
+  id: string;
+  orderId: string;
+  store: string;
+  status: OrderStatusKey;
+  date: string;
+}
+
+const RECENT_ORDERS_COLUMNS = [
+  { key: "order",  header: "Order"  },
+  { key: "store",  header: "Store"  },
+  { key: "status", header: "Status" },
+  { key: "date",   header: "Date"   },
+  { key: "arrow",  header: ""       },
+];
+
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+}
 
 const recentOrders: RecentOrder[] = [
   { id: "1",  orderId: "3015", store: "Galaxy Toys",    status: "pending",       date: new Date(Date.now() - 1  * 3600000).toISOString() },
@@ -94,7 +116,25 @@ export default function AdminDashboard() {
             </button>
           }
         >
-          <RecentOrdersTable items={recentOrders} />
+          <DashboardTable
+            variant="list"
+            columns={RECENT_ORDERS_COLUMNS}
+            gridTemplateColumns="1fr 1.5fr 1.2fr 1fr 24px"
+            rows={recentOrders}
+            cap={30}
+            getRowKey={(o) => o.id}
+            onRowClick={(o) => navigate(`/dashboard/admin/orders?order=${o.orderId}`)}
+            renderCell={(o, key) => {
+              switch (key) {
+                case "order":  return <span className="truncate text-[clamp(12px,1vw,14px)] font-semibold text-zinc-100">#{o.orderId}</span>;
+                case "store":  return <span className="truncate text-[clamp(12px,1vw,14px)] text-zinc-200">{o.store}</span>;
+                case "status": return <OrderStatusPill status={o.status} />;
+                case "date":   return <span className="text-[11px] text-zinc-300">{formatDate(o.date)}</span>;
+                case "arrow":  return <span className="text-sm text-zinc-300">→</span>;
+                default:       return null;
+              }
+            }}
+          />
         </DashboardCard>
       </DashboardPage>
     </DashboardLayout>

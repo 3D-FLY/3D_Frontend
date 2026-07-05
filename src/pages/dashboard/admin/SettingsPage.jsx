@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, Eye, EyeOff, Trash2, Check, X } from "lucide-react";
+import Modal from "../../../features/dashboard/components/Modal.js";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardPage from "../../../features/dashboard/components/DashboardPage.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
+import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
 import Input from "../../../components/ui/Input.js";
 
 // ─── Shared constants ─────────────────────────────────────────────────────────
@@ -50,19 +52,7 @@ function ChangePasswordModal({ onClose }) {
   const [pwForm, setPwForm] = useState({ newPw: "", confirm: "" });
 
   return (
-    <div
-      className="fixed inset-0 z-[2000] flex items-center justify-center bg-[rgba(149,149,149,0.08)] backdrop-blur-[12px]"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <div className="relative w-full max-w-sm rounded-2xl border border-white/10 bg-[rgba(5,10,7,0.97)] p-6 flex flex-col gap-5 shadow-2xl">
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors"
-        >
-          <X size={18} />
-        </button>
-
+    <Modal onClose={onClose} size="sm">
         <h2 className="text-base font-bold uppercase tracking-widest text-white">
           Change Password
         </h2>
@@ -100,8 +90,7 @@ function ChangePasswordModal({ onClose }) {
             Save
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -233,60 +222,56 @@ function AdminUsersSection() {
   return (
     <div className="flex flex-col gap-5">
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-white/10">
-              {["", "Name", "Email", "Role", "Actions"].map((h) => (
-                <th
-                  key={h}
-                  className="pb-2.5 pr-4 text-left text-[11px] font-bold uppercase tracking-[0.12em] text-zinc-400 last:pr-0"
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {admins.map((admin) => (
-              <tr
-                key={admin.id}
-                className="border-b border-white/5 transition-colors hover:bg-white/[0.02]"
+      <DashboardTable
+        variant="data"
+        scrollable={false}
+        subtle
+        columns={[
+          { key: "avatar", header: "", cellClassName: "pr-3" },
+          { key: "name", header: "Name", cellClassName: "font-medium text-white whitespace-nowrap" },
+          { key: "email", header: "Email", cellClassName: "text-zinc-400" },
+          { key: "role", header: "Role" },
+          { key: "actions", header: "Actions", cellClassName: "pr-0" },
+        ]}
+        rows={admins}
+        getRowKey={(admin) => admin.id}
+        renderCell={(admin, key) => {
+          if (key === "avatar") {
+            return <InitialsAvatar name={admin.name} size={32} />;
+          }
+          if (key === "name") {
+            return admin.name;
+          }
+          if (key === "email") return admin.email;
+          if (key === "role") {
+            return (
+              <span
+                className={`inline-flex whitespace-nowrap rounded-full px-2.5 py-0.5 text-[12px] font-bold ${
+                  admin.role === "Super Admin"
+                    ? "border border-[#5ac422]/30 bg-[#5ac422]/15 text-[#5ac422]"
+                    : "border border-white/10 bg-white/5 text-zinc-300"
+                }`}
               >
-                <td className="py-3 pr-3">
-                  <InitialsAvatar name={admin.name} size={32} />
-                </td>
-                <td className="py-3 pr-4 font-medium text-white whitespace-nowrap">
-                  {admin.name}
-                </td>
-                <td className="py-3 pr-4 text-zinc-400">{admin.email}</td>
-                <td className="py-3 pr-4">
-                  <span
-                    className={`rounded-full px-2.5 py-0.5 text-[12px] font-bold whitespace-nowrap ${
-                      admin.role === "Super Admin"
-                        ? "border border-[#5ac422]/30 bg-[#5ac422]/15 text-[#5ac422]"
-                        : "border border-white/10 bg-white/5 text-zinc-300"
-                    }`}
-                  >
-                    {admin.role}
-                  </span>
-                </td>
-                <td className="py-3">
-                  <button
-                    onClick={() => setAdmins((a) => a.filter((x) => x.id !== admin.id))}
-                    disabled={admin.role === "Super Admin"}
-                    title={admin.role === "Super Admin" ? "Cannot remove Super Admin" : "Remove"}
-                    className="rounded-md p-1.5 text-zinc-600 transition-colors hover:bg-red-400/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-zinc-600"
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+                {admin.role}
+              </span>
+            );
+          }
+          if (key === "actions") {
+            return (
+              <button
+                type="button"
+                onClick={() => setAdmins((a) => a.filter((x) => x.id !== admin.id))}
+                disabled={admin.role === "Super Admin"}
+                title={admin.role === "Super Admin" ? "Cannot remove Super Admin" : "Remove"}
+                className="rounded-md p-1.5 text-zinc-600 transition-colors hover:bg-red-400/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-zinc-600"
+              >
+                <Trash2 size={15} />
+              </button>
+            );
+          }
+          return null;
+        }}
+      />
 
       {/* Invite toggle */}
       <div>
@@ -458,41 +443,35 @@ const ROLES_PERMS = {
 
 function RolesPermissionsSection() {
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-white/10">
-            <th className="w-36 pb-2.5 pr-4 text-left text-[11px] font-bold uppercase tracking-[0.12em] text-zinc-400">
-              Role
-            </th>
-            {PERMISSIONS.map((p) => (
-              <th
-                key={p}
-                className="pb-2.5 px-2 text-center text-[11px] font-bold uppercase tracking-[0.12em] text-zinc-400"
-              >
-                {p}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {Object.entries(ROLES_PERMS).map(([role, perms]) => (
-            <tr key={role} className="border-b border-white/5">
-              <td className="py-3 pr-4 font-medium text-white">{role}</td>
-              {PERMISSIONS.map((p) => (
-                <td key={p} className="py-3 px-2 text-center">
-                  {perms[p] ? (
-                    <Check size={15} className="inline-block text-[#5ac422]" strokeWidth={2.5} />
-                  ) : (
-                    <X size={15} className="inline-block text-red-400" strokeWidth={2.5} />
-                  )}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <DashboardTable
+      variant="data"
+      scrollable={false}
+      subtle
+      hoverable={false}
+      columns={[
+        { key: "role", header: "Role", headerClassName: "w-36", cellClassName: "font-medium text-white" },
+        ...PERMISSIONS.map((p) => ({
+          key: p,
+          header: p,
+          align: "center",
+          headerClassName: "px-2 text-center",
+          cellClassName: "px-2 text-center",
+        })),
+      ]}
+      rows={Object.entries(ROLES_PERMS).map(([role, perms]) => ({ role, perms }))}
+      getRowKey={(row) => row.role}
+      renderCell={(row, key) => {
+        if (key === "role") {
+          return row.role;
+        }
+        const allowed = row.perms[key];
+        return allowed ? (
+          <Check size={15} className="inline-block text-[#5ac422]" strokeWidth={2.5} />
+        ) : (
+          <X size={15} className="inline-block text-red-400" strokeWidth={2.5} />
+        );
+      }}
+    />
   );
 }
 
