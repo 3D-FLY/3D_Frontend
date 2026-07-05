@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Printer, Pencil, Trash2, ArrowRight, X } from "lucide-react";
+import { Printer, Pencil, Trash2, ArrowRight } from "lucide-react";
+import ActiveBadge from "../../../features/dashboard/components/ActiveBadge.js";
+import Modal from "../../../features/dashboard/components/Modal.js";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
 import Input from "../../../components/ui/Input.tsx";
@@ -32,21 +34,7 @@ function SupplierModal({ mode, initial, onSave, onClose }) {
   };
 
   return (
-    /* Full-screen glass backdrop — sits above everything including the banner */
-    <div
-      className="fixed inset-0 z-[2000] flex items-center justify-center bg-[rgba(149,149,149,0.08)] backdrop-blur-[12px]"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      {/* Small card */}
-      <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[rgba(5,10,7,0.97)] p-6 flex flex-col gap-5 shadow-2xl">
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors"
-        >
-          <X size={18} />
-        </button>
-
+    <Modal onClose={onClose}>
         <h2 className="text-base font-bold uppercase tracking-widest text-white">
           {mode === "add" ? "Add Supplier" : "Edit Supplier"}
         </h2>
@@ -111,8 +99,7 @@ function SupplierModal({ mode, initial, onSave, onClose }) {
             Save
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -142,15 +129,7 @@ function SupplierCard({ supplier, onEdit, onDelete, onView, onViewOrders }) {
           </span>
         </div>
 
-        <span
-          className={`self-start rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
-            supplier.active
-              ? "bg-[#5ac422]/15 text-[#5ac422] border border-[#5ac422]/30"
-              : "bg-zinc-700/60 text-zinc-400 border border-zinc-600/40"
-          }`}
-        >
-          {supplier.active ? "Active" : "Inactive"}
-        </span>
+        <ActiveBadge active={supplier.active} color="#5ac422" className="self-start" />
       </div>
 
       {/* Divider */}

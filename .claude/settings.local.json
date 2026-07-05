@@ -22,7 +22,9 @@
       "Bash(npx vite:*)",
       "Bash(npx tsc:*)",
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\1\\\\Documents\\\\3d-fly\\\\3D_Frontend\\\\src\\\\pages\\\\admin\" -ErrorAction SilentlyContinue)",
-      "Bash(Select-Object Name)"
+      "Bash(Select-Object Name)",
+      "mcp__plugin_figma_figma__use_figma",
+      "mcp__plugin_figma_figma__get_screenshot"
     ]
   }
 }

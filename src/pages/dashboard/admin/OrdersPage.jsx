@@ -1,22 +1,17 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSearchParams } from "react-router-dom";
 import { X, Package, MapPin, Truck, AlertTriangle, User, Store } from "lucide-react";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
 import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
-import ScrollableContent from "../../../features/dashboard/components/ScrollableContent.js";
+import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
+import OrderStatusPill from "../../../features/dashboard/components/OrderStatusPill.js";
+import { ORDER_STATUS_CONFIG as STATUS_CONFIG } from "../../../constants/orderStatusConfig.js";
 
 // ─── Status config ────────────────────────────────────────────────────────────
 
-const STATUS_CONFIG = {
-  pending:       { label: "Pending",       dot: "bg-orange-400", text: "text-orange-400", border: "border-orange-400/30", bg: "bg-orange-400/10" },
-  in_production: { label: "In Production", dot: "bg-sky-400",    text: "text-sky-400",    border: "border-sky-400/30",    bg: "bg-sky-400/10"    },
-  shipped:       { label: "Shipped",       dot: "bg-sky-400",    text: "text-sky-400",    border: "border-sky-400/30",    bg: "bg-sky-400/10"    },
-  delivered:     { label: "Delivered",     dot: "bg-green-400",  text: "text-green-400",  border: "border-green-400/30",  bg: "bg-green-400/10"  },
-  issue:         { label: "Issue",         dot: "bg-red-400",    text: "text-red-400",    border: "border-red-400/30",    bg: "bg-red-400/10"    },
-};
-
-const ALL_STATUSES = Object.keys(STATUS_CONFIG);
+const ALL_STATUSES = ["pending", "in_production", "shipped", "delivered", "issue"];
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
@@ -269,20 +264,6 @@ const ISSUE_TYPE_LABEL = {
   production_delay:  "Production Delay",
 };
 
-// ─── Status badge (inline) ────────────────────────────────────────────────────
-
-function StatusBadge({ status, size = "sm" }) {
-  const cfg = STATUS_CONFIG[status];
-  return (
-    <div className="flex items-center gap-2">
-      <span className={`shrink-0 w-2 h-2 rounded-full ${cfg.dot}`} />
-      <span className={`font-semibold uppercase tracking-wide ${cfg.text} ${size === "lg" ? "text-sm" : "text-[clamp(11px,0.9vw,13px)]"} truncate`}>
-        {cfg.label}
-      </span>
-    </div>
-  );
-}
-
 // ─── Section label ────────────────────────────────────────────────────────────
 
 function SectionLabel({ children }) {
@@ -454,9 +435,17 @@ function OrderModal({ order, onClose }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function OrdersPage() {
+  const [searchParams] = useSearchParams();
   const [search, setSearch]       = useState("");
   const [statusFilter, setStatus] = useState("all");
   const [selected, setSelected]   = useState(null);
+
+  useEffect(() => {
+    const orderId = searchParams.get("order");
+    if (!orderId) return;
+    const found = ORDERS.find((o) => o.orderId === orderId);
+    if (found) setSelected(found);
+  }, [searchParams]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -484,24 +473,35 @@ export default function OrdersPage() {
         }
       >
         {/* Filters */}
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap gap-2">
+            {["all", ...ALL_STATUSES].map((s) => {
+              const isActive = statusFilter === s;
+              const label = s === "all" ? "All" : STATUS_CONFIG[s].label;
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setStatus(s)}
+                  className={[
+                    "rounded-full border px-3 py-1 text-[12px] font-semibold uppercase tracking-wide transition-colors",
+                    isActive
+                      ? "border-[#5ac422] bg-[#5ac422]/15 text-[#5ac422]"
+                      : "border-white/10 bg-transparent text-zinc-400 hover:border-white/20 hover:text-zinc-200",
+                  ].join(" ")}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by order #, store, or customer…"
-            className="flex-1 min-w-[200px] rounded-md border border-white/10 bg-[rgba(5,10,7,0.7)] px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-[#5ac422] transition-colors"
+            className="min-w-[200px] flex-1 rounded-md border border-white/10 bg-[rgba(5,10,7,0.7)] px-4 py-2 text-sm text-white outline-none placeholder:text-zinc-500 transition-colors focus:border-[#5ac422]"
           />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatus(e.target.value)}
-            className="rounded-md border border-white/10 bg-[rgba(5,10,7,0.7)] px-3 py-2.5 text-sm text-white outline-none focus:border-[#5ac422] transition-colors cursor-pointer"
-          >
-            <option value="all">All Statuses</option>
-            {ALL_STATUSES.map((s) => (
-              <option key={s} value={s}>{STATUS_CONFIG[s].label}</option>
-            ))}
-          </select>
         </div>
 
         {/* Table */}
@@ -509,55 +509,65 @@ export default function OrdersPage() {
           {filtered.length === 0 ? (
             <p className="py-10 text-center text-sm text-zinc-500">No orders found.</p>
           ) : (
-            <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
-              {/* Header row */}
-              <div className="grid grid-cols-[0.8fr_1.4fr_1.4fr_1.2fr_1fr_0.8fr_32px] gap-3 px-2 pb-2 border-b border-white/20">
-                {["Order", "Customer", "Store", "Status", "Date", "Total", ""].map((col) => (
-                  <span key={col} className="text-[11px] font-semibold uppercase tracking-wide text-zinc-300">
-                    {col}
-                  </span>
-                ))}
-              </div>
-
-              <ScrollableContent scrollbarSide="left">
-                {filtered.map((order, index) => (
-                  <div
-                    key={order.id}
-                    onClick={() => setSelected(order)}
-                    className={`
-                      grid grid-cols-[0.8fr_1.4fr_1.4fr_1.2fr_1fr_0.8fr_32px] gap-3 items-center py-3 px-2
-                      hover:bg-[rgba(149,149,149,0.1)] transition-colors rounded-2xl cursor-pointer
-                      ${index < filtered.length - 1 ? "border-b-[0.5px] border-white/10" : ""}
-                    `}
-                  >
-                    <span className="text-[clamp(12px,1vw,14px)] font-semibold text-zinc-100 truncate">
+            <DashboardTable
+              variant="list"
+              gridTemplateColumns="0.8fr 1.4fr 1.4fr 1.2fr 1fr 0.8fr 32px"
+              columns={[
+                { key: "order", header: "Order" },
+                { key: "customer", header: "Customer" },
+                { key: "store", header: "Store" },
+                { key: "status", header: "Status" },
+                { key: "date", header: "Date" },
+                { key: "total", header: "Total" },
+                { key: "action", header: "" },
+              ]}
+              rows={filtered}
+              getRowKey={(order) => order.id}
+              onRowClick={setSelected}
+              renderCell={(order, key) => {
+                if (key === "order") {
+                  return (
+                    <span className="truncate text-[clamp(12px,1vw,14px)] font-semibold text-zinc-100">
                       #{order.orderId}
                     </span>
-                    <span className="text-[clamp(12px,1vw,14px)] text-zinc-200 truncate">
-                      {order.customer}
+                  );
+                }
+                if (key === "customer" || key === "store") {
+                  return (
+                    <span className="truncate text-[clamp(12px,1vw,14px)] text-zinc-200">
+                      {order[key]}
                     </span>
-                    <span className="text-[clamp(12px,1vw,14px)] text-zinc-200 truncate">
-                      {order.store}
-                    </span>
-                    <StatusBadge status={order.status} />
-                    <span className="text-[11px] text-zinc-300">
-                      {formatDate(order.date)}
-                    </span>
+                  );
+                }
+                if (key === "status") return <OrderStatusPill status={order.status} />;
+                if (key === "date") {
+                  return <span className="text-[11px] text-zinc-300">{formatDate(order.date)}</span>;
+                }
+                if (key === "total") {
+                  return (
                     <span className="text-[clamp(12px,1vw,14px)] font-semibold text-[#5ac422]">
                       {order.total}
                     </span>
+                  );
+                }
+                if (key === "action") {
+                  return (
                     <button
                       type="button"
-                      onClick={() => setSelected(order)}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 hover:text-[#5ac422] hover:bg-[#5ac422]/10 transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelected(order);
+                      }}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-[#5ac422]/10 hover:text-[#5ac422]"
                       title="View details"
                     >
                       →
                     </button>
-                  </div>
-                ))}
-              </ScrollableContent>
-            </div>
+                  );
+                }
+                return null;
+              }}
+            />
           )}
         </DashboardCard>
       </DashboardPage>

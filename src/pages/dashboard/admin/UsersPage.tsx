@@ -1,9 +1,12 @@
 import { useState, useMemo } from "react";
-import { Store, Pencil, Trash2, ArrowRight, X } from "lucide-react";
+import { Store } from "lucide-react";
+import ActiveBadge from "../../../features/dashboard/components/ActiveBadge.js";
+import Modal from "../../../features/dashboard/components/Modal.js";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
 import Input from "../../../components/ui/Input.js";
+import EntityCard from "../../../features/dashboard/components/EntityCard.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Plan = "basic" | "pro" | "enterprise";
@@ -72,19 +75,7 @@ function StoreModal({
   const toggleActive = () => setForm((f) => ({ ...f, active: !f.active }));
 
   return (
-    <div
-      className="fixed inset-0 z-[2000] flex items-center justify-center bg-[rgba(149,149,149,0.08)] backdrop-blur-[12px]"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <div className="relative w-full max-w-md rounded-2xl border border-white/10 bg-[rgba(5,10,7,0.97)] p-6 flex flex-col gap-5 shadow-2xl">
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors"
-        >
-          <X size={18} />
-        </button>
-
+    <Modal onClose={onClose}>
         <h2 className="text-base font-bold uppercase tracking-widest text-white">
           {mode === "add" ? "Add Store" : "Edit Store"}
         </h2>
@@ -169,118 +160,10 @@ function StoreModal({
             Save
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
 
-// ─── Store card ───────────────────────────────────────────────────────────────
-function StoreCard({
-  store,
-  onEdit,
-  onDelete,
-  onNavigate,
-}: {
-  store: StoreRecord;
-  onEdit: (s: StoreRecord) => void;
-  onDelete: (id: string) => void;
-  onNavigate: (id: string) => void;
-}) {
-  const [confirmDelete, setConfirmDelete] = useState(false);
-
-  return (
-    <div className="flex flex-col rounded-2xl border border-white/10 bg-[rgba(149,149,149,0.1)] backdrop-blur-[12px] hover:border-[#22a8c4]/50 hover:brightness-110 transition-all">
-
-      {/* Top — click to open detail page */}
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => onNavigate(store.id)}
-        onKeyDown={(e) => e.key === "Enter" && onNavigate(store.id)}
-        className="flex flex-col gap-2 px-5 pt-5 pb-4 cursor-pointer"
-      >
-        <Store size={32} color="#22a8c4" strokeWidth={1.5} />
-
-        <div className="flex flex-col gap-0.5 mt-1">
-          <span className="font-bold text-white leading-snug" style={{ fontSize: 15 }}>
-            {store.name}
-          </span>
-          <span className="text-[#22a8c4]" style={{ fontSize: 12 }}>
-            {store.city}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ${PLAN_BADGE[store.plan]}`}>
-            {store.plan}
-          </span>
-          <span
-            className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
-              store.active
-                ? "bg-[#22a8c4]/15 text-[#22a8c4] border border-[#22a8c4]/30"
-                : "bg-zinc-700/60 text-zinc-400 border border-zinc-600/40"
-            }`}
-          >
-            {store.active ? "Active" : "Inactive"}
-          </span>
-        </div>
-      </div>
-
-      {/* Divider */}
-      <div className="h-px bg-white/10" />
-
-      {/* Action row */}
-      <div className="flex items-center justify-between px-4 py-3">
-        {confirmDelete ? (
-          <div className="flex items-center gap-2 w-full">
-            <span className="text-[11px] text-zinc-300 flex-1">Delete?</span>
-            <button
-              type="button"
-              onClick={() => onDelete(store.id)}
-              className="rounded px-2 py-1 text-[11px] font-bold text-rose-400 border border-rose-400/40 hover:bg-rose-400/10 transition-colors"
-            >
-              Yes
-            </button>
-            <button
-              type="button"
-              onClick={() => setConfirmDelete(false)}
-              className="rounded px-2 py-1 text-[11px] font-bold text-zinc-400 border border-zinc-600/40 hover:bg-zinc-700/40 transition-colors"
-            >
-              No
-            </button>
-          </div>
-        ) : (
-          <>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onEdit(store); }}
-              title="Edit"
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-white/10 transition-colors"
-            >
-              <Pencil size={16} />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); setConfirmDelete(true); }}
-              title="Delete"
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-rose-400 hover:bg-rose-400/10 transition-colors"
-            >
-              <Trash2 size={16} />
-            </button>
-            <button
-              type="button"
-              onClick={(e) => { e.stopPropagation(); onNavigate(store.id); }}
-              title="View Detail"
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-[#22a8c4] hover:bg-[#22a8c4]/10 transition-colors"
-            >
-              <ArrowRight size={16} />
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function UsersPage() {
@@ -364,12 +247,25 @@ export default function UsersPage() {
         ) : (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filtered.map((store) => (
-              <StoreCard
+              <EntityCard
                 key={store.id}
-                store={store}
-                onEdit={(s) => setModal({ mode: "edit", store: s })}
-                onDelete={handleDelete}
-                onNavigate={(id) => navigate(`/dashboard/admin/users/${id}`)}
+                icon={<Store size={32} color="#22a8c4" strokeWidth={1.5} />}
+                accentColor="#22a8c4"
+                name={store.name}
+                subtitle={store.city}
+                badges={
+                  <>
+                    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold capitalize ${PLAN_BADGE[store.plan]}`}>
+                      {store.plan}
+                    </span>
+                    <ActiveBadge active={store.active} color="#22a8c4" />
+                  </>
+                }
+                onClick={() => navigate(`/dashboard/admin/users/${store.id}`)}
+                onEdit={() => setModal({ mode: "edit", store })}
+                onDelete={() => handleDelete(store.id)}
+                onNavigate={() => navigate(`/dashboard/admin/users/${store.id}`)}
+                navigateLabel="View Detail"
               />
             ))}
           </div>
