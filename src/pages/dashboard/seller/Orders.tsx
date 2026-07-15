@@ -41,8 +41,8 @@ const PLATFORM_LABELS: Record<string, string> = {
 interface SellerOrder {
   id: string;
   product: { name: string; image: string };
-  platforms: string[];
-  supplier: string;
+  platform: string;
+  supplier: { city: string; country: string };
   date: string;
   status: OrderStatus;
   total: number;
@@ -51,16 +51,16 @@ interface SellerOrder {
 // ─── Mock data ────────────────────────────────────────────────────────────────
 
 const mockOrders: SellerOrder[] = [
-  { id: "#0041", product: { name: "SoldierXPT",  image: "/mock/soldier.png"  }, platforms: ["shopify"],           supplier: "PrintLab Berlin", date: "2025-05-12", status: "in_production", total: 42.00  },
-  { id: "#0040", product: { name: "WarriorX",    image: "/mock/warrior.png"  }, platforms: ["woocommerce","ebay"], supplier: "3D Masters NY",   date: "2025-05-10", status: "shipped",        total: 67.50  },
-  { id: "#0039", product: { name: "DragonMini",  image: "/mock/dragon.png"   }, platforms: ["wix"],               supplier: "FormLabs TLV",    date: "2025-05-08", status: "delivered",      total: 34.99  },
-  { id: "#0038", product: { name: "RocketBase",  image: "/mock/rocket.png"   }, platforms: ["amazon"],            supplier: "PrintLab Berlin", date: "2025-05-06", status: "issue",          total: 89.00  },
-  { id: "#0037", product: { name: "SoldierXPT",  image: "/mock/soldier.png"  }, platforms: ["shopify","ebay"],    supplier: "3D Masters NY",   date: "2025-05-03", status: "delivered",      total: 42.00  },
-  { id: "#0036", product: { name: "DragonMini",  image: "/mock/dragon.png"   }, platforms: ["etsy"],              supplier: "FormLabs TLV",    date: "2025-04-30", status: "shipped",        total: 34.99  },
-  { id: "#0035", product: { name: "MechBot",     image: "/mock/mech.png"     }, platforms: ["shopify"],           supplier: "PrintLab Berlin", date: "2025-04-28", status: "delivered",      total: 58.00  },
-  { id: "#0034", product: { name: "WarriorX",    image: "/mock/warrior.png"  }, platforms: ["woocommerce"],       supplier: "3D Masters NY",   date: "2025-04-25", status: "in_production",  total: 67.50  },
-  { id: "#0033", product: { name: "RocketBase",  image: "/mock/rocket.png"   }, platforms: ["shopify","amazon"],  supplier: "PrintLab Berlin", date: "2025-04-22", status: "delivered",      total: 89.00  },
-  { id: "#0032", product: { name: "PhoenixV2",   image: "/mock/phoenix.png"  }, platforms: ["ebay"],              supplier: "FormLabs TLV",    date: "2025-04-19", status: "issue",          total: 75.00  },
+  { id: "#0041", product: { name: "SoldierXPT",  image: "/mock/soldier.png"  }, platform: "shopify",     supplier: { city: "Berlin",    country: "Germany" }, date: "2025-05-12", status: "in_production", total: 42.00  },
+  { id: "#0040", product: { name: "WarriorX",    image: "/mock/warrior.png"  }, platform: "woocommerce", supplier: { city: "New York",  country: "USA"     }, date: "2025-05-10", status: "shipped",        total: 67.50  },
+  { id: "#0039", product: { name: "DragonMini",  image: "/mock/dragon.png"   }, platform: "wix",         supplier: { city: "Tel Aviv",  country: "Israel"  }, date: "2025-05-08", status: "delivered",      total: 34.99  },
+  { id: "#0038", product: { name: "RocketBase",  image: "/mock/rocket.png"   }, platform: "amazon",      supplier: { city: "Berlin",    country: "Germany" }, date: "2025-05-06", status: "issue",          total: 89.00  },
+  { id: "#0037", product: { name: "SoldierXPT",  image: "/mock/soldier.png"  }, platform: "shopify",     supplier: { city: "New York",  country: "USA"     }, date: "2025-05-03", status: "delivered",      total: 42.00  },
+  { id: "#0036", product: { name: "DragonMini",  image: "/mock/dragon.png"   }, platform: "etsy",        supplier: { city: "Tel Aviv",  country: "Israel"  }, date: "2025-04-30", status: "shipped",        total: 34.99  },
+  { id: "#0035", product: { name: "MechBot",     image: "/mock/mech.png"     }, platform: "shopify",     supplier: { city: "Berlin",    country: "Germany" }, date: "2025-04-28", status: "delivered",      total: 58.00  },
+  { id: "#0034", product: { name: "WarriorX",    image: "/mock/warrior.png"  }, platform: "woocommerce", supplier: { city: "New York",  country: "USA"     }, date: "2025-04-25", status: "in_production",  total: 67.50  },
+  { id: "#0033", product: { name: "RocketBase",  image: "/mock/rocket.png"   }, platform: "shopify",     supplier: { city: "Berlin",    country: "Germany" }, date: "2025-04-22", status: "delivered",      total: 89.00  },
+  { id: "#0032", product: { name: "PhoenixV2",   image: "/mock/phoenix.png"  }, platform: "ebay",        supplier: { city: "Tel Aviv",  country: "Israel"  }, date: "2025-04-19", status: "issue",          total: 75.00  },
 ];
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -71,7 +71,7 @@ const TABLE_COLUMNS = [
   { key: "order",    header: "Order #"  },
   { key: "product",  header: "Product"  },
   { key: "platform", header: "Platform" },
-  { key: "supplier", header: "Supplier" },
+  { key: "supplier", header: "Supplier Location" },
   { key: "date",     header: "Date"     },
   { key: "status",   header: "Status"   },
   { key: "total",    header: "Total", align: "right" as const },
@@ -92,15 +92,19 @@ function formatDate(dateStr: string): string {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
+function formatSupplierLocation({ city, country }: { city: string; country: string }): string {
+  return `${city}, ${country}`;
+}
+
 function ProductCell({ product }: { product: SellerOrder["product"] }) {
   const [imgError, setImgError] = useState(false);
 
   return (
-    <div className="flex min-w-0 items-center gap-3">
-      <div className="h-8 w-8 shrink-0 overflow-hidden rounded-lg bg-zinc-800">
+    <div className="flex min-w-0 items-center gap-4">
+      <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-zinc-800">
         {imgError || !product.image ? (
           <div className="flex h-full w-full items-center justify-center">
-            <Package size={14} className="text-zinc-600" />
+            <Package size={24} className="text-zinc-600" />
           </div>
         ) : (
           <img
@@ -118,28 +122,21 @@ function ProductCell({ product }: { product: SellerOrder["product"] }) {
   );
 }
 
-function PlatformIcons({ platforms }: { platforms: string[] }) {
+function PlatformIcon({ platform }: { platform: string }) {
+  const key = platform.toLowerCase();
+  const icon = PLATFORM_ICONS[key];
+  const label = PLATFORM_LABELS[key] ?? platform;
+
+  if (icon) {
+    return (
+      <img src={icon} alt={label} title={label} className="h-5 w-5 object-contain" />
+    );
+  }
+
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
-      {platforms.map((p) => {
-        const key = p.toLowerCase();
-        const icon = PLATFORM_ICONS[key];
-        const label = PLATFORM_LABELS[key] ?? p;
-        if (icon) {
-          return (
-            <img key={p} src={icon} alt={label} title={label} className="h-5 w-5 object-contain" />
-          );
-        }
-        return (
-          <span
-            key={p}
-            className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-zinc-400"
-          >
-            {label}
-          </span>
-        );
-      })}
-    </div>
+    <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] font-semibold uppercase text-zinc-400">
+      {label}
+    </span>
   );
 }
 
@@ -193,13 +190,20 @@ export default function SellerOrdersPage() {
                     type="button"
                     onClick={() => setStatusFilter(s)}
                     className={[
-                      "rounded-full border px-3 py-1 text-[12px] font-semibold uppercase tracking-wide transition-colors",
+                      "relative rounded-full px-3 py-1 text-[12px] font-semibold uppercase tracking-wide transition-colors",
                       isActive
-                        ? "border-[#5ac422] bg-[#5ac422]/15 text-[#5ac422]"
-                        : "border-white/10 bg-transparent text-zinc-400 hover:border-white/20 hover:text-zinc-200",
+                        ? "text-[#5ac422]"
+                        : "border border-white/10 bg-transparent text-zinc-400 hover:border-white/20 hover:text-zinc-200",
                     ].join(" ")}
                   >
-                    {label}
+                    {isActive && (
+                      <motion.span
+                        layoutId="seller-orders-active-pill"
+                        className="absolute inset-0 rounded-full border border-[#5ac422]/40 bg-[#5ac422]/15"
+                        transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10">{label}</span>
                   </button>
                 );
               })}
@@ -241,12 +245,12 @@ export default function SellerOrdersPage() {
                     return <ProductCell product={o.product} />;
                   }
                   if (key === "platform") {
-                    return <PlatformIcons platforms={o.platforms} />;
+                    return <PlatformIcon platform={o.platform} />;
                   }
                   if (key === "supplier") {
                     return (
                       <span className="truncate text-[clamp(12px,1vw,14px)] text-zinc-200">
-                        {o.supplier}
+                        {formatSupplierLocation(o.supplier)}
                       </span>
                     );
                   }

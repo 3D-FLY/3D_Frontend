@@ -46,6 +46,9 @@ const PLATFORM_LABELS: Record<string, string> = {
 
 const ALL_PLATFORMS = ["shopify", "woocommerce", "ebay", "wix", "amazon"];
 
+/** Platforms not yet available — shown grayed out in the connect grid */
+const COMING_SOON_PLATFORMS = new Set(["woocommerce", "ebay", "wix", "amazon"]);
+
 const PLATFORM_FIELDS: Record<string, PlatformField[]> = {
   shopify: [
     { label: "Store URL",     key: "url",      placeholder: "yourstore.myshopify.com"       },
@@ -231,10 +234,17 @@ export default function IntegrationPage() {
               </p>
             ) : (
               <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
-                {available.map((platform) => (
+                {available.map((platform) => {
+                  const comingSoon = COMING_SOON_PLATFORMS.has(platform);
+                  return (
                   <div
                     key={platform}
-                    className="flex flex-col items-center gap-4 rounded-xl border border-white/10 bg-white/[0.07] p-6 transition-colors hover:border-white/20"
+                    className={[
+                      "flex flex-col items-center gap-4 rounded-xl border border-white/10 bg-white/[0.07] p-6 transition-colors",
+                      comingSoon
+                        ? "cursor-not-allowed opacity-45"
+                        : "hover:border-white/20",
+                    ].join(" ")}
                   >
                     <img
                       src={PLATFORM_ICONS[platform]}
@@ -244,15 +254,22 @@ export default function IntegrationPage() {
                     <span className="text-base font-semibold text-white">
                       {PLATFORM_LABELS[platform]}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => openModal(platform)}
-                      className="rounded-md border border-green-500/40 bg-green-500/10 px-4 py-2 text-[12px] font-bold uppercase tracking-wide text-green-500 transition-colors hover:bg-green-500/20"
-                    >
-                      + Connect
-                    </button>
+                    {comingSoon ? (
+                      <span className="rounded-md border border-white/15 bg-white/[0.06] px-4 py-2 text-[11px] font-bold uppercase tracking-wide text-white/60">
+                        Coming Soon
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => openModal(platform)}
+                        className="rounded-md border border-green-500/40 bg-green-500/10 px-4 py-2 text-[12px] font-bold uppercase tracking-wide text-green-500 transition-colors hover:bg-green-500/20"
+                      >
+                        + Connect
+                      </button>
+                    )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </DashboardCard>
