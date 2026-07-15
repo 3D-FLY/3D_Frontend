@@ -41,17 +41,9 @@ export default function PartnerMap() {
   return (
     <div className="relative flex min-h-0 w-full flex-1 flex-col items-center overflow-x-hidden overflow-y-auto bg-dark">
       <AmbientGlowBackdrop />
-      <Turtle
-        bottom="0"
-        left="50%"
-        height="50vh"
-        translateX="-50%"
-        translateY="0"
-        opacity={0.1}
-        zIndex={0}
-      />
+  
 
-      <div className="relative z-10 mt-10 flex w-full max-w-[1440px] flex-col items-center gap-8 px-6 py-8 pb-[50vh]">
+      <div className="relative z-10 mt-10 flex w-full max-w-[1440px] flex-col items-center gap-8 px-6 py-8 pb-15">
         <SectionTitle className="w-full mb-7">3D-FLY GLOBAL NETWORK</SectionTitle>
 
         <div className="flex w-full flex-col items-center gap-3">

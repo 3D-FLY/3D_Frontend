@@ -155,6 +155,8 @@ function CitySelector({ onAdd }) {
     onAdd({
       id,
       name: selectedCity.label,
+      cityName: selectedCity.cityName,
+      countryName: selectedCity.countryName,
       lat: selectedCity.lat,
       lng: selectedCity.lng,
       supplierName: trimmedName,

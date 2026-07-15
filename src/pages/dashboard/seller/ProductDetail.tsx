@@ -198,13 +198,13 @@ export default function SellerProductDetailPage() {
             {/* ── Section 1: Product Info (full width) ────────────────────── */}
             <div className="lg:col-span-2">
               <DashboardCard index={0} title="PRODUCT INFO" autoHeight withBackground={false}>
-                <div className="flex flex-col gap-6 sm:flex-row">
+                <div className="flex gap-6">
 
-                  {/* Image */}
-                  <div className="h-40 w-40 shrink-0 overflow-hidden rounded-2xl bg-zinc-800">
+                  {/* Large image — left */}
+                  <div className="h-[200px] w-[200px] shrink-0 overflow-hidden rounded-2xl bg-zinc-800">
                     {imgError || !product.image ? (
                       <div className="flex h-full w-full items-center justify-center">
-                        <Package size={40} className="text-zinc-600" />
+                        <Package size={48} className="text-zinc-600" />
                       </div>
                     ) : (
                       <img
@@ -216,25 +216,24 @@ export default function SellerProductDetailPage() {
                     )}
                   </div>
 
-                  {/* Info grid */}
-                  <div className="flex flex-1 flex-col gap-5">
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-4">
-                      <InfoField label="Name">
-                        <span className="text-[15px] font-bold text-white">{product.name}</span>
-                      </InfoField>
-                      <InfoField label="SKU">
-                        <span className="text-sm text-zinc-300">{product.sku}</span>
-                      </InfoField>
-                      <InfoField label="Cost">
-                        <span className="text-sm font-medium text-zinc-300">${product.cost.toFixed(2)}</span>
-                      </InfoField>
-                      <InfoField label="Price">
-                        <span className="text-xl font-bold text-[#5ac422]">${product.price.toFixed(2)}</span>
-                      </InfoField>
+                  {/* Right side — full height, divided into rows */}
+                  <div className="flex flex-1 flex-col divide-y divide-white/8">
+
+                    {/* Row 1: Name + SKU */}
+                    <div className="flex items-baseline gap-3 pb-4">
+                      <span className="text-[22px] font-bold text-white">{product.name}</span>
+                      <span className="text-sm text-white/35">{product.sku}</span>
                     </div>
 
-                    <InfoField label="Connected Stores">
-                      <div className="flex flex-wrap items-center gap-2 pt-1">
+                    {/* Row 2: Cost + Price + Connected Stores — labels row + values row */}
+                    <div className="grid grid-cols-[auto_auto_1fr] grid-rows-2 items-start gap-x-8 gap-y-0.5 py-4">
+                      <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-600">Cost</span>
+                      <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-600">Price</span>
+                      <span className="pl-16 text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-600">Connected Stores</span>
+
+                      <span className="text-sm font-medium leading-none text-zinc-300">${product.cost.toFixed(2)}</span>
+                      <span className="text-2xl font-bold leading-none text-green-500">${product.price.toFixed(2)}</span>
+                      <div className="flex flex-wrap items-center gap-2 pl-16">
                         {product.stores.map((s) => {
                           const icon = PLATFORM_ICONS[s.toLowerCase()];
                           const label = PLATFORM_LABELS[s.toLowerCase()] ?? s;
@@ -248,9 +247,10 @@ export default function SellerProductDetailPage() {
                           );
                         })}
                       </div>
-                    </InfoField>
+                    </div>
 
-                    <div className="grid grid-cols-2 gap-x-8 gap-y-4 sm:grid-cols-3">
+                    {/* Row 3: Print Time + Weight + Colors */}
+                    <div className="grid grid-cols-3 gap-6 py-4">
                       <InfoField label="Print Time">
                         <span className="text-sm text-zinc-200">{product.details.printTime}</span>
                       </InfoField>
@@ -263,6 +263,7 @@ export default function SellerProductDetailPage() {
                         </div>
                       </InfoField>
                     </div>
+
                   </div>
                 </div>
               </DashboardCard>

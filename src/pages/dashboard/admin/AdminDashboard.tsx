@@ -64,28 +64,25 @@ export default function AdminDashboard() {
   return (
     <DashboardLayout role="admin">
       <DashboardPage title="Welcome, Raz">
-        <DashboardCard index={0} title="Status" className="status-container">
-          <div className="grid h-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {statusCards.map((card) => (
-              <div key={card.label} className="h-full">
-                <StatusBadge
-                  count={card.count}
-                  label={card.label}
-                  accentColor={card.accentColor}
-                  {...(card.label === "Pending Match" && { onClick: () => navigate("/admin/matching") })}
-                />
-              </div>
-            ))}
-          </div>
-        </DashboardCard>
+        <div className="grid min-h-[180px] w-full grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+          {statusCards.map((card) => (
+            <StatusBadge
+              key={card.label}
+              count={card.count}
+              label={card.label}
+              accentColor={card.accentColor}
+              {...(card.label === "Pending Match" && { onClick: () => navigate("/admin/matching") })}
+            />
+          ))}
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          <DashboardCard index={1} title="Action Required" autoHeight className="h-full">
+          <DashboardCard index={0} title="Action Required" autoHeight className="h-full">
             <OrderAttentionList items={attentionOrders} />
           </DashboardCard>
 
           <div className="flex h-full min-h-0 flex-col gap-6">
-            <DashboardCard index={2} title="Find an Order" autoHeight fill withBackground={false}>
+            <DashboardCard index={1} title="Find an Order" autoHeight fill withBackground={false}>
               <input
                 type="text"
                 placeholder="Order # or customer name…"
@@ -93,7 +90,7 @@ export default function AdminDashboard() {
               />
             </DashboardCard>
 
-            <DashboardCard index={3} title="Find a Supplier" autoHeight fill withBackground={false}>
+            <DashboardCard index={2} title="Find a Supplier" autoHeight fill withBackground={false}>
               <input
                 type="text"
                 placeholder="Supplier name or city…"
@@ -104,7 +101,7 @@ export default function AdminDashboard() {
         </div>
 
         <DashboardCard
-          index={4}
+          index={3}
           title="Recent Orders"
           autoHeight
           headerAction={
