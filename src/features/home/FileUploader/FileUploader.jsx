@@ -70,6 +70,7 @@ export default function FileUploader() {
         <UploadDropCard
           accept={acceptedFileTypes}
           onFile={(file) => setUploadedFile(file)}
+          fileName={uploadedFile?.name}
           className="w-full max-w-[500px] mx-auto lg:max-w-none lg:h-full"
         />
 

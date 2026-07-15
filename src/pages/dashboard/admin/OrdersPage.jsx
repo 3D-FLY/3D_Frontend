@@ -484,13 +484,20 @@ export default function OrdersPage() {
                   type="button"
                   onClick={() => setStatus(s)}
                   className={[
-                    "rounded-full border px-3 py-1 text-[12px] font-semibold uppercase tracking-wide transition-colors",
+                    "relative rounded-full px-3 py-1 text-[12px] font-semibold uppercase tracking-wide transition-colors",
                     isActive
-                      ? "border-[#5ac422] bg-[#5ac422]/15 text-[#5ac422]"
-                      : "border-white/10 bg-transparent text-zinc-400 hover:border-white/20 hover:text-zinc-200",
+                      ? "text-[#5ac422]"
+                      : "border border-white/10 bg-transparent text-zinc-400 hover:border-white/20 hover:text-zinc-200",
                   ].join(" ")}
                 >
-                  {label}
+                  {isActive && (
+                    <motion.span
+                      layoutId="admin-orders-active-pill"
+                      className="absolute inset-0 rounded-full border border-[#5ac422]/40 bg-[#5ac422]/15"
+                      transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10">{label}</span>
                 </button>
               );
             })}
