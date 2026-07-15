@@ -89,19 +89,15 @@ export default function FinancePage() {
     <DashboardLayout role="admin">
       <DashboardPage title="Payments">
         {/* SECTION 1 — Stat Cards */}
-        <DashboardCard index={0} title="Overview">
-          <div className="grid h-full grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {statCards.map((card) => (
-              <div key={card.label} className="h-full">
-                <StatusBadge count={card.value} label={card.label} color={card.color} />
-              </div>
-            ))}
-          </div>
-        </DashboardCard>
+        <div className="grid min-h-[180px] w-full grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+          {statCards.map((card) => (
+            <StatusBadge key={card.label} count={card.value} label={card.label} color={card.color} />
+          ))}
+        </div>
 
         {/* SECTION 2 — Revenue Chart */}
         <DashboardCard
-          index={1}
+          index={0}
           title="Revenue Overview"
           autoHeight
           headerAction={
@@ -190,7 +186,7 @@ export default function FinancePage() {
         {/* SECTION 3 — Two Columns */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* LEFT — Recent Transactions */}
-          <DashboardCard index={2} title="Recent Transactions" autoHeight>
+          <DashboardCard index={1} title="Recent Transactions" autoHeight>
             <DashboardTable
               variant="data"
               scrollable
@@ -220,7 +216,7 @@ export default function FinancePage() {
           </DashboardCard>
 
           {/* RIGHT — Supplier Payouts */}
-          <DashboardCard index={3} title="Supplier Payouts" autoHeight>
+          <DashboardCard index={2} title="Supplier Payouts" autoHeight>
             <DashboardTable
               variant="data"
               scrollable

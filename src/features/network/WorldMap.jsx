@@ -2,7 +2,7 @@
  * WorldMap — shared, fully-controlled map renderer.
  *
  * Props:
- *   partners   { id, lat, lng }[]  — pins to display
+ *   partners   { id, lat, lng, cityName?, countryName?, name? }[]  — pins to display
  *   center     [lng, lat]          — controlled center
  *   zoom       number              — controlled zoom level
  *   onMoveEnd  ({ coordinates, zoom }) => void
@@ -42,52 +42,120 @@ const GEO_STYLE = {
   pressed: { fill: "#4aad1a", stroke: "#000000", strokeWidth: 0.9, outline: "none" },
 };
 
+function getPartnerLocation(partner) {
+  if (partner.cityName || partner.countryName) {
+    return {
+      city: partner.cityName ?? "",
+      country: partner.countryName ?? "",
+    };
+  }
+  const name = partner.name ?? "";
+  const idx = name.indexOf(", ");
+  if (idx === -1) return { city: name, country: "" };
+  return { city: name.slice(0, idx), country: name.slice(idx + 2) };
+}
+
+function MarkerTooltip({ city, country }) {
+  const label = [city, country].filter(Boolean).join(", ") || "Unknown location";
+  const width = Math.min(200, Math.max(96, label.length * 6.2 + 24));
+  const halfW = width / 2;
+  const boxH = country ? 40 : 28;
+  const tipY = country ? -52 : -46;
+
+  return (
+    <g
+      className="pointer-events-none opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+      transform={`translate(0, ${tipY})`}
+    >
+      <rect
+        x={-halfW}
+        y={-boxH}
+        width={width}
+        height={boxH}
+        rx={6}
+        fill="rgba(5, 10, 7, 0.94)"
+        stroke="#39e75f"
+        strokeWidth={1}
+      />
+      <text
+        textAnchor="middle"
+        y={country ? -boxH + 15 : -boxH / 2 + 4}
+        fill="#ffffff"
+        fontSize={11}
+        fontWeight={600}
+        fontFamily="system-ui, sans-serif"
+      >
+        {city || "—"}
+      </text>
+      {country ? (
+        <text
+          textAnchor="middle"
+          y={-boxH + 29}
+          fill="#a1a1aa"
+          fontSize={10}
+          fontFamily="system-ui, sans-serif"
+        >
+          {country}
+        </text>
+      ) : null}
+    </g>
+  );
+}
+
 // ─── Marker layer (must live inside ZoomableGroup to access useZoomPanContext) ─
 function MarkerLayer({ partners }) {
   const { k } = useZoomPanContext();
   const inv = k > 0 ? 1 / k : 1;
 
-  return partners.map((p) => (
-    <Marker key={p.id} coordinates={[p.lng, p.lat]}>
-      <g transform={`scale(${inv})`}>
-        <g
-          className="group"
-          onMouseDown={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
-        >
-          <circle
-            r={12} cx={0} cy={0}
-            fill="#39e75f" opacity={0.55}
-            style={{ pointerEvents: "none" }}
+  return partners.map((p) => {
+    const { city, country } = getPartnerLocation(p);
+    const title = [city, country].filter(Boolean).join(", ");
+
+    return (
+      <Marker key={p.id} coordinates={[p.lng, p.lat]}>
+        <g transform={`scale(${inv})`}>
+          <g
+            className="group cursor-pointer"
+            onMouseDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
           >
-            <animate
-              attributeName="opacity"
-              values="0.55;0;0.55"
-              dur="1.8s"
-              repeatCount="indefinite"
-            />
-            <animateTransform
-              attributeName="transform"
-              type="scale"
-              values="1;2.4;1"
-              dur="1.8s"
-              repeatCount="indefinite"
-            />
-          </circle>
-          <g transform="translate(-12.5, -34)">
-            <g className="origin-[12.5px_34px] transition-transform duration-200 group-hover:scale-110">
-              <image
-                href={locationMarkerUrl}
-                width={25}
-                height={35}
-                className="pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.45)]"
+            <circle r={18} cx={0} cy={-8} fill="transparent" />
+            <title>{title}</title>
+            <circle
+              r={12} cx={0} cy={0}
+              fill="#39e75f" opacity={0.55}
+              style={{ pointerEvents: "none" }}
+            >
+              <animate
+                attributeName="opacity"
+                values="0.55;0;0.55"
+                dur="1.8s"
+                repeatCount="indefinite"
               />
+              <animateTransform
+                attributeName="transform"
+                type="scale"
+                values="1;2.4;1"
+                dur="1.8s"
+                repeatCount="indefinite"
+              />
+            </circle>
+            <g transform="translate(-12.5, -34)">
+              <g className="origin-[12.5px_34px] transition-transform duration-200 group-hover:scale-110">
+                <image
+                  href={locationMarkerUrl}
+                  width={25}
+                  height={35}
+                  className="pointer-events-none drop-shadow-[0_2px_4px_rgba(0,0,0,0.45)]"
+                />
+              </g>
             </g>
+            <MarkerTooltip city={city} country={country} />
           </g>
         </g>
-      </g>
-    </Marker>
-  ));
+      </Marker>
+    );
+  });
 }
 
 // ─── WorldMap ─────────────────────────────────────────────────────────────────
@@ -168,13 +236,32 @@ export default function WorldMap({
    * translate_y = scale × π → top of world at y = 0.
    */
   const projectionConfig = useMemo(() => {
-    const mult  = mapWidth <= 768 ? 0.92 : mapWidth <= 1024 ? 1.05 : 1.25;
-    const scale = (Math.min(mapWidth, mapHeight) / (2 * Math.PI)) * mult;
-    const yMult = mapWidth <= 768 ? 1.22 : 1.35;
+    const mult =
+      mapWidth <= 768
+        ? 0.92
+        : mapWidth <= 1024
+          ? 1.05
+          : 1.25;
+  
+    const scale =
+      (Math.min(mapWidth, mapHeight) / (2 * Math.PI)) * mult;
+  
+    const yMult =
+      mapWidth <= 768
+        ? 1.22
+        : 1.35;
+  
     return {
       scale,
       center: [...DEFAULT_CENTER],
-      translate: [mapWidth / 2, scale * Math.PI * yMult],
+  
+      // מזיז את קו החיתוך של מפת העולם
+      rotate: [-10, 0, 0],
+  
+      translate: [
+        mapWidth / 2,
+        scale * Math.PI * yMult,
+      ],
     };
   }, [mapWidth, mapHeight]);
 

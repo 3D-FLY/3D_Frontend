@@ -1,7 +1,8 @@
 import { CreditCard, Download, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, BarChart, Bar, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
 import shopifyIcon     from "../../../assets/icons/shops/shopify-icon.svg?url";
 import ebayIcon        from "../../../assets/icons/shops/ebay-icon.svg?url";
@@ -35,6 +36,14 @@ const CHART_PLATFORMS = [
   { key: "etsy",        name: "Etsy",        color: "#f87171", icon: etsyIcon        },
 ];
 
+const productOrdersData = [
+  { name: "SoldierXPT", orders: 34, color: "#5ac422" },
+  { name: "WarriorX",   orders: 21, color: "#3b82f6" },
+  { name: "DragonMini", orders: 18, color: "#a855f7" },
+  { name: "RocketBase", orders: 12, color: "#f97316" },
+  { name: "MechBot",    orders:  9, color: "#22a8c4" },
+];
+
 type InvoiceStatus = "paid" | "pending";
 
 interface Invoice {
@@ -60,12 +69,25 @@ const PLAN_FEATURES = [
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-const statCards = [
-  { value: "$1,084", label: "Revenue This Month", color: "#5ac422"  },
-  { value: "12",     label: "Total Orders",        color: "#ffffff"  },
-  { value: "$90",    label: "Avg. Order Value",    color: "#22a8c4"  },
-  { value: "$108",   label: "Platform Fees",       color: "#facc15"  },
+const primaryStatCards = [
+  { value: "12",     label: "Orders",         color: "#ffffff"  },
+  { value: "$1,084", label: "Total Payments", color: "#5ac422"  },
+  { value: "$976",   label: "Profits",        color: "#22a8c4"  },
 ];
+
+function ProductTick({ x, y, payload }: { x?: number; y?: number; payload?: { value: string } }) {
+  return (
+    <text
+      x={x}
+      y={(y ?? 0) + 16}
+      textAnchor="middle"
+      fill="rgba(255,255,255,0.4)"
+      fontSize={11}
+    >
+      {payload?.value}
+    </text>
+  );
+}
 
 function InvoiceStatusBadge({ status }: { status: InvoiceStatus }) {
   if (status === "paid") {
@@ -97,9 +119,9 @@ export default function BillingPage() {
       >
         <DashboardPage header={<DashboardPageTitle>BILLING</DashboardPageTitle>}>
 
-          {/* ── Section 1 — Stat Cards ──────────────────────────────────── */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 xl:grid-cols-4 min-h-[180px]">
-            {statCards.map((card) => (
+          {/* ── Section 1a — Primary stats ──────────────────────────────── */}
+          <div className="grid min-h-[180px] w-full grid-cols-1 gap-6 sm:grid-cols-3">
+            {primaryStatCards.map((card) => (
               <StatusBadge key={card.label} count={card.value} label={card.label} color={card.color} />
             ))}
           </div>
@@ -155,16 +177,57 @@ export default function BillingPage() {
             </div>
           </DashboardCard>
 
+          {/* ── Section 2b — Product Orders Chart ──────────────────────────── */}
+          <DashboardCard index={1} title="ORDERS BY PRODUCT" autoHeight>
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart
+                data={productOrdersData}
+                barSize={36}
+                barCategoryGap="20%"
+                margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" vertical={false} />
+                <XAxis
+                  dataKey="name"
+                  tick={<ProductTick />}
+                  axisLine={false}
+                  tickLine={false}
+                  height={32}
+                />
+                <YAxis
+                  tick={{ fill: "#71717a", fontSize: 12 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "#0d1a10",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "8px",
+                  }}
+                  labelStyle={{ color: "white", fontSize: 12, fontWeight: 600 }}
+                  formatter={(value) => [`${value} orders`, undefined]}
+                  cursor={{ fill: "rgba(255,255,255,0.04)" }}
+                />
+                <Bar dataKey="orders" radius={[6, 6, 0, 0]}>
+                  {productOrdersData.map((entry) => (
+                    <Cell key={entry.name} fill={entry.color} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </DashboardCard>
+
           {/* ── Section 3 + 4 — Plan + Payment Method (side by side) ─────── */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
 
-            <DashboardCard index={1} title="MY PLAN" autoHeight withBackground={false}>
+            <DashboardCard index={2} title="MY PLAN" autoHeight withBackground={false}>
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1">
                   <span className="text-2xl font-bold uppercase tracking-wide text-green-500">
                     Pro Plan
                   </span>
-                  <span className="text-base font-semibold text-white">$49 / month</span>
+                  <span className="text-base font-semibold text-white">$0 / month</span>
                 </div>
                 <ul className="flex flex-col gap-2.5">
                   {PLAN_FEATURES.map((f) => (
@@ -185,7 +248,7 @@ export default function BillingPage() {
               </div>
             </DashboardCard>
 
-            <DashboardCard index={2} title="PAYMENT METHOD" autoHeight withBackground={false}>
+            <DashboardCard index={3} title="PAYMENT METHOD" autoHeight withBackground={false}>
               <div className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.07] px-4 py-4">
                 <div className="flex items-center gap-4">
                   <CreditCard size={24} className="shrink-0 text-white/40" />
@@ -207,7 +270,7 @@ export default function BillingPage() {
           </div>
 
           {/* ── Section 5 — Invoice History ──────────────────────────────── */}
-          <DashboardCard index={3} title="INVOICES" autoHeight withBackground={false}>
+          <DashboardCard index={4} title="INVOICES" autoHeight withBackground={false}>
             <DashboardTable
               variant="data"
               scrollable
