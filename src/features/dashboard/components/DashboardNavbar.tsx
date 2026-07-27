@@ -1,36 +1,17 @@
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { Settings, LogOut } from "lucide-react";
 import LogoSvg from "../../../assets/icons/logo.svg?react";
-import { Link } from "react-router-dom";
-
-function GlobalIcon() {
-  return (
-    <svg width="33" height="33" viewBox="0 0 33 33" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M10.5193 28.7512C10.478 28.7512 10.423 28.7787 10.3818 28.7787C7.71426 27.4587 5.54176 25.2724 4.20801 22.6049C4.20801 22.5637 4.23551 22.5087 4.23551 22.4674C5.91301 22.9624 7.64551 23.3337 9.36426 23.6224C9.66676 25.3549 10.0243 27.0737 10.5193 28.7512Z" fill="#5AC422"/>
-      <path d="M28.7912 22.6187C27.43 25.3549 25.1612 27.5687 22.3975 28.9024C22.92 27.1562 23.36 25.3962 23.6487 23.6224C25.3812 23.3337 27.0862 22.9624 28.7637 22.4674C28.75 22.5224 28.7912 22.5774 28.7912 22.6187Z" fill="#5AC422"/>
-      <path d="M28.9012 10.6012C27.1687 10.0787 25.4225 9.65241 23.6487 9.34991C23.36 7.57616 22.9337 5.81616 22.3975 4.09741C25.2437 5.45866 27.54 7.75491 28.9012 10.6012Z" fill="#5AC422"/>
-      <path d="M10.5189 4.24877C10.0239 5.92627 9.66641 7.63127 9.37766 9.36377C7.60391 9.63877 5.84391 10.0788 4.09766 10.6013C5.43141 7.83752 7.64516 5.56877 10.3814 4.20752C10.4227 4.20752 10.4777 4.24877 10.5189 4.24877Z" fill="#5AC422"/>
-      <path d="M21.2987 9.06125C18.1087 8.70375 14.8912 8.70375 11.7012 9.06125C12.0449 7.1775 12.4849 5.29375 13.1037 3.47875C13.1312 3.36875 13.1174 3.28625 13.1312 3.17625C14.2174 2.915 15.3312 2.75 16.4999 2.75C17.6549 2.75 18.7824 2.915 19.8549 3.17625C19.8687 3.28625 19.8687 3.36875 19.8962 3.47875C20.5149 5.3075 20.9549 7.1775 21.2987 9.06125Z" fill="#5AC422"/>
-      <path d="M9.06125 21.2988C7.16375 20.955 5.29375 20.515 3.47875 19.8963C3.36875 19.8688 3.28625 19.8825 3.17625 19.8688C2.915 18.7825 2.75 17.6688 2.75 16.5C2.75 15.345 2.915 14.2175 3.17625 13.145C3.28625 13.1313 3.36875 13.1313 3.47875 13.1038C5.3075 12.4988 7.16375 12.045 9.06125 11.7013C8.7175 14.8913 8.7175 18.1088 9.06125 21.2988Z" fill="#5AC422"/>
-      <path d="M30.2497 16.5C30.2497 17.6688 30.0847 18.7825 29.8235 19.8688C29.7135 19.8825 29.631 19.8688 29.521 19.8963C27.6922 20.5013 25.8222 20.955 23.9385 21.2988C24.296 18.1088 24.296 14.8913 23.9385 11.7013C25.8222 12.045 27.706 12.485 29.521 13.1038C29.631 13.1313 29.7135 13.145 29.8235 13.145C30.0847 14.2313 30.2497 15.345 30.2497 16.5Z" fill="#5AC422"/>
-      <path d="M21.2987 23.9387C20.9549 25.8362 20.5149 27.7062 19.8962 29.5212C19.8687 29.6312 19.8687 29.7137 19.8549 29.8237C18.7824 30.085 17.6549 30.25 16.4999 30.25C15.3312 30.25 14.2174 30.085 13.1312 29.8237C13.1174 29.7137 13.1312 29.6312 13.1037 29.5212C12.4987 27.6925 12.0449 25.8362 11.7012 23.9387C13.2962 24.1175 14.8912 24.2412 16.4999 24.2412C18.1087 24.2412 19.7174 24.1175 21.2987 23.9387Z" fill="#5AC422"/>
-      <path d="M21.6746 21.6746C18.2356 22.1085 14.7644 22.1085 11.3254 21.6746C10.8915 18.2356 10.8915 14.7644 11.3254 11.3254C14.7644 10.8915 18.2356 10.8915 21.6746 11.3254C22.1085 14.7644 22.1085 18.2356 21.6746 21.6746Z" fill="#5AC422"/>
-    </svg>
-  );
-}
+import GlobalIcon from "../../../components/icons/GlobalIcon.js";
+import { getNewAlertsCount, ALERTS_UPDATED_EVENT } from "../../../data/mockAlerts.js";
+import type { SidebarRole } from "./Sidebar.js";
 
 function BellIcon() {
   return (
     <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M28.3654 21.252L26.8987 18.8173C26.5907 18.2747 26.312 17.248 26.312 16.6467V12.936C26.312 9.48935 24.288 6.51202 21.3694 5.11868C20.6067 3.76935 19.1987 2.93335 17.5854 2.93335C15.9867 2.93335 14.5494 3.79868 13.7867 5.16268C10.9267 6.58535 8.94671 9.53335 8.94671 12.936V16.6467C8.94671 17.248 8.66805 18.2747 8.36005 18.8027L6.87871 21.252C6.29205 22.2347 6.16005 23.32 6.52671 24.3174C6.87871 25.3 7.71471 26.0627 8.80005 26.4293C11.6454 27.3974 14.6374 27.8667 17.6294 27.8667C20.6214 27.8667 23.6134 27.3974 26.4587 26.444C27.4854 26.1067 28.2774 25.3293 28.6587 24.3174C29.04 23.3053 28.9374 22.1907 28.3654 21.252Z" fill="#5AC422"/>
       <path d="M21.7505 29.348C21.1345 31.0494 19.5065 32.2667 17.5999 32.2667C16.4412 32.2667 15.2972 31.7974 14.4905 30.9614C14.0212 30.5214 13.6692 29.9347 13.4639 29.3334C13.6545 29.3627 13.8452 29.3774 14.0505 29.4067C14.3879 29.4507 14.7399 29.4947 15.0919 29.524C15.9279 29.5974 16.7785 29.6414 17.6292 29.6414C18.4652 29.6414 19.3012 29.5974 20.1225 29.524C20.4305 29.4947 20.7385 29.48 21.0319 29.436C21.2665 29.4067 21.5012 29.3774 21.7505 29.348Z" fill="#5AC422"/>
-    </svg>
-  );
-}
-
-function UserIcon() {
-  return (
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M17.5999 17.6C21.65 17.6 24.9333 14.3168 24.9333 10.2667C24.9333 6.21659 21.65 2.93335 17.5999 2.93335C13.5498 2.93335 10.2666 6.21659 10.2666 10.2667C10.2666 14.3168 13.5498 17.6 17.5999 17.6Z" fill="#5AC422"/>
-      <path d="M17.5996 21.2667C10.2516 21.2667 4.26758 26.1947 4.26758 32.2667C4.26758 32.6774 4.59024 33.0001 5.00091 33.0001H30.1982C30.6089 33.0001 30.9316 32.6774 30.9316 32.2667C30.9316 26.1947 24.9476 21.2667 17.5996 21.2667Z" fill="#5AC422"/>
     </svg>
   );
 }
@@ -43,7 +24,110 @@ function SearchIcon() {
   );
 }
 
-export default function DashboardNavbar() {
+const DROPDOWN_USER: Record<SidebarRole, { name: string; email: string; initials: string; plan: string }> = {
+  admin:    { name: "Raz Malka",   email: "raz@3dfly.io",    initials: "RM", plan: "Super Admin" },
+  seller:   { name: "Raz Store",   email: "raz@3dfly.com",   initials: "RS", plan: "Pro Plan"    },
+  supplier: { name: "David Print", email: "david@printlab.io", initials: "DP", plan: "Supplier"  },
+};
+
+function UserDropdown({ role }: { role: SidebarRole }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+  const user = DROPDOWN_USER[role];
+
+  useEffect(() => {
+    if (!open) return;
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative not-italic">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-green-500/30 bg-green-500/20 text-sm font-bold text-green-500 transition-colors hover:bg-green-500/30"
+        aria-label="Profile"
+      >
+        {user.initials}
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.97 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="absolute right-0 top-11 z-50 w-[220px] overflow-hidden rounded-2xl border border-white/10 bg-[rgba(10,18,12,0.97)] shadow-2xl backdrop-blur-md"
+          >
+            {/* User info */}
+            <div className="border-b border-white/10 px-4 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-green-500/30 bg-green-500/20 text-sm font-bold text-green-500">
+                  {user.initials}
+                </div>
+                <div className="flex min-w-0 flex-col">
+                  <span className="truncate text-sm font-semibold text-white">{user.name}</span>
+                  <span className="truncate text-[11px] text-white/40">{user.email}</span>
+                  <span className="mt-1 text-[10px] font-bold uppercase tracking-wider text-green-500">{user.plan}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Menu items */}
+            <div className="py-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  navigate(`/dashboard/${role}/settings`);
+                  setOpen(false);
+                }}
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-white/60 transition-colors hover:bg-white/[0.06] hover:text-white"
+              >
+                <Settings size={15} />
+                Account Settings
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  navigate("/login");
+                }}
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-400 transition-colors hover:bg-red-400/5 hover:text-red-300"
+              >
+                <LogOut size={15} />
+                Log Out
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+interface DashboardNavbarProps {
+  role: SidebarRole;
+}
+
+export default function DashboardNavbar({ role }: DashboardNavbarProps) {
+  const navigate = useNavigate();
+  const [unreadCount, setUnreadCount] = useState(() => getNewAlertsCount(role));
+
+  useEffect(() => {
+    const refresh = () => setUnreadCount(getNewAlertsCount(role));
+    refresh();
+    window.addEventListener(ALERTS_UPDATED_EVENT, refresh);
+    return () => window.removeEventListener(ALERTS_UPDATED_EVENT, refresh);
+  }, [role]);
+
   return (
     <header className="fixed top-0 right-0 left-0 z-50 flex h-[72px] items-center justify-between bg-dark px-5 italic">
       {/* Logo */}
@@ -85,12 +169,22 @@ export default function DashboardNavbar() {
         >
           <GlobalIcon />
         </Link>
-        <button className="flex items-center justify-center rounded-full p-1 transition-opacity hover:opacity-70" aria-label="Notifications">
-          <BellIcon />
-        </button>
-        <button className="flex items-center justify-center rounded-full p-1 transition-opacity hover:opacity-70" aria-label="Profile">
-          <UserIcon />
-        </button>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => navigate(`/dashboard/${role}/alerts`)}
+            className="flex items-center justify-center rounded-full p-1 transition-opacity hover:opacity-70"
+            aria-label="Notifications"
+          >
+            <BellIcon />
+          </button>
+          {unreadCount > 0 && (
+            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-green-500 px-1 text-[10px] font-bold text-black not-italic">
+              {unreadCount}
+            </span>
+          )}
+        </div>
+        <UserDropdown role={role} />
       </div>
     </header>
   );

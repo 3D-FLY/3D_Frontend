@@ -37,6 +37,10 @@ const SellerAddProductPage    = lazy(() => import("./pages/dashboard/seller/AddP
 const SellerProductsPage      = lazy(() => import("./pages/dashboard/seller/Products.tsx"));
 const SellerProductDetailPage  = lazy(() => import("./pages/dashboard/seller/ProductDetail.tsx"));
 const SellerOrderDetailPage    = lazy(() => import("./pages/dashboard/seller/OrderDetail.tsx"));
+const SellerAlertsPage         = lazy(() => import("./pages/dashboard/seller/AlertsPage.tsx"));
+const SellerAlertDetailPage    = lazy(() => import("./pages/dashboard/seller/AlertDetailPage.tsx"));
+const AdminAlertsPage          = lazy(() => import("./pages/dashboard/admin/AlertsPage.tsx"));
+const AdminAlertDetailPage     = lazy(() => import("./pages/dashboard/admin/AlertDetailPage.tsx"));
 const OrdersPage      = lazy(() => import("./pages/dashboard/admin/OrdersPage.jsx"));
 const SettingsPage    = lazy(() => import("./pages/dashboard/admin/SettingsPage.jsx"));
 const UsersPage       = lazy(() => import("./pages/dashboard/admin/UsersPage.tsx"));
@@ -44,6 +48,14 @@ const UserDetailPage    = lazy(() => import("./pages/dashboard/admin/UserDetailP
 const SupplierDetailPage = lazy(() => import("./pages/dashboard/admin/SupplierDetailPage.jsx"));
 const StoresPage         = lazy(() => import("./pages/dashboard/admin/StoresPage.tsx"));
 const StoreDetailPage    = lazy(() => import("./pages/dashboard/admin/StoreDetailPage.tsx"));
+const SupplierHomePage          = lazy(() => import("./pages/dashboard/supplier/SupplierHome.tsx"));
+const SupplierOrdersPage         = lazy(() => import("./pages/dashboard/supplier/SupplierOrders.tsx"));
+const SupplierOrderDetailPage    = lazy(() => import("./pages/dashboard/supplier/SupplierOrderDetail.tsx"));
+const SupplierCapabilitiesPage   = lazy(() => import("./pages/dashboard/supplier/SupplierCapabilities.tsx"));
+const SupplierPaymentsPage       = lazy(() => import("./pages/dashboard/supplier/SupplierPayments.tsx"));
+const SupplierAlertsPage         = lazy(() => import("./pages/dashboard/supplier/SupplierAlerts.tsx"));
+const SupplierAlertDetailPage    = lazy(() => import("./pages/dashboard/supplier/SupplierAlertDetail.tsx"));
+const SupplierSettingsPage       = lazy(() => import("./pages/dashboard/supplier/SupplierSettings.tsx"));
 /** Layout wrapper for pages that include the global Navbar + Footer. */
 function MainLayout() {
   return (
@@ -59,6 +71,7 @@ function MainLayout() {
 
 function App() {
   return (
+    <PartnerLocationsProvider>
     <Router>
       <ScrollToTop />
       <Routes>
@@ -132,6 +145,22 @@ function App() {
           element={
             <Suspense fallback={null}>
               <SellerProductsPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/seller/alerts/:id"
+          element={
+            <Suspense fallback={null}>
+              <SellerAlertDetailPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/seller/alerts"
+          element={
+            <Suspense fallback={null}>
+              <SellerAlertsPage />
             </Suspense>
           }
         />
@@ -209,8 +238,90 @@ function App() {
             </Suspense>
           }
         />
+        <Route
+          path="/dashboard/admin/alerts/:id"
+          element={
+            <Suspense fallback={null}>
+              <AdminAlertDetailPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/admin/alerts"
+          element={
+            <Suspense fallback={null}>
+              <AdminAlertsPage />
+            </Suspense>
+          }
+        />
         <Route path="/dashboard/admin/payments" element={<PaymentsPage />} />
         <Route path="/dashboard/admin/*" element={<AdminDashboard />} />
+
+        {/* Supplier dashboard routes */}
+        <Route
+          path="/dashboard/supplier/orders/:id"
+          element={
+            <Suspense fallback={null}>
+              <SupplierOrderDetailPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/supplier/orders"
+          element={
+            <Suspense fallback={null}>
+              <SupplierOrdersPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/supplier/capabilities"
+          element={
+            <Suspense fallback={null}>
+              <SupplierCapabilitiesPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/supplier/payments"
+          element={
+            <Suspense fallback={null}>
+              <SupplierPaymentsPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/supplier/alerts/:id"
+          element={
+            <Suspense fallback={null}>
+              <SupplierAlertDetailPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/supplier/alerts"
+          element={
+            <Suspense fallback={null}>
+              <SupplierAlertsPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/supplier/settings"
+          element={
+            <Suspense fallback={null}>
+              <SupplierSettingsPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/supplier"
+          element={
+            <Suspense fallback={null}>
+              <SupplierHomePage />
+            </Suspense>
+          }
+        />
 
         <Route path="/loading-preview" element={<LoadingPage />} />
 
@@ -228,16 +339,15 @@ function App() {
           <Route
             path="/partner-map"
             element={
-              <PartnerLocationsProvider>
-                <div className="flex min-h-0 flex-1 flex-col bg-dark">
-                  <PartnerMapPage />
-                </div>
-              </PartnerLocationsProvider>
+              <div className="flex min-h-0 flex-1 flex-col bg-dark">
+                <PartnerMapPage />
+              </div>
             }
           />
         </Route>
       </Routes>
     </Router>
+    </PartnerLocationsProvider>
   );
 }
 

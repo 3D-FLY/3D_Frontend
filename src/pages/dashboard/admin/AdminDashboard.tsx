@@ -10,11 +10,11 @@ import OrderStatusPill from "../../../features/dashboard/components/OrderStatusP
 import type { OrderStatusKey } from "../../../constants/orderStatusConfig.js";
 
 const attentionOrders: OrderAttention[] = [
-  { id: "1", orderId: "3012", reason: "supplier_rejected", detail: "Rejected by: Supplier A",     timestamp: new Date(Date.now() - 5  * 60000).toISOString() },
-  { id: "2", orderId: "3015", reason: "no_supplier",       detail: "No match in Tel Aviv area",   timestamp: new Date(Date.now() - 18 * 60000).toISOString() },
-  { id: "3", orderId: "3009", reason: "missing_data",      detail: "Missing: print file",         timestamp: new Date(Date.now() - 40 * 60000).toISOString() },
-  { id: "4", orderId: "3007", reason: "shipping_issue",    detail: "Stuck at courier for 3 days", timestamp: new Date(Date.now() - 2  * 3600000).toISOString() },
-  { id: "5", orderId: "3001", reason: "production_delay",  detail: "Supplier B — 2 days overdue", timestamp: new Date(Date.now() - 5  * 3600000).toISOString() },
+  { id: "a1", orderId: "3012", reason: "supplier_rejected", detail: "Rejected by: Supplier A",     timestamp: new Date(Date.now() - 5  * 60000).toISOString() },
+  { id: "a2", orderId: "3015", reason: "no_supplier",       detail: "No match in Tel Aviv area",   timestamp: new Date(Date.now() - 18 * 60000).toISOString() },
+  { id: "a3", orderId: "3009", reason: "missing_data",      detail: "Missing: print file",         timestamp: new Date(Date.now() - 40 * 60000).toISOString() },
+  { id: "a4", orderId: "3007", reason: "shipping_issue",    detail: "Stuck at courier for 3 days", timestamp: new Date(Date.now() - 2  * 3600000).toISOString() },
+  { id: "a5", orderId: "3001", reason: "production_delay",  detail: "Supplier B — 2 days overdue", timestamp: new Date(Date.now() - 5  * 3600000).toISOString(), status: "resolved" },
 ];
 
 const statusCards = [
@@ -77,7 +77,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          <DashboardCard index={0} title="Action Required" autoHeight className="h-full">
+          <DashboardCard index={0} title="Alerts" autoHeight className="h-full">
             <OrderAttentionList items={attentionOrders} />
           </DashboardCard>
 

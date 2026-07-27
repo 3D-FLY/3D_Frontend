@@ -43,7 +43,7 @@ export default function PartnerMap() {
       <AmbientGlowBackdrop />
   
 
-      <div className="relative z-10 mt-10 flex w-full max-w-[1440px] flex-col items-center gap-8 px-6 py-8 pb-15">
+      <div className="relative z-10 mt-10 flex w-full max-w-[1440px] flex-col items-center gap-8 px-6 py-8 pb-[clamp(96px,16vw,200px)]">
         <SectionTitle className="w-full mb-7">3D-FLY GLOBAL NETWORK</SectionTitle>
 
         <div className="flex w-full flex-col items-center gap-3">
