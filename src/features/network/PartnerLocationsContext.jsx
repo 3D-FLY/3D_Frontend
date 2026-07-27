@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -17,12 +18,70 @@ export const INITIAL_PARTNERS = [
   { id: "init-saopaulo", name: "São Paulo, Brazil", cityName: "São Paulo", countryName: "Brazil", lat: -23.5505, lng: -46.6333 },
 ];
 
+const STORAGE_KEY = "3dfly-partner-locations";
+
+function isValidPartner(partner) {
+  return (
+    partner != null &&
+    typeof partner.id === "string" &&
+    typeof partner.lat === "number" &&
+    typeof partner.lng === "number"
+  );
+}
+
+function readStoredPartners() {
+  if (typeof window === "undefined") return INITIAL_PARTNERS;
+
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return INITIAL_PARTNERS;
+
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return INITIAL_PARTNERS;
+
+    const valid = parsed.filter(isValidPartner);
+    return valid.length > 0 ? valid : INITIAL_PARTNERS;
+  } catch {
+    return INITIAL_PARTNERS;
+  }
+}
+
+function writeStoredPartners(partners) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(partners));
+  } catch {
+    // ignore quota / private mode errors
+  }
+}
+
 const PartnerLocationsContext = createContext(null);
 
 export function PartnerLocationsProvider({ children }) {
-  const [partners, setPartners] = useState(INITIAL_PARTNERS);
+  const [partners, setPartners] = useState(readStoredPartners);
+
+  useEffect(() => {
+    writeStoredPartners(partners);
+  }, [partners]);
+
+  useEffect(() => {
+    const onStorage = (event) => {
+      if (event.key !== STORAGE_KEY || !event.newValue) return;
+      try {
+        const parsed = JSON.parse(event.newValue);
+        if (!Array.isArray(parsed)) return;
+        const valid = parsed.filter(isValidPartner);
+        if (valid.length > 0) setPartners(valid);
+      } catch {
+        // ignore malformed storage payloads
+      }
+    };
+
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   const addPartner = useCallback((partner) => {
+    if (!isValidPartner(partner)) return;
     setPartners((prev) => [...prev, partner]);
   }, []);
 

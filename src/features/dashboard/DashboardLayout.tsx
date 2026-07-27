@@ -24,6 +24,7 @@ const BANNER_OVERFLOW = 100; // extends off-screen to the left
 const roleLabels: Record<SidebarRole, string> = {
   admin: "ADMIN",
   seller: "MY STORE",
+  supplier: "SUPPLIER",
 };
 
 export default function DashboardLayout({ role, children }: DashboardLayoutProps) {
@@ -45,7 +46,7 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
     <div className="bg-dark font-sans text-white">
 
       {/* NAVBAR — fixed, full width */}
-      <DashboardNavbar />
+      <DashboardNavbar role={role} />
 
       {/* BANNER — fixed, expands/collapses on scroll */}
       <motion.div

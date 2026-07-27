@@ -225,32 +225,36 @@ export default function SellerProductDetailPage() {
                       <span className="text-sm text-white/35">{product.sku}</span>
                     </div>
 
-                    {/* Row 2: Cost + Price + Connected Stores — labels row + values row */}
-                    <div className="grid grid-cols-[auto_auto_1fr] grid-rows-2 items-start gap-x-8 gap-y-0.5 py-4">
-                      <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-600">Cost</span>
-                      <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-600">Price</span>
-                      <span className="pl-16 text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-600">Connected Stores</span>
-
-                      <span className="text-sm font-medium leading-none text-zinc-300">${product.cost.toFixed(2)}</span>
-                      <span className="text-2xl font-bold leading-none text-green-500">${product.price.toFixed(2)}</span>
-                      <div className="flex flex-wrap items-center gap-2 pl-16">
-                        {product.stores.map((s) => {
-                          const icon = PLATFORM_ICONS[s.toLowerCase()];
-                          const label = PLATFORM_LABELS[s.toLowerCase()] ?? s;
-                          if (icon) {
-                            return <img key={s} src={icon} alt={label} title={label} className="h-6 w-6 object-contain" />;
-                          }
-                          return (
-                            <span key={s} className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] uppercase text-zinc-400">
-                              {label}
-                            </span>
-                          );
-                        })}
+                    {/* Row 2: Cost + Price */}
+                    <div className="flex items-start gap-6 py-3">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-600">Cost</span>
+                        <span className="text-sm font-medium leading-none text-zinc-300">${product.cost.toFixed(2)}</span>
+                      </div>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-600">Price</span>
+                        <span className="text-2xl font-bold leading-none text-green-500">${product.price.toFixed(2)}</span>
                       </div>
                     </div>
 
-                    {/* Row 3: Print Time + Weight + Colors */}
-                    <div className="grid grid-cols-3 gap-6 py-4">
+                    {/* Row 3: Connected Stores + Print Time + Weight + Colors */}
+                    <div className="grid grid-cols-4 gap-6 py-4">
+                      <InfoField label="Connected Stores">
+                        <div className="flex flex-wrap items-center gap-2 pt-1">
+                          {product.stores.map((s) => {
+                            const icon = PLATFORM_ICONS[s.toLowerCase()];
+                            const label = PLATFORM_LABELS[s.toLowerCase()] ?? s;
+                            if (icon) {
+                              return <img key={s} src={icon} alt={label} title={label} className="h-6 w-6 object-contain" />;
+                            }
+                            return (
+                              <span key={s} className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] uppercase text-zinc-400">
+                                {label}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      </InfoField>
                       <InfoField label="Print Time">
                         <span className="text-sm text-zinc-200">{product.details.printTime}</span>
                       </InfoField>
