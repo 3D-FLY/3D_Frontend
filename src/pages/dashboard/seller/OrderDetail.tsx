@@ -102,6 +102,10 @@ function NotFound({ onBack }: { onBack: () => void }) {
   );
 }
 
+function formatSupplierLocation({ city, country }: { city: string; country: string }): string {
+  return `${city}, ${country}`;
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SellerOrderDetailPage() {
@@ -325,8 +329,10 @@ export default function SellerOrderDetailPage() {
                       ))}
                     </div>
                   </InfoRow>
-                  <InfoRow label="SUPPLIER">
-                    <span className="text-[13px] text-zinc-200">{order.supplier.name}</span>
+                  <InfoRow label="SUPPLIER LOCATION">
+                    <span className="text-[13px] text-zinc-200">
+                      {formatSupplierLocation(order.supplier)}
+                    </span>
                   </InfoRow>
                 </div>
               </DashboardCard>
@@ -359,10 +365,9 @@ export default function SellerOrderDetailPage() {
               {/* Section 6 — Supplier */}
               <DashboardCard index={5} title="SUPPLIER" autoHeight withBackground={false}>
                 <div className="flex flex-col gap-4">
-                  <div>
-                    <p className="font-bold text-white">{order.supplier.name}</p>
-                    <p className="text-sm text-zinc-500">{order.supplier.city}</p>
-                  </div>
+                  <p className="font-bold text-white">
+                    {formatSupplierLocation(order.supplier)}
+                  </p>
                   <div className="flex flex-col">
                     <InfoRow label="PRINT TIME">
                       <span className="text-[13px] text-zinc-200">{order.printTime}</span>

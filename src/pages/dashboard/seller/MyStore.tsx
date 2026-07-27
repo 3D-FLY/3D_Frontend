@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Package } from "lucide-react";
 import {
@@ -11,7 +12,8 @@ import DashboardTable from "../../../features/dashboard/components/DashboardTabl
 import StatusBadge from "../../../features/dashboard/components/StatusBadge.js";
 import ScrollableContent from "../../../features/dashboard/components/ScrollableContent.js";
 import OrderStatusPill from "../../../features/dashboard/components/OrderStatusPill.js";
-import type { AttentionReason } from "../../../features/dashboard/components/OrderAttentionList.js";
+import AlertListItem from "../../../features/dashboard/components/AlertListItem.js";
+import { getAlertsByRole } from "../../../data/mockAlerts.js";
 import { getStatusConfig, type OrderStatusKey as OrderStatus } from "../../../constants/orderStatusConfig.js";
 import soldierXPTImg from "../../../assets/soldierxpt.png?url";
 import { mockOrderDetails } from "./mockOrders.js";
@@ -21,21 +23,6 @@ import woocommerceIcon from "../../../assets/icons/shops/woocommerce-icon.svg?ur
 import wixIcon         from "../../../assets/icons/shops/wix-company-icon.svg?url";
 
 // ── Mock data ───────────────────────────────────────────────────────────────
-
-const alertAccent: Record<AttentionReason, string> = {
-  supplier_rejected: "border-l-red-400",
-  no_supplier:       "border-l-orange-400",
-  production_delay:  "border-l-orange-400",
-  missing_data:      "border-l-yellow-400",
-  shipping_issue:    "border-l-sky-400",
-};
-
-const mockAlerts = [
-  { id: "#3012", title: "SUPPLIER REJECTED", desc: "Rejected by: Supplier A",      reason: "supplier_rejected" as const },
-  { id: "#3015", title: "NO SUPPLIER FOUND", desc: "No match in Tel Aviv area",     reason: "no_supplier" as const },
-  { id: "#3009", title: "MISSING DATA",      desc: "Missing: print file",           reason: "missing_data" as const },
-  { id: "#3007", title: "SHIPPING DELAY",    desc: "Stuck at courier for 3 days",   reason: "shipping_issue" as const },
-] as const;
 
 const SELLER_STATUS: { status: OrderStatus; count: number }[] = [
   { status: "in_production", count: 7  },
@@ -164,6 +151,13 @@ function PlatformTick({ x, y, payload }: any) {
 // ── Page ────────────────────────────────────────────────────────────────────
 
 export default function MyStore() {
+  const navigate = useNavigate();
+
+  const sellerAlerts = useMemo(
+    () => getAlertsByRole("seller").filter((a) => a.status !== "resolved"),
+    [],
+  );
+
   return (
     <DashboardLayout role="seller">
       <motion.div
@@ -222,28 +216,24 @@ export default function MyStore() {
             <div className="mx-6 w-px self-stretch bg-white/10" />
 
             {/* 1/3: Best Seller */}
-            <div className="flex flex-1 flex-col px-6 gap-3 items-center text-center">
-              <span className="text-[16px] font-bold uppercase tracking-widest text-green-500">
-                BEST SELLER
+            <div className="flex flex-1 flex-col items-center justify-center gap-2">
+              <span
+                className="text-[11px] font-semibold uppercase tracking-[1.5px]"
+                style={{ color: "rgba(255,255,255,0.55)" }}
+              >
+                Best Seller
               </span>
-              <div className="w-full flex justify-center">
-                <img
-                  src={soldierXPTImg}
-                  alt="SoldierXPT"
-                  className="object-cover rounded-xl"
-                  style={{
-                    width: "120px",
-                    height: "120px",
-                    aspectRatio: "1 / 1",
-                  }}
-                />
-              </div>
-              <p className="font-staatliches text-[32px] uppercase leading-none text-white">
+              <img
+                src={soldierXPTImg}
+                alt="SoldierXPT"
+                className="h-24 w-24 rounded-full object-cover"
+              />
+              <p className="font-staatliches text-[24px] uppercase leading-none text-white">
                 SoldierXPT
               </p>
-              <div className="text-[12px] text-white/50">
-                34 orders · $1,428 revenue
-              </div>
+              <span className="text-[15px] font-semibold text-green-500">
+                34 orders · $1,428
+              </span>
             </div>
           </div>
     
@@ -270,23 +260,27 @@ export default function MyStore() {
             <DashboardCard title="Alerts" autoHeight className="h-full col-span-2" index={2}>
               <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
                 <ScrollableContent scrollbarSide="left">
-                  {mockAlerts.map((alert) => (
-                    <div
+                  {sellerAlerts.map((alert) => (
+                    <AlertListItem
                       key={alert.id}
-                      className={`mb-3 flex min-h-[60px] cursor-pointer items-center gap-3 rounded-2xl border border-white/10 border-l-4 bg-[rgba(149,149,149,0.05)] px-5 py-2 transition-colors hover:bg-[rgba(149,149,149,0.1)] ${alertAccent[alert.reason]}`}
-                    >
-                      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                        <span className="text-[clamp(13px,1vw,14.5px)] font-semibold uppercase tracking-wide text-zinc-100">
-                          {alert.id} — {alert.title}
-                        </span>
-                        <span className="truncate text-[11px] font-normal text-zinc-300">
-                          {alert.desc}
-                        </span>
-                      </div>
-                      <span className="shrink-0 text-sm text-zinc-300">→</span>
-                    </div>
+                      orderId={alert.orderId}
+                      title={alert.title}
+                      description={alert.description}
+                      reason={alert.reason}
+                      status={alert.status}
+                      onClick={() => navigate(`/dashboard/seller/alerts/${alert.id}`)}
+                    />
                   ))}
                 </ScrollableContent>
+                <div className="mt-2 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/dashboard/seller/alerts")}
+                    className="rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wide text-zinc-200 transition-colors hover:text-white"
+                  >
+                    View All →
+                  </button>
+                </div>
               </div>
             </DashboardCard>
 

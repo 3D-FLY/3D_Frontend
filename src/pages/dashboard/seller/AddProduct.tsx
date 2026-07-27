@@ -81,6 +81,79 @@ function ColorSwatch({ color, onRemove }: { color: string; onRemove: () => void 
   );
 }
 
+function NumberStepper({
+  value,
+  onChange,
+  min,
+  max,
+  step = 1,
+  prefix,
+  suffix,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+  min: number;
+  max: number;
+  step?: number;
+  prefix?: string;
+  suffix?: string;
+}) {
+  const [editStr, setEditStr] = useState<string | null>(null);
+  const displayValue = editStr !== null ? editStr : String(value);
+
+  const clamp = (n: number) => Math.min(max, Math.max(min, n));
+  const dec = () => onChange(+clamp(value - step).toFixed(2));
+  const inc = () => onChange(+clamp(value + step).toFixed(2));
+
+  const commit = (raw: string) => {
+    const n = parseFloat(raw.replace(",", ".").replace(/\s/g, ""));
+    if (!Number.isNaN(n)) onChange(+clamp(n).toFixed(2));
+    setEditStr(null);
+  };
+
+  return (
+    <div className="inline-flex h-10 w-full items-center gap-2 rounded-md bg-dark px-2">
+      <button
+        type="button"
+        onClick={dec}
+        className="grid h-8 w-8 shrink-0 translate-y-[2px] place-items-center rounded transition-colors hover:bg-black/20"
+        aria-label="Decrease"
+      >
+        <span className="text-xs leading-none text-green-500">▼</span>
+      </button>
+
+      <div className="flex min-w-0 flex-1 items-center justify-center">
+        <div className="inline-flex items-center gap-0.5">
+          {prefix && <span className="shrink-0 text-sm text-green-500/70">{prefix}</span>}
+          <input
+            type="text"
+            inputMode="decimal"
+            value={displayValue}
+            onChange={(e) => setEditStr(e.target.value)}
+            onFocus={() => setEditStr(String(value))}
+            onBlur={() => commit(editStr ?? String(value))}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") commit(editStr ?? String(value));
+            }}
+            style={{ width: `${Math.max(1, displayValue.length)}ch` }}
+            className="min-w-[1ch] max-w-[10ch] bg-transparent text-center text-sm font-medium tabular-nums text-green-500 outline-none"
+          />
+          {suffix && <span className="shrink-0 text-sm text-green-500/70">{suffix}</span>}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={inc}
+        className="grid h-8 w-8 shrink-0 -translate-y-[2px] place-items-center rounded transition-colors hover:bg-black/20"
+        aria-label="Increase"
+      >
+        <span className="text-xs leading-none text-green-500">▲</span>
+      </button>
+    </div>
+  );
+}
+
 function Stepper({ step }: { step: Step }) {
   return (
     <div className="mx-auto my-5 flex w-full max-w-2xl items-center">
@@ -141,7 +214,11 @@ export default function AddProductPage() {
   const [productName, setProductName]       = useState(existing?.name ?? "");
   const [colors, setColors]                 = useState<string[]>(existing?.details.colors ?? []);
   const [selectedStores, setSelectedStores] = useState<string[]>(existing?.stores ?? []);
-  const colorPickerRef = useRef<HTMLInputElement>(null);
+  const [pendingColor, setPendingColor]     = useState<string>("#5ac422");
+  const [showColorConfirm, setShowColorConfirm] = useState(false);
+  const [supplierInstructions, setSupplierInstructions] = useState("");
+  const [supplierPdf, setSupplierPdf]                   = useState<File | null>(null);
+  const supplierPdfRef                                   = useRef<HTMLInputElement>(null);
 
   // Print settings
   const [tech, setTech]                           = useState(eps?.tech ?? "FDM");
@@ -161,6 +238,8 @@ export default function AddProductPage() {
   const [margin, setMargin] = useState<number>(
     existing && existing.cost > 0 ? Math.round((existing.price / existing.cost - 1) * 100) : 40,
   );
+  const [manualPrice, setManualPrice] = useState<string>("");
+  const [priceMode, setPriceMode] = useState<"margin" | "manual">("margin");
 
   const is3mf = modelFile?.name.toLowerCase().endsWith(".3mf") ?? false;
   const canProceedStep1 = isEdit || !!modelFile;
@@ -174,6 +253,9 @@ export default function AddProductPage() {
     const customerPrice = +(totalCost * (1 + margin / 100)).toFixed(2);
     return { weightGrams, printHours, materialCost, machineCost, totalCost, customerPrice };
   }, [infill, shells, layerHeight, margin]);
+
+  const finalPrice =
+    priceMode === "manual" && manualPrice !== "" ? parseFloat(manualPrice) : pricing.customerPrice;
 
   const toggleStore = (store: string) =>
     setSelectedStores((prev) =>
@@ -222,7 +304,7 @@ export default function AddProductPage() {
               name: productName,
               image: primaryImage || p.image,
               cost: pricing.totalCost,
-              price: pricing.customerPrice,
+              price: finalPrice,
               stores: selectedStores,
               printSettings,
               details: { ...p.details, colors },
@@ -237,7 +319,7 @@ export default function AddProductPage() {
         sku: `#${String(all.length + 1).padStart(3, "0")}`,
         image: primaryImage,
         cost: pricing.totalCost,
-        price: pricing.customerPrice,
+        price: finalPrice,
         stores: selectedStores,
         printSettings,
         details: {
@@ -316,9 +398,27 @@ export default function AddProductPage() {
                           Current file: {existing.name}.stl
                         </p>
                       )}
-                      {is3mf && (
-                        <div className="mt-3 shrink-0 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-2 text-center text-[12px] font-medium text-green-500">
-                          ✓ Settings loaded from file — you can still adjust them below.
+                      {modelFile && (
+                        <div className="mt-3 flex items-center gap-4 rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3">
+                          {/* File type icon */}
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/[0.07]">
+                            <span className="text-[11px] font-bold uppercase text-white/60">
+                              {modelFile.name.split(".").pop()?.toUpperCase()}
+                            </span>
+                          </div>
+                          {/* File info */}
+                          <div className="flex min-w-0 flex-col gap-0.5">
+                            <span className="truncate text-sm font-medium text-white">{modelFile.name}</span>
+                            <span className="text-[11px] text-white/40">
+                              {(modelFile.size / 1024 / 1024).toFixed(2)} MB
+                            </span>
+                          </div>
+                          {/* 3MF badge */}
+                          {is3mf && (
+                            <span className="ml-auto shrink-0 rounded-full border border-green-500/30 bg-green-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-green-500">
+                              ✓ Settings loaded
+                            </span>
+                          )}
                         </div>
                       )}
                     </div>
@@ -485,21 +585,111 @@ export default function AddProductPage() {
 
                     <div className="mt-6 flex flex-col gap-3">
                       <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-green-500">
-                        Profit Margin
+                        My Price
                       </span>
-                      <LabeledSlider
-                        value={margin}
-                        onChange={setMargin}
-                        min={0}
-                        max={200}
-                        step={5}
-                        format={(v: number) => `${v}%`}
-                      />
-                    </div>
 
-                    <div className="mt-6 flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3">
-                      <span className="text-[11px] uppercase tracking-wider text-white/40">Customer Price</span>
-                      <span className="text-2xl font-bold text-green-500">${pricing.customerPrice}</span>
+                      {/* Mode selector */}
+                      <div className="flex items-center gap-5">
+                        <button
+                          type="button"
+                          onClick={() => setPriceMode("margin")}
+                          className="flex items-center gap-2"
+                        >
+                          <span
+                            className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                              priceMode === "margin" ? "border-green-500" : "border-white/25"
+                            }`}
+                          >
+                            {priceMode === "margin" && (
+                              <span className="h-2 w-2 rounded-full bg-green-500" />
+                            )}
+                          </span>
+                          <span
+                            className={`text-[12px] font-medium uppercase tracking-wide transition-colors ${
+                              priceMode === "margin" ? "text-white" : "text-white/40"
+                            }`}
+                          >
+                            Profit Margin %
+                          </span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setPriceMode("manual")}
+                          className="flex items-center gap-2"
+                        >
+                          <span
+                            className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                              priceMode === "manual" ? "border-green-500" : "border-white/25"
+                            }`}
+                          >
+                            {priceMode === "manual" && (
+                              <span className="h-2 w-2 rounded-full bg-green-500" />
+                            )}
+                          </span>
+                          <span
+                            className={`text-[12px] font-medium uppercase tracking-wide transition-colors ${
+                              priceMode === "manual" ? "text-white" : "text-white/40"
+                            }`}
+                          >
+                            Manual Price
+                          </span>
+                        </button>
+                      </div>
+
+                      {/* Input + final price side by side */}
+                      <div className="flex items-start gap-3">
+                        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                          <AnimatePresence mode="wait">
+                            {priceMode === "margin" ? (
+                              <motion.div
+                                key="margin-input"
+                                initial={{ opacity: 0, y: -6 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -6 }}
+                                transition={{ duration: 0.15, ease: "easeOut" }}
+                                className="flex flex-col gap-1.5"
+                              >
+                                <span className="text-[10px] uppercase tracking-wider text-white/40">Profit Margin</span>
+                                <NumberStepper
+                                  value={margin}
+                                  onChange={setMargin}
+                                  min={0}
+                                  max={500}
+                                  step={1}
+                                  suffix="%"
+                                />
+                              </motion.div>
+                            ) : (
+                              <motion.div
+                                key="manual-input"
+                                initial={{ opacity: 0, y: -6 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -6 }}
+                                transition={{ duration: 0.15, ease: "easeOut" }}
+                                className="flex flex-col gap-1.5"
+                              >
+                                <span className="text-[10px] uppercase tracking-wider text-white/40">Manual Price</span>
+                                <NumberStepper
+                                  value={manualPrice !== "" ? parseFloat(manualPrice) : pricing.customerPrice}
+                                  onChange={(v) => setManualPrice(String(v))}
+                                  min={0}
+                                  max={100000}
+                                  step={0.5}
+                                  prefix="$"
+                                />
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+
+                        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+                          <span className="text-[10px] uppercase tracking-wider text-white/40">Customer Price</span>
+                          <div className="flex h-10 items-center justify-end rounded-md border border-white/10 bg-white/[0.04] px-4">
+                            <span className="text-sm font-bold text-green-500">${finalPrice.toFixed(2)}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </DashboardCard>
                 </div>
@@ -590,24 +780,62 @@ export default function AddProductPage() {
                                 onRemove={() => setColors((prev) => prev.filter((_, j) => j !== i))}
                               />
                             ))}
-                            <input
-                              ref={colorPickerRef}
-                              type="color"
-                              className="sr-only"
-                              onChange={(e) => {
-                                const hex = e.target.value;
-                                setColors((prev) => (prev.includes(hex) ? prev : [...prev, hex]));
-                              }}
-                            />
                             <button
                               type="button"
-                              onClick={() => colorPickerRef.current?.click()}
+                              onClick={() => setShowColorConfirm(true)}
                               className="flex h-7 w-7 items-center justify-center rounded-full border border-white/20 text-white/40 transition-colors hover:border-green-500/40 hover:text-green-500"
                               title="Add color"
                             >
                               +
                             </button>
                           </div>
+
+                          {/* Color confirmation panel */}
+                          <AnimatePresence>
+                            {showColorConfirm && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                transition={{ duration: 0.2, ease: "easeOut" }}
+                                className="overflow-hidden"
+                              >
+                                <div className="mt-2 flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3">
+                                  {/* Color picker — circular swatch, click to pick exact hue */}
+                                  <input
+                                    type="color"
+                                    value={pendingColor}
+                                    onChange={(e) => setPendingColor(e.target.value)}
+                                    title="Pick color"
+                                    className="h-8 w-8 shrink-0 cursor-pointer rounded-full border border-white/20 bg-transparent p-0 [&::-webkit-color-swatch]:rounded-full [&::-webkit-color-swatch]:border-none [&::-webkit-color-swatch-wrapper]:rounded-full [&::-webkit-color-swatch-wrapper]:p-0 [&::-moz-color-swatch]:rounded-full [&::-moz-color-swatch]:border-none"
+                                  />
+                                  {/* Hex value */}
+                                  <span className="text-sm font-mono text-white/60">{pendingColor}</span>
+                                  {/* Confirm */}
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      if (!colors.includes(pendingColor)) {
+                                        setColors((prev) => [...prev, pendingColor]);
+                                      }
+                                      setShowColorConfirm(false);
+                                    }}
+                                    className="ml-auto rounded-md border border-green-500/30 bg-green-500/15 px-3 py-1.5 text-[12px] font-bold text-green-500 transition-colors hover:bg-green-500/25"
+                                  >
+                                    Add
+                                  </button>
+                                  {/* Cancel */}
+                                  <button
+                                    type="button"
+                                    onClick={() => setShowColorConfirm(false)}
+                                    className="rounded-md border border-white/10 px-3 py-1.5 text-[12px] font-bold text-white/40 transition-colors hover:text-white"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
                         </div>
                       </div>
                     </DashboardCard>
@@ -639,6 +867,65 @@ export default function AddProductPage() {
                         })}
                       </div>
                     </DashboardCard>
+
+                    <DashboardCard index={2} title="SUPPLIER INSTRUCTIONS" autoHeight withBackground={false}>
+                      {/* Guidance text */}
+                      <div className="mb-4 rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3">
+                        <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-white/40">
+                          For supplier use only — not visible to customers
+                        </p>
+                        <ul className="flex flex-col gap-1.5 text-[12px] text-white/50">
+                          <li>• <span className="text-white/70">Assembly</span> — if the product has multiple parts that need to be joined</li>
+                          <li>• <span className="text-white/70">Print orientation</span> — preferred direction for best results</li>
+                          <li>• <span className="text-white/70">Finishing</span> — sanding, painting, coating requirements</li>
+                          <li>• <span className="text-white/70">Special packaging</span> — fragile parts, protective wrapping</li>
+                          <li>• <span className="text-white/70">Reference file</span> — attach a PDF with diagrams or assembly instructions</li>
+                        </ul>
+                      </div>
+
+                      {/* Instructions textarea */}
+                      <textarea
+                        value={supplierInstructions}
+                        onChange={(e) => setSupplierInstructions(e.target.value)}
+                        placeholder="Write any special instructions for the supplier..."
+                        rows={5}
+                        className="w-full resize-none rounded-xl border border-white/10 bg-dark px-4 py-3 text-sm text-white outline-none placeholder:text-[11px] placeholder:uppercase placeholder:tracking-wider placeholder:text-white/25 transition-colors focus:border-green-500/40"
+                      />
+
+                      {/* PDF upload */}
+                      <div className="mt-3">
+                        <input
+                          ref={supplierPdfRef}
+                          type="file"
+                          accept="application/pdf"
+                          className="hidden"
+                          onChange={(e) => setSupplierPdf(e.target.files?.[0] ?? null)}
+                        />
+                        {supplierPdf ? (
+                          <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5">
+                            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/[0.07] text-[10px] font-bold uppercase text-white/60">
+                              PDF
+                            </span>
+                            <span className="min-w-0 flex-1 truncate text-[12px] text-white/70">{supplierPdf.name}</span>
+                            <button
+                              type="button"
+                              onClick={() => setSupplierPdf(null)}
+                              className="text-[11px] text-white/30 transition-colors hover:text-white/60"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => supplierPdfRef.current?.click()}
+                            className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 bg-transparent px-4 py-2.5 text-[12px] text-white/40 transition-colors hover:border-white/25 hover:text-white/60"
+                          >
+                            + Attach PDF (optional)
+                          </button>
+                        )}
+                      </div>
+                    </DashboardCard>
                   </div>
                 </div>
 
@@ -649,7 +936,7 @@ export default function AddProductPage() {
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-white/40">Cost: ${pricing.totalCost}</span>
                     <span className="text-white/30">→</span>
-                    <span className="font-semibold text-green-500">Price: ${pricing.customerPrice}</span>
+                    <span className="font-semibold text-green-500">Price: ${finalPrice}</span>
                   </div>
                   <button
                     type="button"

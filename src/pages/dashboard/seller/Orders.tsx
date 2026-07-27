@@ -1,12 +1,13 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Package } from "lucide-react";
+import { Package, MoreHorizontal } from "lucide-react";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
 import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
 import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
 import OrderStatusPill from "../../../features/dashboard/components/OrderStatusPill.js";
+import Modal from "../../../features/dashboard/components/Modal.js";
 import type { OrderStatusKey as OrderStatus } from "../../../constants/orderStatusConfig.js";
 import { ORDER_STATUS_CONFIG } from "../../../constants/orderStatusConfig.js";
 import shopifyIcon from "../../../assets/icons/shops/shopify-icon.svg?url";
@@ -78,7 +79,7 @@ const TABLE_COLUMNS = [
   { key: "action",   header: ""         },
 ];
 
-const GRID_TEMPLATE = "0.7fr 1.8fr 1.1fr 1.4fr 1fr 1.2fr 0.65fr 32px";
+const GRID_TEMPLATE = "0.7fr 1.8fr 1.1fr 1.4fr 1fr 1.2fr 0.65fr 40px";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -140,12 +141,148 @@ function PlatformIcon({ platform }: { platform: string }) {
   );
 }
 
+function RowMenu({
+  order,
+  onViewOrder,
+  onOpenDispute,
+}: {
+  order: SellerOrder;
+  onViewOrder: () => void;
+  onOpenDispute: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative" onClick={(e) => e.stopPropagation()}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
+        title={`Order ${order.id} actions`}
+      >
+        <MoreHorizontal size={18} />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-8 z-50 min-w-[160px] rounded-xl border border-white/10 bg-[rgba(5,10,7,0.95)] py-1.5 shadow-xl">
+          <div
+            onClick={() => {
+              setOpen(false);
+              onViewOrder();
+            }}
+            className="flex cursor-pointer items-center gap-2.5 px-4 py-2.5 text-sm text-white/70 transition-colors hover:bg-white/[0.06] hover:text-white"
+          >
+            View Order <span>→</span>
+          </div>
+          <div
+            onClick={() => {
+              setOpen(false);
+              onOpenDispute();
+            }}
+            className="flex cursor-pointer items-center gap-2.5 px-4 py-2.5 text-sm text-yellow-400 transition-colors hover:bg-white/[0.06] hover:text-yellow-300"
+          >
+            Open Dispute <span>⚑</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DisputeModal({
+  order,
+  disputeText,
+  onChangeText,
+  onClose,
+  onSubmit,
+}: {
+  order: SellerOrder;
+  disputeText: string;
+  onChangeText: (text: string) => void;
+  onClose: () => void;
+  onSubmit: () => void;
+}) {
+  return (
+    <Modal onClose={onClose} size="sm">
+      <h2 className="text-lg font-extrabold uppercase italic tracking-wide text-white">
+        Open Dispute
+      </h2>
+
+      <div className="flex flex-col gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] uppercase tracking-wider text-white/40">Order</span>
+          <span className="text-sm text-white">{order.id}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] uppercase tracking-wider text-white/40">Product</span>
+          <span className="text-sm text-white">{order.product.name}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] uppercase tracking-wider text-white/40">Status</span>
+          <OrderStatusPill status={order.status} />
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] uppercase tracking-wider text-white/40">Total</span>
+          <span className="text-sm text-white">${order.total.toFixed(2)}</span>
+        </div>
+      </div>
+
+      <div className="border-t border-white/10" />
+
+      <div className="flex flex-col gap-2">
+        <label className="text-[11px] uppercase tracking-wider text-white/40">
+          Describe the issue
+        </label>
+        <textarea
+          value={disputeText}
+          onChange={(e) => onChangeText(e.target.value)}
+          placeholder="Please describe the issue with this order in detail..."
+          rows={5}
+          className="w-full resize-none rounded-xl border border-white/10 bg-dark px-4 py-3 text-sm text-white outline-none placeholder:text-[11px] placeholder:uppercase placeholder:tracking-wider placeholder:text-white/25 transition-colors focus:border-yellow-400/40"
+        />
+      </div>
+
+      <div className="flex items-center justify-end gap-3">
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-lg border border-white/10 px-4 py-2 text-sm font-semibold text-white/50 transition-colors hover:text-white"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          disabled={!disputeText.trim()}
+          onClick={onSubmit}
+          className="rounded-lg bg-yellow-400 px-4 py-2 text-sm font-extrabold italic uppercase tracking-wide text-black transition-[filter] hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:brightness-100"
+        >
+          Submit Dispute
+        </button>
+      </div>
+    </Modal>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SellerOrdersPage() {
   const navigate = useNavigate();
   const [search, setSearch]           = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [disputeOrder, setDisputeOrder] = useState<SellerOrder | null>(null);
+  const [disputeText, setDisputeText]   = useState("");
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -271,17 +408,16 @@ export default function SellerOrdersPage() {
                   }
                   if (key === "action") {
                     return (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/dashboard/seller/orders/${o.id.replace("#", "")}`);
+                      <RowMenu
+                        order={o}
+                        onViewOrder={() =>
+                          navigate(`/dashboard/seller/orders/${o.id.replace("#", "")}`)
+                        }
+                        onOpenDispute={() => {
+                          setDisputeOrder(o);
+                          setDisputeText("");
                         }}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-[#5ac422]/10 hover:text-[#5ac422]"
-                        title="View order details"
-                      >
-                        →
-                      </button>
+                      />
                     );
                   }
                   return null;
@@ -291,6 +427,22 @@ export default function SellerOrdersPage() {
           </DashboardCard>
         </DashboardPage>
       </motion.div>
+
+      {disputeOrder && (
+        <DisputeModal
+          order={disputeOrder}
+          disputeText={disputeText}
+          onChangeText={setDisputeText}
+          onClose={() => {
+            setDisputeOrder(null);
+            setDisputeText("");
+          }}
+          onSubmit={() => {
+            setDisputeOrder(null);
+            setDisputeText("");
+          }}
+        />
+      )}
     </DashboardLayout>
   );
 }

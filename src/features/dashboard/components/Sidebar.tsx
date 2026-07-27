@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
-import { type LucideIcon, LayoutDashboard, Users, Truck, MapPin, ShoppingCart, Store, Settings, Package, Plug, CreditCard, DollarSign } from "lucide-react";
+import { type LucideIcon, LayoutDashboard, Users, Truck, MapPin, ShoppingCart, Store, Settings, Settings2, Package, Plug, CreditCard, DollarSign, Bell, Home } from "lucide-react";
 
-export type SidebarRole = "admin" | "seller";
+export type SidebarRole = "admin" | "seller" | "supplier";
 
 interface NavItem {
   label: string;
@@ -19,6 +19,7 @@ const adminItems: NavItem[] = [
   { label: "Suppliers",    to: "/dashboard/admin/suppliers",    icon: Truck           },
   { label: "Supplier Map", to: "/dashboard/admin/supplier-map", icon: MapPin          },
   { label: "Orders",       to: "/dashboard/admin/orders",       icon: ShoppingCart    },
+  { label: "Alerts",       to: "/dashboard/admin/alerts",       icon: Bell            },
   { label: "Payments",     to: "/dashboard/admin/payments",     icon: DollarSign      },
   { label: "Store",        to: "/dashboard/admin/stores",        icon: Store           },
   { label: "Settings",     to: "/dashboard/admin/settings",     icon: Settings        },
@@ -27,14 +28,24 @@ const adminItems: NavItem[] = [
 const sellerItems: NavItem[] = [
   { label: "My Store",    to: "/dashboard/seller",             icon: Store           },
   { label: "Orders",      to: "/dashboard/seller/orders",      icon: ShoppingCart    },
+  { label: "Alerts",      to: "/dashboard/seller/alerts",      icon: Bell            },
   { label: "Products",    to: "/dashboard/seller/products",    icon: Package         },
   { label: "Integration", to: "/dashboard/seller/integration", icon: Plug            },
   { label: "Billing",     to: "/dashboard/seller/billing",     icon: CreditCard      },
   { label: "Settings",    to: "/dashboard/seller/settings",    icon: Settings        },
 ];
 
+const supplierItems: NavItem[] = [
+  { label: "Home",         to: "/dashboard/supplier",              icon: Home       },
+  { label: "Orders",       to: "/dashboard/supplier/orders",        icon: ShoppingCart },
+  { label: "Capabilities", to: "/dashboard/supplier/capabilities",  icon: Settings2  },
+  { label: "Payments",     to: "/dashboard/supplier/payments",      icon: CreditCard },
+  { label: "Alerts",       to: "/dashboard/supplier/alerts",        icon: Bell       },
+  { label: "Settings",     to: "/dashboard/supplier/settings",      icon: Settings   },
+];
+
 export default function Sidebar({ role }: SidebarProps) {
-  const items = role === "admin" ? adminItems : sellerItems;
+  const items = role === "admin" ? adminItems : role === "seller" ? sellerItems : supplierItems;
 
   return (
     <nav className="flex flex-col gap-1 w-full">
@@ -46,7 +57,8 @@ export default function Sidebar({ role }: SidebarProps) {
             to={item.to}
             end={
               item.to === "/dashboard/admin" ||
-              item.to === "/dashboard/seller"
+              item.to === "/dashboard/seller" ||
+              item.to === "/dashboard/supplier"
             }
             className={({ isActive }) =>
               [

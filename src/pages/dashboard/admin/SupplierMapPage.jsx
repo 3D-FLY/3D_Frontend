@@ -11,7 +11,6 @@ import DashboardCard from "../../../features/dashboard/components/DashboardCard.
 import DashboardPage from "../../../features/dashboard/components/DashboardPage.js";
 import ScrollableContent from "../../../features/dashboard/components/ScrollableContent.js";
 import {
-  PartnerLocationsProvider,
   usePartnerLocations,
 } from "../../../features/network/PartnerLocationsContext.jsx";
 import LogoLoaderOverlay from "../../../components/ui/LogoLoaderOverlay.tsx";
@@ -382,9 +381,5 @@ function SupplierMapContent() {
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 export default function SupplierMapPage() {
-  return (
-    <PartnerLocationsProvider>
-      <SupplierMapContent />
-    </PartnerLocationsProvider>
-  );
+  return <SupplierMapContent />;
 }

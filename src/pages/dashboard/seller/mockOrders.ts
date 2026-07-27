@@ -36,7 +36,7 @@ export interface SellerOrderDetail {
     quantity: number;
   };
   platforms: string[];
-  supplier: { name: string; city: string };
+  supplier: { city: string; country: string };
   printTime: string;
   weight: string;
   date: string;
@@ -65,7 +65,7 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     },
     customerSelection: { color: "Black", colorHex: "#222222", quantity: 2 },
     platforms: ["shopify"],
-    supplier: { name: "PrintLab Berlin", city: "Berlin" },
+    supplier: { city: "Berlin", country: "Germany" },
     printTime: "12:30 Hours",
     weight: "300 Grams",
     date: "2025-05-12",
@@ -95,7 +95,7 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     },
     customerSelection: { color: "Silver", colorHex: "#d1d5db", quantity: 1 },
     platforms: ["woocommerce", "ebay"],
-    supplier: { name: "3D Masters NY", city: "New York" },
+    supplier: { city: "New York", country: "USA" },
     printTime: "09:45 Hours",
     weight: "240 Grams",
     date: "2025-05-10",
@@ -125,7 +125,7 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     },
     customerSelection: { color: "Green", colorHex: "#22c55e", quantity: 1 },
     platforms: ["wix"],
-    supplier: { name: "FormLabs TLV", city: "Tel Aviv" },
+    supplier: { city: "Tel Aviv", country: "Israel" },
     printTime: "07:15 Hours",
     weight: "180 Grams",
     date: "2025-05-08",
@@ -155,7 +155,7 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     },
     customerSelection: { color: "Red", colorHex: "#ef4444", quantity: 3 },
     platforms: ["amazon"],
-    supplier: { name: "PrintLab Berlin", city: "Berlin" },
+    supplier: { city: "Berlin", country: "Germany" },
     printTime: "18:00 Hours",
     weight: "450 Grams",
     date: "2025-05-06",
@@ -185,7 +185,7 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     },
     customerSelection: { color: "White", colorHex: "#f9fafb", quantity: 1 },
     platforms: ["shopify", "ebay"],
-    supplier: { name: "3D Masters NY", city: "New York" },
+    supplier: { city: "New York", country: "USA" },
     printTime: "12:30 Hours",
     weight: "300 Grams",
     date: "2025-05-03",
@@ -215,7 +215,7 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     },
     customerSelection: { color: "Blue", colorHex: "#3b82f6", quantity: 2 },
     platforms: ["etsy"],
-    supplier: { name: "FormLabs TLV", city: "Tel Aviv" },
+    supplier: { city: "Tel Aviv", country: "Israel" },
     printTime: "07:15 Hours",
     weight: "360 Grams",
     date: "2025-04-30",
@@ -245,7 +245,7 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     },
     customerSelection: { color: "Gray", colorHex: "#9ca3af", quantity: 1 },
     platforms: ["shopify"],
-    supplier: { name: "PrintLab Berlin", city: "Berlin" },
+    supplier: { city: "Berlin", country: "Germany" },
     printTime: "15:00 Hours",
     weight: "420 Grams",
     date: "2025-04-28",
@@ -275,7 +275,7 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     },
     customerSelection: { color: "Orange", colorHex: "#f97316", quantity: 1 },
     platforms: ["woocommerce"],
-    supplier: { name: "3D Masters NY", city: "New York" },
+    supplier: { city: "New York", country: "USA" },
     printTime: "09:45 Hours",
     weight: "240 Grams",
     date: "2025-04-25",
@@ -305,7 +305,7 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     },
     customerSelection: { color: "Purple", colorHex: "#a855f7", quantity: 1 },
     platforms: ["shopify", "amazon"],
-    supplier: { name: "PrintLab Berlin", city: "Berlin" },
+    supplier: { city: "Berlin", country: "Germany" },
     printTime: "18:00 Hours",
     weight: "450 Grams",
     date: "2025-04-22",
@@ -335,7 +335,7 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     },
     customerSelection: { color: "Yellow", colorHex: "#eab308", quantity: 1 },
     platforms: ["ebay"],
-    supplier: { name: "FormLabs TLV", city: "Tel Aviv" },
+    supplier: { city: "Tel Aviv", country: "Israel" },
     printTime: "14:20 Hours",
     weight: "390 Grams",
     date: "2025-04-19",
