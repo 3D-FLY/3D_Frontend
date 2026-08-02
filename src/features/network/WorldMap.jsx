@@ -12,7 +12,7 @@
  *   className  string              — extra classes for the frame div
  */
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import {
   ComposableMap,
   Geographies,
@@ -170,9 +170,10 @@ export default function WorldMap({
   hideLoadingOverlay = false,
 }) {
   const frameRef  = useRef(null);
-  const [mapWidth,  setMapWidth]  = useState(800);
-  const [mapHeight, setMapHeight] = useState(height ?? 440);
+  const [mapWidth,  setMapWidth]  = useState(null);
+  const [mapHeight, setMapHeight] = useState(null);
   const [geoLoaded, setGeoLoaded] = useState(isWorldGeoReady);
+  const wasDraggingRef = useRef(false);
 
   // Notify parent once geo is ready (stable ref avoids stale closure)
   const onLoadRef = useRef(onLoad);
@@ -195,7 +196,7 @@ export default function WorldMap({
     const { width: w, height: h } = el.getBoundingClientRect();
     if (w > 0) setMapWidth(Math.floor(w));
     if (h > 0) setMapHeight(Math.floor(h));
-  }, []);
+  }, [height]);
 
   // ResizeObserver — keeps projection correct when the container is resized
   useEffect(() => {
@@ -229,6 +230,23 @@ export default function WorldMap({
     el.addEventListener("wheel", handler, { passive: false });
     return () => el.removeEventListener("wheel", handler);
   }, []); // intentionally empty — uses refs above
+
+  const handleMoveStart = useCallback(() => {
+    wasDraggingRef.current = false;
+  }, []);
+
+  const handleMove = useCallback(({ dragging }) => {
+    if (dragging) wasDraggingRef.current = true;
+  }, []);
+
+  // Skip state sync on bare clicks — avoids a controlled-mode re-render jump.
+  const handleMoveEnd = useCallback((payload) => {
+    const zoomChanged = Math.abs(payload.zoom - zoomRef.current) > 0.001;
+    if (!wasDraggingRef.current && !zoomChanged) return;
+    onMoveEndRef.current?.(payload);
+  }, []);
+
+  const isMeasured = mapWidth != null && mapHeight != null && mapWidth > 0 && mapHeight > 0;
 
   /**
    * Mercator projection calibration.
@@ -265,12 +283,6 @@ export default function WorldMap({
     };
   }, [mapWidth, mapHeight]);
 
-  // Restrict drag so the map can't be panned fully off-screen
-  const translateExtent = useMemo(() => {
-    const vi = Math.max(40, Math.round(mapHeight * 0.18));
-    return [[0, vi], [mapWidth, mapHeight - vi]];
-  }, [mapWidth, mapHeight]);
-
   return (
     <div
       ref={frameRef}
@@ -282,6 +294,7 @@ export default function WorldMap({
         <LogoLoaderOverlay className="z-10" label="Loading map" />
       )}
 
+      {isMeasured && (
       <ComposableMap
         projection="geoMercator"
         projectionConfig={projectionConfig}
@@ -294,9 +307,10 @@ export default function WorldMap({
           zoom={zoom}
           minZoom={MIN_ZOOM}
           maxZoom={MAX_ZOOM}
-          translateExtent={translateExtent}
           filterZoomEvent={(e) => e.type !== "wheel"}
-          onMoveEnd={onMoveEnd}
+          onMoveStart={handleMoveStart}
+          onMove={handleMove}
+          onMoveEnd={handleMoveEnd}
         >
           <Geographies geography={GEO_URL}>
             {({ geographies }) => {
@@ -315,6 +329,7 @@ export default function WorldMap({
           <MarkerLayer partners={partners} />
         </ZoomableGroup>
       </ComposableMap>
+      )}
     </div>
   );
 }
