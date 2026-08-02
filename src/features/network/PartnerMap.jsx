@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import SectionTitle from "../../components/ui/SectionTitle.js";
 import Button from "../../components/ui/Button.jsx";
@@ -44,11 +45,23 @@ export default function PartnerMap() {
   
 
       <div className="relative z-10 mt-10 flex w-full max-w-[1440px] flex-col items-center gap-8 px-6 py-8 pb-[clamp(96px,16vw,200px)]">
-        <SectionTitle className="w-full mb-7">3D-FLY GLOBAL NETWORK</SectionTitle>
+        <motion.div
+          className="w-full mb-7"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
+          <SectionTitle className="w-full">3D-FLY GLOBAL NETWORK</SectionTitle>
+        </motion.div>
 
         <div className="flex w-full flex-col items-center gap-3">
           {/* Responsive container — WorldMap fills it via className="h-full" */}
-          <div className="relative h-[88vh] min-h-[280px] w-full max-w-[1440px] overflow-hidden border-none bg-transparent box-border max-[1024px]:h-[56vh] max-[1024px]:min-h-[240px] max-[768px]:h-[42vh] max-[768px]:min-h-[190px]">
+          <motion.div
+            className="relative h-[88vh] min-h-[280px] w-full max-w-[1440px] overflow-hidden border-none bg-transparent box-border max-[1024px]:h-[56vh] max-[1024px]:min-h-[240px] max-[768px]:h-[42vh] max-[768px]:min-h-[190px]"
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: mapReady ? 1 : 0, scale: mapReady ? 1 : 0.97 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+          >
             {!mapReady && <LogoLoaderOverlay label="Loading map" />}
             <WorldMap
               partners={partners}
@@ -59,10 +72,15 @@ export default function PartnerMap() {
               hideLoadingOverlay
               className="h-full"
             />
-          </div>
+          </motion.div>
         </div>
 
-        <div className="flex flex-col items-center gap-8 text-center">
+        <motion.div
+          className="flex flex-col items-center gap-8 text-center"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.5 }}
+        >
           <div className="flex flex-col items-center justify-center gap-1">
             <p
               className="m-0 font-sans text-[clamp(2rem,12vw,128px)] font-extrabold italic leading-none tracking-[0.02em] text-[#5AC422]"
@@ -81,7 +99,7 @@ export default function PartnerMap() {
           >
             Join As a Partner!
           </Button>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
