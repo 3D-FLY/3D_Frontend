@@ -196,9 +196,18 @@ flat packages (`package entity;` → `com.threedfly.<module>.*`).
 ## Next steps
 
 - Rotate the committed Gmail app password; externalize PayPal creds.
-- Scaffold the new monorepo (Gradle multi-module skeleton per domain).
-- Transplant module-by-module, starting with **Pricing** (most self-contained,
-  most valuable), then Integrations (Shopify).
+- ~~Scaffold the new monorepo~~ **Done** — repo live at 3D-FLY/3dfly, backend
+  skeleton + frontend (with history) + path-filtered CI.
+- ~~Transplant Pricing~~ **Done 2026-08-14** — quotation pipeline, slicer
+  strategies, extractors, INI generator + 7 material profiles, auto-orient
+  script, exception handler; 110 tests green, 8 slicer-gated tests auto-skip
+  without PrusaSlicer. Fixed inherited bugs: hardcoded author-machine paths in
+  two test classes (mock-slicer + real-model tests never ran anywhere else);
+  `smart-slicer.py` now lives honestly at `backend/tools/heuristic_estimator.py`
+  (no prusa-slicer symlink). Next in Pricing: shipping table engine, fee layer,
+  OrderPricingRecord.
+- Next transplant: **Integrations** (Shopify OAuth + GraphQL publish) + build
+  the missing order webhooks.
 - Draft DB schema (incl. Order Pricing Record + ledger) and the order state
   machine with admin-override paths — one Postgres + Liquibase.
 - Wire the frontend to the new backend (API client, managed auth, kill mocks);

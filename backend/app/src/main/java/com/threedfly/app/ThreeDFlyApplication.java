@@ -1,7 +1,9 @@
 package com.threedfly.app;
 
+import com.threedfly.pricing.config.PrintingPricingConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 /**
  * Single deployable for all domain modules. Runs in one of two modes,
@@ -10,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  *   - "worker" — queue consumers: slicing, routing, notifications
  */
 @SpringBootApplication(scanBasePackages = "com.threedfly")
+@EnableConfigurationProperties(PrintingPricingConfig.class)
 public class ThreeDFlyApplication {
 
     public static void main(String[] args) {

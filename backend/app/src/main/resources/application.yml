@@ -12,3 +12,39 @@ management:
     web:
       exposure:
         include: health,info
+
+printing:
+  price:
+    per-gram: 0.05
+    per-minute: 0.10
+  slicer:
+    type: prusa
+    config:
+      directory: ${SLICER_CONFIG_DIR:modules/pricing/slicer-configs}
+  prusa:
+    slicer:
+      path: ${PRUSA_SLICER_PATH:/Applications/PrusaSlicer.app/Contents/MacOS/PrusaSlicer}
+  bambu:
+    slicer:
+      path: ${BAMBU_SLICER_PATH:/Applications/BambuStudio.app/Contents/MacOS/BambuStudio}
+    printer:
+      config: bambu_a1
+  temp:
+    directory: ${PRINTING_TEMP_DIR:/tmp/printing-calculations}
+  orientation:
+    enabled: true
+    script:
+      path: ${ORIENT_SCRIPT_PATH:modules/pricing/scripts/auto_orient_model.py}
+    timeout: 60000
+  pricing:
+    shell-cost-factor: 0.25
+    standard-layer-height: 0.2
+    technology:
+      FDM: 1.0
+      SLS: 1.5
+      SLA: 2.0
+    material:
+      PLA: { density: 1.24, price-per-gram: 0.05 }
+      ABS: { density: 1.04, price-per-gram: 0.06 }
+      PETG: { density: 1.27, price-per-gram: 0.055 }
+      TPU: { density: 1.2, price-per-gram: 0.08 }
