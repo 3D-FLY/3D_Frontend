@@ -1,0 +1,83 @@
+/* ייבוא פונטים מ-Google Fonts */
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@theme {
+  --color-dark: #222222;
+  --color-green: #5ac422;
+  --color-gray: #959595;
+  
+  /* Tailwind v4 font tokens used by font-* utilities */
+  --font-sans: "Montserrat", sans-serif;
+  --font-staatliches: "Staatliches", sans-serif;
+  --font-inter: "Inter", sans-serif;
+}
+
+/* ✅ הגדרות כלליות לכל הכותרות */
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Montserrat", sans-serif;
+    font-weight: 900;
+    font-style: italic;
+    line-height: 100%;
+    letter-spacing: 0%;
+  }
+}
+
+/* גובה נבר ל־hero sections (Home וכו') */
+:root {
+  --nav-h: 72px;
+}
+
+/* כללים בסיסיים */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  scroll-behavior: smooth;
+  font-family: "Montserrat", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* מונע מילה בודדת בשורה – מנסה להשאיר לפחות שתי מילים יחד */
+  text-wrap: pretty;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Montserrat", sans-serif;
+}
+
+/* פונט מיוחד ל-Staatliches */
+.font-staatliches {
+  font-family: "Staatliches", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  letter-spacing: 0.015em;
+}
+
+/* פונט מיוחד ל-Inter */
+.font-inter {
+  font-family: "Inter", sans-serif;
+}
+
+/* פוטר: כותרות וקישורים באותו פונט של הפוטר (Montserrat Alternates) */
+footer h3,
+footer a {
+  font-family: inherit;
+}
+
+/* הסתרת פס גלילה מובנה — משתמשים בפס מותאם ב־ScrollableContent */
+@layer components {
+  .scrollbar-native-hidden {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-native-hidden::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+}

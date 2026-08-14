@@ -1,0 +1,56 @@
+
+.track {
+  width: 200%;
+  display: flex;
+  gap: 2rem;
+}
+
+.track .group {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-30%);
+  }
+}
+@keyframes scroll-reverse {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 18s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+.animate-scroll-reverse {
+  animation: scroll-reverse 18s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-scroll,
+  .animate-scroll-reverse {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

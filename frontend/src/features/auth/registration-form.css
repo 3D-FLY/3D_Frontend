@@ -1,0 +1,27 @@
+/* RegistrationForm.tsx — main column enter animation only */
+
+@keyframes reg-form-content-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.15rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reg-form-content-in {
+  opacity: 0;
+  animation: reg-form-content-in 0.9s cubic-bezier(0.33, 1, 0.68, 1) 0.08s forwards;
+  will-change: opacity, transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reg-form-content-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+  }
+}

@@ -1,0 +1,75 @@
+# 3D-Fly — Frontend
+
+> 3DFLY is a smart 3D-printing marketplace that connects online stores with nearby suppliers, enabling products to be printed and shipped faster without managing inventory or logistics.
+
+## Overview
+
+3D-Fly is a platform that bridges the gap between e-commerce stores and local 3D-printing suppliers. Store owners can list products without holding physical inventory, while nearby print farms fulfil orders on demand. This repository contains the web frontend built with React and TypeScript.
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| UI Framework | React 18 + TypeScript |
+| Styling | Tailwind CSS |
+| Routing | React Router v6 |
+| Animations | Framer Motion |
+| Build Tool | Vite |
+| Backend | Spring Boot (separate repo) |
+| Mobile | Expo / React Native (separate repo) |
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js >= 18
+- npm >= 9
+
+### Installation
+
+```bash
+git clone https://github.com/your-org/3D_Frontend.git
+cd 3D_Frontend
+npm install
+npm run dev
+```
+
+The dev server starts at `http://localhost:5173` by default.
+
+## Project Structure
+
+```
+src/
+├── features/           # Domain-driven feature modules
+│   ├── dashboard/      # Admin & shop dashboard components
+│   ├── network/        # Supplier map and partner network
+│   ├── home/           # Landing page sections
+│   ├── auth/           # Login / registration
+│   └── Store/          # Store-front feature
+├── pages/              # Route-level page components
+│   ├── admin/          # Admin-only pages
+│   └── shop/           # Shop-owner pages
+├── components/         # Shared UI & layout primitives
+│   ├── ui/
+│   └── layout/
+├── assets/             # Global images and icons
+│   └── icons/
+├── types/              # Shared TypeScript types
+└── hooks/              # Shared custom hooks
+```
+
+## Dashboard Roles
+
+| Role | Description |
+|---|---|
+| **Admin** | Full platform management — users, suppliers, orders, settings, and the global supplier map |
+| **Shop** | Store-level view — own orders, production status, and shop settings |
+
+The dashboard layout adapts automatically based on the `role` prop passed to `DashboardLayout`.
+
+## Related Repos
+
+| Repo | Stack | Description |
+|---|---|---|
+| `3D_Backend` | Spring Boot | REST API, business logic, database |
+| `3D_Mobile` | Expo / React Native | iOS & Android companion app |
