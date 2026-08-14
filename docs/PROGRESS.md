@@ -102,3 +102,39 @@
 - Left for 2b: ShopifyProvider product publish + catalog module (Product/Shop/
   ProductSync), webhook→order.received processing in worker, reconciliation
   polling, fulfillment push-back.
+
+## 2026-08-14 — Phase 2b: catalog module + Shopify product publishing
+
+- **Migration tool decision:** stayed with Liquibase (challenged by Lidor;
+  kept for H2-test/Postgres-prod dialect abstraction — revisit if we adopt
+  Testcontainers). Immediately vindicated: H2's PostgreSQL mode has no BLOB
+  type — Product blobs became plain byte[] (VARBINARY/bytea, no @Lob).
+- **catalog module (com.threedfly.catalog):** Product, Shop entities; Product/
+  Shop repositories (incl. 5 JPQL search queries); ProductService (CRUD only),
+  ShopService; ProductMapper/ShopMapper + ModelMapper config; DTOs;
+  ProductController (CRUD + image/STL file endpoints), ShopController.
+  Changelog catalog/001 (shop, products). Fixes: JPA auditing actually enabled
+  (@EntityListeners + @EnableJpaAuditing — legacy @CreatedDate never fired);
+  ngrok URL hack → app.public-base-url property (PUBLIC_BASE_URL env).
+- **Publishing (integrations):** StoreProvider interface moved from legacy
+  common (it imports domain entities) and RETYPED — legacy returned
+  ResponseEntity<?>, which is why ProductSync records were NEVER written
+  (publish→delete was broken end-to-end). Now PublishResult record →
+  PublishService upserts ProductSync (CREATED/UPDATED/FAILED + lastError).
+  ShopifyProvider ported + hardened (userErrors checked after productCreate,
+  slf4j, config-based media URL). PublishController: POST/DELETE
+  /publish/products/{id}. ProductSync entity+repo in integrations.
+  Deliberately not @Transactional across remote calls (FAILED record must
+  survive the exception; no tx held over slow HTTP).
+- **Left behind (dead code):** ImageUploader + ImageController (unused legacy
+  filesystem/ngrok path), setup-shopify dev endpoint (raw token, hardcoded
+  shop 1 — real OAuth replaces it), unused Shopify DTOs (Variant/Inventory/
+  Metafield/Seo/Collections — never imported).
+- **Tests: 206 total, 0 failures** (pricing 120/8-skip, integrations 30,
+  catalog 31 = 23 ported ShopServiceTest + 8 new ProductServiceTest,
+  common 24, app 1). New PublishServiceIntegrationTest drives the full
+  GraphQL sequence against MockWebServer: happy path, re-publish→UPDATED,
+  userErrors→FAILED+lastError, delete flow, unknown-account fail-fast.
+- Runtime smoke: boot → health UP, /products + /shops serving, 3 changesets ran.
+- Gotcha: test bootstrap apps also need explicit @EntityScan/
+  @EnableJpaRepositories("com.threedfly") once they touch other modules' repos.

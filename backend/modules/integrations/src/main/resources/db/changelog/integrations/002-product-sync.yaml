@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: integrations-004-product-sync
+      author: 3dfly
+      changes:
+        - createTable:
+            tableName: product_sync
+            columns:
+              - column: { name: id, type: bigint, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: product_id, type: bigint, constraints: { nullable: false } }
+              - column: { name: integration_account_id, type: bigint, constraints: { nullable: false } }
+              - column: { name: external_product_id, type: varchar(255) }
+              - column: { name: external_variant_id, type: varchar(255) }
+              - column: { name: external_inventory_item_id, type: varchar(255) }
+              - column: { name: sync_state, type: varchar(32) }
+              - column: { name: last_synced_at, type: timestamp }
+              - column: { name: last_error, type: varchar(2000) }
+        - addUniqueConstraint:
+            tableName: product_sync
+            columnNames: product_id, integration_account_id
+            constraintName: uk_product_account

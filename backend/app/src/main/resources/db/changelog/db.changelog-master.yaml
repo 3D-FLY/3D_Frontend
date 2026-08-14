@@ -1,5 +1,10 @@
 databaseChangeLog:
   # One include per module changelog; module changelogs live in the module's
-  # own resources and ship inside its jar.
+  # own resources and ship inside its jar. Order matters: catalog before
+  # integrations (product_sync references product/account ids).
+  - include:
+      file: db/changelog/catalog/001-catalog-init.yaml
   - include:
       file: db/changelog/integrations/001-integrations-init.yaml
+  - include:
+      file: db/changelog/integrations/002-product-sync.yaml

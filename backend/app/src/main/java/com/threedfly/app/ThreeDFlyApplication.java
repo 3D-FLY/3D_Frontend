@@ -14,6 +14,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @SpringBootApplication(scanBasePackages = "com.threedfly")
 @org.springframework.boot.autoconfigure.domain.EntityScan(basePackages = "com.threedfly")
 @org.springframework.data.jpa.repository.config.EnableJpaRepositories(basePackages = "com.threedfly")
+@org.springframework.data.jpa.repository.config.EnableJpaAuditing
 @EnableConfigurationProperties(PrintingPricingConfig.class)
 public class ThreeDFlyApplication {
 

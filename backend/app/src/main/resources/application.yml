@@ -16,6 +16,11 @@ spring:
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 
+app:
+  # Public base URL of this deployment. Shopify fetches product media from
+  # here, so it must be externally reachable (ngrok in dev, ALB URL in prod).
+  public-base-url: ${PUBLIC_BASE_URL:http://localhost:8080}
+
 shopify:
   apiKey: ${SHOPIFY_API_KEY:xxx}
   apiSecret: ${SHOPIFY_API_SECRET:xxx}

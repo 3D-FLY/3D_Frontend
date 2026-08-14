@@ -7,5 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * The real entrypoint lives in backend/app.
  */
 @SpringBootApplication(scanBasePackages = "com.threedfly")
+@org.springframework.boot.autoconfigure.domain.EntityScan(basePackages = "com.threedfly")
+@org.springframework.data.jpa.repository.config.EnableJpaRepositories(basePackages = "com.threedfly")
 public class IntegrationsTestApplication {
 }

@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: catalog-001-shop
+      author: 3dfly
+      changes:
+        - createTable:
+            tableName: shop
+            columns:
+              - column: { name: id, type: bigint, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: seller_id, type: bigint }
+              - column: { name: name, type: varchar(255) }
+              - column: { name: description, type: varchar(255) }
+              - column: { name: address, type: varchar(255) }
+              - column: { name: contact_info, type: varchar(255) }
+
+  - changeSet:
+      id: catalog-002-products
+      author: 3dfly
+      changes:
+        - createTable:
+            tableName: products
+            columns:
+              - column: { name: id, type: bigint, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: name, type: varchar(255) }
+              - column: { name: description, type: varchar(255) }
+              - column: { name: price, type: double, constraints: { nullable: false } }
+              - column: { name: image_data, type: bytea }
+              - column: { name: image_filename, type: varchar(255) }
+              - column: { name: image_content_type, type: varchar(255) }
+              - column: { name: stl_data, type: bytea }
+              - column: { name: stl_filename, type: varchar(255) }
+              - column: { name: stl_content_type, type: varchar(255) }
+              - column: { name: created_at, type: timestamp }
+              - column: { name: updated_at, type: timestamp }
+              - column: { name: seller_id, type: bigint }
+              - column: { name: shop_id, type: bigint }
+        - createIndex:
+            tableName: products
+            indexName: idx_products_shop_id
+            columns:
+              - column: { name: shop_id }

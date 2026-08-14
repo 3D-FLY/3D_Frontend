@@ -1,0 +1,10 @@
+databaseChangeLog:
+  # Test-scope master: integrations tests also need catalog tables because
+  # PublishService loads products (catalog is a compile dependency, so its
+  # changelog is on the test classpath).
+  - include:
+      file: db/changelog/catalog/001-catalog-init.yaml
+  - include:
+      file: db/changelog/integrations/001-integrations-init.yaml
+  - include:
+      file: db/changelog/integrations/002-product-sync.yaml
