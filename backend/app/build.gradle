@@ -1,0 +1,17 @@
+plugins {
+    id 'org.springframework.boot'
+}
+
+dependencies {
+    implementation project(':modules:common')
+    implementation project(':modules:catalog')
+    implementation project(':modules:integrations')
+    implementation project(':modules:orders')
+    implementation project(':modules:partners')
+    implementation project(':modules:pricing')
+    implementation project(':modules:users')
+    implementation project(':modules:notifications')
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+}

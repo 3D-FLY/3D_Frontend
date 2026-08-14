@@ -1,0 +1,15 @@
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.8.0'
+}
+
+rootProject.name = '3dfly-backend'
+
+include 'app'
+include 'modules:common'
+include 'modules:catalog'
+include 'modules:integrations'
+include 'modules:orders'
+include 'modules:partners'
+include 'modules:pricing'
+include 'modules:users'
+include 'modules:notifications'

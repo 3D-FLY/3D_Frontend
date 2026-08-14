@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: 3dfly
+  profiles:
+    default: api
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
