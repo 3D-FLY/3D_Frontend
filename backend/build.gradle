@@ -19,6 +19,11 @@ subprojects {
         }
     }
 
+    // Spring 6.1+ resolves @RequestParam/@PathVariable names via reflection
+    tasks.withType(JavaCompile).configureEach {
+        options.compilerArgs.add('-parameters')
+    }
+
     repositories {
         mavenCentral()
     }

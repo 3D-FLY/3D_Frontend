@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: integrations-001-integration-account
+      author: 3dfly
+      changes:
+        - createTable:
+            tableName: integration_account
+            columns:
+              - column: { name: id, type: bigint, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: shop_id, type: bigint }
+              - column: { name: provider, type: varchar(32), constraints: { nullable: false } }
+              - column: { name: external_shop_id, type: varchar(255), constraints: { nullable: false } }
+              - column: { name: access_token, type: clob, constraints: { nullable: false } }
+              - column: { name: scopes, type: varchar(1000) }
+              - column: { name: installed_at, type: timestamp }
+              - column: { name: updated_at, type: timestamp }
+              - column: { name: metadata_json, type: clob }
+        - addUniqueConstraint:
+            tableName: integration_account
+            columnNames: provider, external_shop_id
+            constraintName: uk_integration_provider_ext
+
+  - changeSet:
+      id: integrations-002-oauth-state
+      author: 3dfly
+      changes:
+        - createTable:
+            tableName: oauth_state
+            columns:
+              - column: { name: state, type: varchar(64), constraints: { primaryKey: true, nullable: false } }
+              - column: { name: shop_domain, type: varchar(255), constraints: { nullable: false } }
+              - column: { name: internal_shop_id, type: bigint }
+              - column: { name: created_at, type: timestamp, constraints: { nullable: false } }
+              - column: { name: expires_at, type: timestamp, constraints: { nullable: false } }
+
+  - changeSet:
+      id: integrations-003-webhook-event
+      author: 3dfly
+      changes:
+        - createTable:
+            tableName: webhook_event
+            columns:
+              - column: { name: id, type: bigint, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: provider, type: varchar(32), constraints: { nullable: false } }
+              - column: { name: webhook_id, type: varchar(128) }
+              - column: { name: topic, type: varchar(128), constraints: { nullable: false } }
+              - column: { name: shop_domain, type: varchar(255) }
+              - column: { name: payload, type: clob, constraints: { nullable: false } }
+              - column: { name: status, type: varchar(32), constraints: { nullable: false } }
+              - column: { name: received_at, type: timestamp, constraints: { nullable: false } }
+              - column: { name: processed_at, type: timestamp }
+              - column: { name: last_error, type: clob }
+        - addUniqueConstraint:
+            tableName: webhook_event
+            columnNames: provider, webhook_id
+            constraintName: uk_webhook_provider_webhook_id
+        - createIndex:
+            tableName: webhook_event
+            indexName: idx_webhook_event_status
+            columns:
+              - column: { name: status }

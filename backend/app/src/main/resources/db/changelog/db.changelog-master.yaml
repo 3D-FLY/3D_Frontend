@@ -1,0 +1,5 @@
+databaseChangeLog:
+  # One include per module changelog; module changelogs live in the module's
+  # own resources and ship inside its jar.
+  - include:
+      file: db/changelog/integrations/001-integrations-init.yaml
