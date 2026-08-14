@@ -1,0 +1,77 @@
+databaseChangeLog:
+  - changeSet:
+      id: orders-001-orders
+      author: 3dfly
+      changes:
+        - createTable:
+            tableName: orders
+            columns:
+              - column: { name: id, type: bigint, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: marketplace, type: varchar(32), constraints: { nullable: false } }
+              - column: { name: external_order_id, type: varchar(128), constraints: { nullable: false } }
+              - column: { name: order_number, type: varchar(64) }
+              - column: { name: shop_domain, type: varchar(255) }
+              - column: { name: integration_account_id, type: bigint }
+              - column: { name: seller_id, type: bigint }
+              - column: { name: partner_id, type: bigint }
+              - column: { name: customer_name, type: varchar(255) }
+              - column: { name: shipping_address_json, type: varchar(4000) }
+              - column: { name: currency, type: varchar(8) }
+              - column: { name: total_price, type: 'decimal(12,2)' }
+              - column: { name: status, type: varchar(32), constraints: { nullable: false } }
+              - column: { name: received_at, type: timestamp, constraints: { nullable: false } }
+              - column: { name: updated_at, type: timestamp }
+              - column: { name: version, type: bigint }
+        - addUniqueConstraint:
+            tableName: orders
+            columnNames: marketplace, external_order_id
+            constraintName: uk_orders_marketplace_external
+        - createIndex:
+            tableName: orders
+            indexName: idx_orders_status
+            columns:
+              - column: { name: status }
+
+  - changeSet:
+      id: orders-002-order-item
+      author: 3dfly
+      changes:
+        - createTable:
+            tableName: order_item
+            columns:
+              - column: { name: id, type: bigint, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: order_id, type: bigint, constraints: { nullable: false, foreignKeyName: fk_order_item_order, references: orders(id) } }
+              - column: { name: external_line_item_id, type: varchar(128) }
+              - column: { name: title, type: varchar(512) }
+              - column: { name: quantity, type: int, constraints: { nullable: false } }
+              - column: { name: price, type: 'decimal(12,2)' }
+              - column: { name: sku, type: varchar(128) }
+              - column: { name: external_product_id, type: varchar(128) }
+              - column: { name: catalog_product_id, type: bigint }
+        - createIndex:
+            tableName: order_item
+            indexName: idx_order_item_order_id
+            columns:
+              - column: { name: order_id }
+
+  - changeSet:
+      id: orders-003-order-ledger
+      author: 3dfly
+      changes:
+        - createTable:
+            tableName: order_ledger
+            columns:
+              - column: { name: id, type: bigint, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: order_id, type: bigint, constraints: { nullable: false } }
+              - column: { name: from_status, type: varchar(32) }
+              - column: { name: to_status, type: varchar(32), constraints: { nullable: false } }
+              - column: { name: actor_type, type: varchar(32), constraints: { nullable: false } }
+              - column: { name: actor_id, type: bigint }
+              - column: { name: override_flag, type: boolean, constraints: { nullable: false } }
+              - column: { name: reason, type: varchar(1000) }
+              - column: { name: created_at, type: timestamp, constraints: { nullable: false } }
+        - createIndex:
+            tableName: order_ledger
+            indexName: idx_order_ledger_order_id
+            columns:
+              - column: { name: order_id }

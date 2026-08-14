@@ -8,3 +8,5 @@ databaseChangeLog:
       file: db/changelog/integrations/001-integrations-init.yaml
   - include:
       file: db/changelog/integrations/002-product-sync.yaml
+  - include:
+      file: db/changelog/orders/001-orders-init.yaml

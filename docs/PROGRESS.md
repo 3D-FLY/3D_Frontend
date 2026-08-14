@@ -138,3 +138,37 @@
 - Runtime smoke: boot → health UP, /products + /shops serving, 3 changesets ran.
 - Gotcha: test bootstrap apps also need explicit @EntityScan/
   @EnableJpaRepositories("com.threedfly") once they touch other modules' repos.
+
+## 2026-08-15 — Phase 3: orders module (state machine + ledger) + webhook processing
+
+- **orders module (com.threedfly.orders)** — pure domain, depends only on
+  common. Order entity (marketplace as plain string to stay decoupled;
+  optimistic @Version; unique (marketplace, external_order_id)), OrderItem
+  (external ids + nullable catalogProductId for later matching),
+  OrderLedgerEntry (append-only audit: from/to, actor SYSTEM/SELLER/PARTNER/
+  ADMIN, override flag, reason).
+- **State machine:** RECEIVED→PRICED→MATCHED→ACCEPTED→IN_PRODUCTION→SHIPPED→
+  DELIVERED, + REJECTED→MATCHED reassignment loop, CANCELLED branches,
+  terminal states frozen. transition() validates against the map;
+  adminOverride() bypasses it but REQUIRES a reason and flags the ledger row
+  (MVP "manual admin intervention allowed" made concrete + auditable).
+- **OrderService.ingest():** idempotent on (marketplace, externalOrderId);
+  every path writes the ledger in the same transaction.
+- **OrderController:** GET /orders[?status], /orders/{id} (+items),
+  /orders/{id}/ledger, POST /orders/{id}/transition, /orders/{id}/override.
+  DTO views (open-in-view=false, lazy items fetched via join in service).
+- **Webhook processing (integrations):** ShopifyOrderParser (orders/create
+  payload → IngestOrderCommand), WebhookProcessingService (drains RECEIVED
+  webhook_event rows; per-event error isolation — poison payload marks FAILED
+  and never blocks the queue; unknown topics marked processed; unknown shop →
+  order ingested without account link), WebhookInboxPoller (@Profile worker,
+  @Scheduled 5s default). app: WorkerConfig enables scheduling ONLY in worker
+  mode. Dependency direction: integrations → orders (orders stays pure).
+- Changelog orders/001 (orders, order_item FK, order_ledger + indexes) added
+  to app master + integrations test master.
+- **Tests: 236 total, 0 failures** (orders 9 lifecycle tests, integrations 36
+  incl. 6 webhook-processing E2E tests, rest unchanged).
+- **Full-loop runtime smoke (worker profile):** POST signed webhook →200 →
+  poller drained inbox → GET /orders shows normalized #2001 RECEIVED with
+  ledger entry "Order ingested from SHOPIFY". First time the core MVP loop
+  ran end-to-end on real HTTP.
