@@ -206,3 +206,18 @@
   Nominatim geocoding (its address had no embedded coords).
 - Note: jdtls LSP shows Lombok false-positives (no lombok agent configured);
   Gradle build is the source of truth.
+
+## 2026-08-15 — Incident: 233MB test models + jdtls bin/ output in git
+
+- GitHub's large-file warning on the Phase 4 push surfaced two problems:
+  (1) the 13 real slicer-validation models (233MB, used ONLY by
+  @EnabledIf(slicer-installed) suites that never run in CI) had been
+  committed since Phase 1; (2) jdtls (Java LSP) compiles into bin/ dirs that
+  duplicate test resources, and .gitignore only covered Gradle's build/.
+- Fix: gitignored bin/ + the test-models dir, untracked everything, then
+  (with Lidor's approval) git filter-repo purged both from ALL history and
+  force-pushed. Repo: ~460MB → ~31MB. Anyone with an old clone must re-clone.
+- Models live on dev machines only now (backup kept). CI unaffected —
+  always-on tests use TestFileFactory synthetic files.
+- Lesson recorded: check fixture sizes during transplants; gitignore IDE
+  output dirs (bin/) from day one.
