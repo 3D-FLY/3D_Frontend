@@ -30,3 +30,10 @@ dist/
 .env
 .env.*
 !.env.example
+
+# --- IDE/LSP compiler output (jdtls/Eclipse) ---
+bin/
+
+# --- Large slicer-validation fixtures: local-only, never committed ---
+# (used only by @EnabledIf(slicer-installed) suites; see PROGRESS.md 2026-08-15)
+backend/modules/pricing/src/test/resources/test-models/
