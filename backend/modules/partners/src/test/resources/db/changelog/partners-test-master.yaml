@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/orders/001-orders-init.yaml
+  - include:
+      file: db/changelog/orders/002-tracking.yaml
+  - include:
+      file: db/changelog/partners/001-partners-init.yaml

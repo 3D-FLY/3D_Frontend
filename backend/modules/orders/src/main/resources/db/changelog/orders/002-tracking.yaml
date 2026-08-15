@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: orders-004-tracking-columns
+      author: 3dfly
+      changes:
+        - addColumn:
+            tableName: orders
+            columns:
+              - column: { name: tracking_number, type: varchar(128) }
+              - column: { name: tracking_carrier, type: varchar(64) }
+        - createIndex:
+            tableName: orders
+            indexName: idx_orders_partner_id
+            columns:
+              - column: { name: partner_id }

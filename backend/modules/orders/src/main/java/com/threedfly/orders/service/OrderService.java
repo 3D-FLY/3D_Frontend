@@ -139,6 +139,60 @@ public class OrderService {
                 .build());
     }
 
+    // ---------- partner-facing operations ----------
+
+    /** PRICED → MATCHED, assigning the partner in the same transaction. */
+    @Transactional
+    public Order matchToPartner(Long orderId, Long partnerId, String reason) {
+        Order order = orders.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
+        OrderStatus from = order.getStatus();
+        if (!from.canTransitionTo(OrderStatus.MATCHED)) {
+            throw new InvalidTransitionException(orderId, from, OrderStatus.MATCHED);
+        }
+        order.setPartnerId(partnerId);
+        return applyTransition(order, from, OrderStatus.MATCHED, ActorType.SYSTEM, null, false, reason);
+    }
+
+    /** IN_PRODUCTION → SHIPPED with tracking info, by the assigned partner. */
+    @Transactional
+    public Order markShipped(Long orderId, Long partnerId, String trackingNumber, String carrier) {
+        Order order = requireAssignedPartner(orderId, partnerId);
+        OrderStatus from = order.getStatus();
+        if (!from.canTransitionTo(OrderStatus.SHIPPED)) {
+            throw new InvalidTransitionException(orderId, from, OrderStatus.SHIPPED);
+        }
+        order.setTrackingNumber(trackingNumber);
+        order.setTrackingCarrier(carrier);
+        return applyTransition(order, from, OrderStatus.SHIPPED, ActorType.PARTNER, partnerId, false,
+                "Shipped via " + (carrier != null ? carrier : "unknown carrier") + ", tracking " + trackingNumber);
+    }
+
+    /** Transition guarded to the partner actually assigned to the order. */
+    @Transactional
+    public Order partnerTransition(Long orderId, Long partnerId, OrderStatus target, String reason) {
+        Order order = requireAssignedPartner(orderId, partnerId);
+        OrderStatus from = order.getStatus();
+        if (!from.canTransitionTo(target)) {
+            throw new InvalidTransitionException(orderId, from, target);
+        }
+        return applyTransition(order, from, target, ActorType.PARTNER, partnerId, false, reason);
+    }
+
+    private Order requireAssignedPartner(Long orderId, Long partnerId) {
+        Order order = orders.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
+        if (order.getPartnerId() == null || !order.getPartnerId().equals(partnerId)) {
+            throw new NotAssignedPartnerException(orderId, partnerId);
+        }
+        return order;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Order> findByPartner(Long partnerId, List<OrderStatus> statuses) {
+        return orders.findByPartnerIdAndStatusInOrderByReceivedAtAsc(partnerId, statuses);
+    }
+
     // ---------- reads ----------
 
     @Transactional(readOnly = true)
@@ -176,6 +230,12 @@ public class OrderService {
     public static class InvalidTransitionException extends RuntimeException {
         public InvalidTransitionException(Long orderId, OrderStatus from, OrderStatus to) {
             super("Order " + orderId + ": illegal transition " + from + " -> " + to);
+        }
+    }
+
+    public static class NotAssignedPartnerException extends RuntimeException {
+        public NotAssignedPartnerException(Long orderId, Long partnerId) {
+            super("Order " + orderId + " is not assigned to partner " + partnerId);
         }
     }
 }

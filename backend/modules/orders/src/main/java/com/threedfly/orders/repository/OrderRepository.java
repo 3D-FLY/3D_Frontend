@@ -15,6 +15,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> findByStatusOrderByReceivedAtAsc(OrderStatus status);
 
+    List<Order> findByPartnerIdAndStatusInOrderByReceivedAtAsc(Long partnerId, java.util.Collection<OrderStatus> statuses);
+
     List<Order> findAllByOrderByReceivedAtDesc();
 
     @Query("select o from Order o left join fetch o.items where o.id = :id")

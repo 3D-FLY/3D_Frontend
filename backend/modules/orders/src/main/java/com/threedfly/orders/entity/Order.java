@@ -78,6 +78,13 @@ public class Order {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    // Set by the partner at shipping time; pushed back to the marketplace
+    @Column(name = "tracking_number", length = 128)
+    private String trackingNumber;
+
+    @Column(name = "tracking_carrier", length = 64)
+    private String trackingCarrier;
+
     @Version
     @Column(name = "version")
     private Long version;

@@ -172,3 +172,37 @@
   poller drained inbox → GET /orders shows normalized #2001 RECEIVED with
   ledger entry "Order ingested from SHOPIFY". First time the core MVP loop
   ran end-to-end on real HTTP.
+
+## 2026-08-15 — Phase 4: partners module (routing + Partner Portal API)
+
+- **partners module (com.threedfly.partners):** Partner entity (renamed from
+  legacy Supplier — matches business language), FilamentStock/FilamentType
+  (12 materials w/ temp specs), PartnerRepository incl. the ported stock-aware
+  closest-partner native query (Haversine in SQL + stock JOIN — parked for the
+  quotation flow), DistanceCalculator + 11 ported tests, GeocodingService
+  (rewritten OkHttp + configurable base-url; was WebFlux), PartnerService
+  (lean records, geocode-at-write-time enrichment; no ModelMapper ceremony —
+  MVP scope says basic routing is enough).
+- **Alpha matcher (OrderMatchingService):** RECEIVED→PRICED explicit
+  pass-through (ledger says "quotation engine not yet wired") → MATCHED to
+  nearest routable partner (active+verified+coords). Buyer coords from
+  Shopify's embedded shipping lat/lon, else Nominatim geocoding. REJECTED
+  orders re-matched excluding the rejector; unplaceable orders wait for admin.
+  OrderMatchingPoller @Profile(worker), 7s.
+- **Partner Portal API** (/partner-portal/{partnerId}): jobs list (scoped),
+  accept, reject(reason), start, ship(tracking). Server-side guard: partner
+  can only act on orders assigned to them (403 otherwise) — via new
+  OrderService.partnerTransition/markShipped/matchToPartner.
+- **orders additions:** tracking_number/carrier columns (changelog orders/002),
+  findByPartnerIdAndStatusIn, NotAssignedPartnerException.
+- Admin CRUD: /partners endpoints + verify/activate/deactivate lifecycle.
+- **Tests: 253 total, 0 failures, 8 slicer-skips** (partners 32: matcher 6,
+  portal flow E2E 5, geocoding 4 vs MockWebServer, partner service 6,
+  distance 11 ported).
+- **FULL LOOP SMOKE (live HTTP, worker profile):** create+verify partner →
+  signed webhook #3001 → inbox drain → matcher (5.4 km) → portal accept →
+  start → ship w/ tracking → SHIPPED. Ledger shows all 6 steps with actors.
+  Bonus: yesterday's #2001 survived restart (file H2) and matched via REAL
+  Nominatim geocoding (its address had no embedded coords).
+- Note: jdtls LSP shows Lombok false-positives (no lombok agent configured);
+  Gradle build is the source of truth.

@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: partners-001-partner
+      author: 3dfly
+      changes:
+        - createTable:
+            tableName: partner
+            columns:
+              - column: { name: id, type: bigint, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: user_id, type: bigint }
+              - column: { name: name, type: varchar(255) }
+              - column: { name: email, type: varchar(255) }
+              - column: { name: phone, type: varchar(64) }
+              - column: { name: address, type: varchar(255) }
+              - column: { name: city, type: varchar(128) }
+              - column: { name: state, type: varchar(128) }
+              - column: { name: country, type: varchar(128) }
+              - column: { name: postal_code, type: varchar(32) }
+              - column: { name: latitude, type: double }
+              - column: { name: longitude, type: double }
+              - column: { name: business_license, type: varchar(255) }
+              - column: { name: description, type: varchar(255) }
+              - column: { name: verified, type: boolean, constraints: { nullable: false } }
+              - column: { name: active, type: boolean, constraints: { nullable: false } }
+        - createIndex:
+            tableName: partner
+            indexName: idx_partner_active_verified
+            columns:
+              - column: { name: active }
+              - column: { name: verified }
+
+  - changeSet:
+      id: partners-002-filament-stock
+      author: 3dfly
+      changes:
+        - createTable:
+            tableName: filament_stock
+            columns:
+              - column: { name: id, type: bigint, autoIncrement: true, constraints: { primaryKey: true, nullable: false } }
+              - column: { name: partner_id, type: bigint, constraints: { foreignKeyName: fk_filament_stock_partner, references: partner(id) } }
+              - column: { name: material_type, type: varchar(32) }
+              - column: { name: color, type: varchar(64) }
+              - column: { name: quantity_kg, type: double }
+              - column: { name: reserved_kg, type: double }
+              - column: { name: available, type: boolean, constraints: { nullable: false } }
+              - column: { name: last_restocked, type: timestamp }
+              - column: { name: expiry_date, type: timestamp }
+        - createIndex:
+            tableName: filament_stock
+            indexName: idx_filament_stock_partner_id
+            columns:
+              - column: { name: partner_id }
