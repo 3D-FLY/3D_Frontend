@@ -11,6 +11,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
  *   - "api"    — HTTP: portal APIs, Shopify webhooks, health checks
  *   - "worker" — queue consumers: slicing, routing, notifications
  */
+
+// some comment
 @SpringBootApplication(scanBasePackages = "com.threedfly")
 @org.springframework.boot.autoconfigure.domain.EntityScan(basePackages = "com.threedfly")
 @org.springframework.data.jpa.repository.config.EnableJpaRepositories(basePackages = "com.threedfly")
