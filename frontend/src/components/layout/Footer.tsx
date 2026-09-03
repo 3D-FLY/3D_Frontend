@@ -1,9 +1,32 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Turtle from "../ui/Turtle.jsx";
 import { footerSections } from "./footerConfig.js";
 import type { FooterItem } from "./footerConfig.js";
 import { FooterSocialIcons } from "./SocialIcons.js";
+
+const DEMO_LINKS = [
+  { label: "Admin",    path: "/dashboard/admin"    },
+  { label: "Seller",   path: "/dashboard/seller"   },
+  { label: "Supplier", path: "/dashboard/supplier" },
+];
+
+function DemoDashboardDots() {
+  const navigate = useNavigate();
+  return (
+    <div className="flex items-center gap-2">
+      {DEMO_LINKS.map(({ label, path }) => (
+        <button
+          key={label}
+          type="button"
+          onClick={() => navigate(path)}
+          aria-label={`Demo: ${label}`}
+          className="h-2 w-2 rounded-full bg-white/20 transition-colors duration-200 hover:bg-white/50"
+        />
+      ))}
+    </div>
+  );
+}
 
 function SmartLink({
   item,
@@ -119,9 +142,12 @@ export default function Footer() {
 
       {/* BOTTOM SECTION */}
       <div className="relative z-20 w-full bg-dark border-t border-white/15 mt-8 py-2">
-        <p className="text-center text-white text-[10px] tracking-wide uppercase">
-          © 2025 3D-FLY | ALL RIGHTS RESERVED
-        </p>
+        <div className="flex items-center justify-center gap-4">
+          <span className="text-center text-white text-[10px] tracking-wide uppercase">
+            © 2025 3D-FLY | ALL RIGHTS RESERVED
+          </span>
+          <DemoDashboardDots />
+        </div>
       </div>
 
       </div>
@@ -199,9 +225,12 @@ export default function Footer() {
 
         {/* BOTTOM SECTION */}
         <div className="relative z-20 w-full bg-dark border-t border-white/15 py-3">
-          <p className="text-center text-white text-[12px] text-medium tracking-wide uppercase">
-            © 2025 3D-FLY | ALL RIGHTS RESERVED
-          </p>
+          <div className="flex items-center justify-center gap-4">
+            <span className="text-center text-white text-[12px] text-medium tracking-wide uppercase">
+              © 2025 3D-FLY | ALL RIGHTS RESERVED
+            </span>
+            <DemoDashboardDots />
+          </div>
         </div>
 
       </div>

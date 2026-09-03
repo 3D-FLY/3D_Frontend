@@ -74,9 +74,9 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     timeline: [
       { step: "Order Placed",     date: "2025-05-12 09:14", done: true  },
       { step: "Sent to Supplier", date: "2025-05-12 09:20", done: true  },
-      { step: "Printing",         date: null,               done: false, active: true },
+      { step: "Printer",          date: null,               done: false, active: true },
       { step: "Shipped",          date: null,               done: false },
-      { step: "Delivered",        date: null,               done: false },
+      { step: "DONE", date: null,               done: false },
     ],
   },
 
@@ -104,9 +104,9 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     timeline: [
       { step: "Order Placed",     date: "2025-05-10 11:02", done: true  },
       { step: "Sent to Supplier", date: "2025-05-10 11:15", done: true  },
-      { step: "Printing",         date: "2025-05-11 08:00", done: true  },
+      { step: "Printer",          date: "2025-05-11 08:00", done: true  },
       { step: "Shipped",          date: "2025-05-12 14:30", done: true, active: true },
-      { step: "Delivered",        date: null,               done: false },
+      { step: "DONE", date: null,               done: false },
     ],
   },
 
@@ -134,9 +134,9 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     timeline: [
       { step: "Order Placed",     date: "2025-05-08 10:05", done: true  },
       { step: "Sent to Supplier", date: "2025-05-08 10:22", done: true  },
-      { step: "Printing",         date: "2025-05-09 07:30", done: true  },
+      { step: "Printer",          date: "2025-05-09 07:30", done: true  },
       { step: "Shipped",          date: "2025-05-10 13:00", done: true  },
-      { step: "Delivered",        date: "2025-05-12 16:45", done: true, active: true },
+      { step: "DONE", date: "2025-05-12 16:45", done: true, active: true },
     ],
   },
 
@@ -164,9 +164,9 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     timeline: [
       { step: "Order Placed",     date: "2025-05-06 08:55", done: true  },
       { step: "Sent to Supplier", date: "2025-05-06 09:10", done: true  },
-      { step: "Printing",         date: "2025-05-07 10:00", done: true  },
+      { step: "Printer",          date: "2025-05-07 10:00", done: true  },
       { step: "Shipped",          date: null,               done: false, active: true },
-      { step: "Delivered",        date: null,               done: false },
+      { step: "DONE", date: null,               done: false },
     ],
   },
 
@@ -194,9 +194,9 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     timeline: [
       { step: "Order Placed",     date: "2025-05-03 08:00", done: true  },
       { step: "Sent to Supplier", date: "2025-05-03 08:15", done: true  },
-      { step: "Printing",         date: "2025-05-04 09:00", done: true  },
+      { step: "Printer",          date: "2025-05-04 09:00", done: true  },
       { step: "Shipped",          date: "2025-05-05 11:30", done: true  },
-      { step: "Delivered",        date: "2025-05-07 14:20", done: true, active: true },
+      { step: "DONE", date: "2025-05-07 14:20", done: true, active: true },
     ],
   },
 
@@ -224,9 +224,9 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     timeline: [
       { step: "Order Placed",     date: "2025-04-30 09:40", done: true  },
       { step: "Sent to Supplier", date: "2025-04-30 10:00", done: true  },
-      { step: "Printing",         date: "2025-05-01 08:00", done: true  },
+      { step: "Printer",          date: "2025-05-01 08:00", done: true  },
       { step: "Shipped",          date: "2025-05-02 12:00", done: true, active: true },
-      { step: "Delivered",        date: null,               done: false },
+      { step: "DONE", date: null,               done: false },
     ],
   },
 
@@ -254,9 +254,9 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     timeline: [
       { step: "Order Placed",     date: "2025-04-28 11:00", done: true  },
       { step: "Sent to Supplier", date: "2025-04-28 11:20", done: true  },
-      { step: "Printing",         date: "2025-04-29 09:00", done: true  },
+      { step: "Printer",          date: "2025-04-29 09:00", done: true  },
       { step: "Shipped",          date: "2025-04-30 10:00", done: true  },
-      { step: "Delivered",        date: "2025-05-02 15:30", done: true, active: true },
+      { step: "DONE", date: "2025-05-02 15:30", done: true, active: true },
     ],
   },
 
@@ -284,9 +284,9 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     timeline: [
       { step: "Order Placed",     date: "2025-04-25 10:30", done: true  },
       { step: "Sent to Supplier", date: "2025-04-25 10:45", done: true  },
-      { step: "Printing",         date: null,               done: false, active: true },
+      { step: "Printer",          date: null,               done: false, active: true },
       { step: "Shipped",          date: null,               done: false },
-      { step: "Delivered",        date: null,               done: false },
+      { step: "DONE", date: null,               done: false },
     ],
   },
 
@@ -314,9 +314,9 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     timeline: [
       { step: "Order Placed",     date: "2025-04-22 09:00", done: true  },
       { step: "Sent to Supplier", date: "2025-04-22 09:15", done: true  },
-      { step: "Printing",         date: "2025-04-23 08:00", done: true  },
+      { step: "Printer",          date: "2025-04-23 08:00", done: true  },
       { step: "Shipped",          date: "2025-04-24 12:30", done: true  },
-      { step: "Delivered",        date: "2025-04-26 17:00", done: true, active: true },
+      { step: "DONE", date: "2025-04-26 17:00", done: true, active: true },
     ],
   },
 
@@ -344,9 +344,9 @@ export const mockOrderDetails: SellerOrderDetail[] = [
     timeline: [
       { step: "Order Placed",     date: "2025-04-19 08:30", done: true  },
       { step: "Sent to Supplier", date: "2025-04-19 08:50", done: true  },
-      { step: "Printing",         date: "2025-04-20 09:00", done: true  },
+      { step: "Printer",          date: "2025-04-20 09:00", done: true  },
       { step: "Shipped",          date: null,               done: false, active: true },
-      { step: "Delivered",        date: null,               done: false },
+      { step: "DONE", date: null,               done: false },
     ],
   },
 ];

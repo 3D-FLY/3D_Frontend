@@ -5,6 +5,7 @@ import {
   Routes,
   Route,
   Outlet,
+  Navigate,
 } from "react-router-dom";
 import Navbar from "./components/layout/Navbar.jsx";
 import Footer from "./components/layout/Footer.jsx";
@@ -21,6 +22,7 @@ import LoginForm from "./features/auth/LoginForm.tsx";
 import ScrollToTop from "./components/ui/ScrollToTop.tsx";
 import MyStore from "./pages/dashboard/seller/MyStore.tsx";
 import AdminDashboard from "./pages/dashboard/admin/AdminDashboard.tsx";
+import SupplierHomePage from "./pages/dashboard/supplier/SupplierHome.tsx";
 import LoadingPage from "./pages/LoadingPage.tsx";
 import AdminDashboardShell from "./features/dashboard/AdminDashboardShell.tsx";
 import SupplierMapPage from "./pages/dashboard/admin/SupplierMapPage.jsx";
@@ -37,10 +39,10 @@ const SellerAddProductPage    = lazy(() => import("./pages/dashboard/seller/AddP
 const SellerProductsPage      = lazy(() => import("./pages/dashboard/seller/Products.tsx"));
 const SellerProductDetailPage  = lazy(() => import("./pages/dashboard/seller/ProductDetail.tsx"));
 const SellerOrderDetailPage    = lazy(() => import("./pages/dashboard/seller/OrderDetail.tsx"));
-const SellerAlertsPage         = lazy(() => import("./pages/dashboard/seller/AlertsPage.tsx"));
-const SellerAlertDetailPage    = lazy(() => import("./pages/dashboard/seller/AlertDetailPage.tsx"));
-const AdminAlertsPage          = lazy(() => import("./pages/dashboard/admin/AlertsPage.tsx"));
-const AdminAlertDetailPage     = lazy(() => import("./pages/dashboard/admin/AlertDetailPage.tsx"));
+const SellerNotificationsPage      = lazy(() => import("./pages/dashboard/seller/NotificationsPage.tsx"));
+const SellerNotificationDetailPage = lazy(() => import("./pages/dashboard/seller/NotificationDetailPage.tsx"));
+const AdminNotificationsPage       = lazy(() => import("./pages/dashboard/admin/NotificationsPage.tsx"));
+const AdminNotificationDetailPage  = lazy(() => import("./pages/dashboard/admin/NotificationDetailPage.tsx"));
 const OrdersPage      = lazy(() => import("./pages/dashboard/admin/OrdersPage.jsx"));
 const SettingsPage    = lazy(() => import("./pages/dashboard/admin/SettingsPage.jsx"));
 const UsersPage       = lazy(() => import("./pages/dashboard/admin/UsersPage.tsx"));
@@ -48,14 +50,16 @@ const UserDetailPage    = lazy(() => import("./pages/dashboard/admin/UserDetailP
 const SupplierDetailPage = lazy(() => import("./pages/dashboard/admin/SupplierDetailPage.jsx"));
 const StoresPage         = lazy(() => import("./pages/dashboard/admin/StoresPage.tsx"));
 const StoreDetailPage    = lazy(() => import("./pages/dashboard/admin/StoreDetailPage.tsx"));
-const SupplierHomePage          = lazy(() => import("./pages/dashboard/supplier/SupplierHome.tsx"));
 const SupplierOrdersPage         = lazy(() => import("./pages/dashboard/supplier/SupplierOrders.tsx"));
 const SupplierOrderDetailPage    = lazy(() => import("./pages/dashboard/supplier/SupplierOrderDetail.tsx"));
 const SupplierCapabilitiesPage   = lazy(() => import("./pages/dashboard/supplier/SupplierCapabilities.tsx"));
 const SupplierPaymentsPage       = lazy(() => import("./pages/dashboard/supplier/SupplierPayments.tsx"));
-const SupplierAlertsPage         = lazy(() => import("./pages/dashboard/supplier/SupplierAlerts.tsx"));
-const SupplierAlertDetailPage    = lazy(() => import("./pages/dashboard/supplier/SupplierAlertDetail.tsx"));
+const SupplierNotificationsPage      = lazy(() => import("./pages/dashboard/supplier/SupplierNotifications.tsx"));
+const SupplierNotificationDetailPage = lazy(() => import("./pages/dashboard/supplier/SupplierNotificationDetail.tsx"));
 const SupplierSettingsPage       = lazy(() => import("./pages/dashboard/supplier/SupplierSettings.tsx"));
+const AdminGlobalMapPage    = lazy(() => import("./pages/dashboard/admin/MapPage.tsx"));
+const SellerGlobalMapPage   = lazy(() => import("./pages/dashboard/seller/MapPage.tsx"));
+const SupplierGlobalMapPage = lazy(() => import("./pages/dashboard/supplier/MapPage.tsx"));
 /** Layout wrapper for pages that include the global Navbar + Footer. */
 function MainLayout() {
   return (
@@ -149,18 +153,26 @@ function App() {
           }
         />
         <Route
-          path="/dashboard/seller/alerts/:id"
+          path="/dashboard/seller/notifications/:id"
           element={
             <Suspense fallback={null}>
-              <SellerAlertDetailPage />
+              <SellerNotificationDetailPage />
             </Suspense>
           }
         />
         <Route
-          path="/dashboard/seller/alerts"
+          path="/dashboard/seller/notifications"
           element={
             <Suspense fallback={null}>
-              <SellerAlertsPage />
+              <SellerNotificationsPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/seller/map"
+          element={
+            <Suspense fallback={null}>
+              <SellerGlobalMapPage />
             </Suspense>
           }
         />
@@ -239,29 +251,37 @@ function App() {
           }
         />
         <Route
-          path="/dashboard/admin/alerts/:id"
+          path="/dashboard/admin/notifications/:id"
           element={
             <Suspense fallback={null}>
-              <AdminAlertDetailPage />
+              <AdminNotificationDetailPage />
             </Suspense>
           }
         />
         <Route
-          path="/dashboard/admin/alerts"
+          path="/dashboard/admin/notifications"
           element={
             <Suspense fallback={null}>
-              <AdminAlertsPage />
+              <AdminNotificationsPage />
             </Suspense>
           }
         />
         <Route path="/dashboard/admin/payments" element={<PaymentsPage />} />
+        <Route
+          path="/dashboard/admin/map"
+          element={
+            <Suspense fallback={null}>
+              <AdminGlobalMapPage />
+            </Suspense>
+          }
+        />
         <Route path="/dashboard/admin/*" element={<AdminDashboard />} />
 
         {/* Supplier dashboard routes */}
         <Route
           path="/dashboard/supplier/orders/:id"
           element={
-            <Suspense fallback={null}>
+            <Suspense fallback={<LoadingPage />}>
               <SupplierOrderDetailPage />
             </Suspense>
           }
@@ -269,7 +289,7 @@ function App() {
         <Route
           path="/dashboard/supplier/orders"
           element={
-            <Suspense fallback={null}>
+            <Suspense fallback={<LoadingPage />}>
               <SupplierOrdersPage />
             </Suspense>
           }
@@ -277,51 +297,53 @@ function App() {
         <Route
           path="/dashboard/supplier/capabilities"
           element={
-            <Suspense fallback={null}>
+            <Suspense fallback={<LoadingPage />}>
               <SupplierCapabilitiesPage />
             </Suspense>
           }
         />
         <Route
-          path="/dashboard/supplier/payments"
+          path="/dashboard/supplier/revenue"
           element={
-            <Suspense fallback={null}>
+            <Suspense fallback={<LoadingPage />}>
               <SupplierPaymentsPage />
             </Suspense>
           }
         />
+        <Route path="/dashboard/supplier/payments" element={<Navigate to="/dashboard/supplier/revenue" replace />} />
         <Route
-          path="/dashboard/supplier/alerts/:id"
+          path="/dashboard/supplier/notifications/:id"
           element={
-            <Suspense fallback={null}>
-              <SupplierAlertDetailPage />
+            <Suspense fallback={<LoadingPage />}>
+              <SupplierNotificationDetailPage />
             </Suspense>
           }
         />
         <Route
-          path="/dashboard/supplier/alerts"
+          path="/dashboard/supplier/notifications"
           element={
-            <Suspense fallback={null}>
-              <SupplierAlertsPage />
+            <Suspense fallback={<LoadingPage />}>
+              <SupplierNotificationsPage />
             </Suspense>
           }
         />
         <Route
           path="/dashboard/supplier/settings"
           element={
-            <Suspense fallback={null}>
+            <Suspense fallback={<LoadingPage />}>
               <SupplierSettingsPage />
             </Suspense>
           }
         />
         <Route
-          path="/dashboard/supplier"
+          path="/dashboard/supplier/map"
           element={
-            <Suspense fallback={null}>
-              <SupplierHomePage />
+            <Suspense fallback={<LoadingPage />}>
+              <SupplierGlobalMapPage />
             </Suspense>
           }
         />
+        <Route path="/dashboard/supplier/*" element={<SupplierHomePage />} />
 
         <Route path="/loading-preview" element={<LoadingPage />} />
 

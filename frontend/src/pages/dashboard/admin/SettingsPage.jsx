@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, Eye, EyeOff, Trash2, Check, X } from "lucide-react";
 import Modal from "../../../features/dashboard/components/Modal.js";
@@ -97,18 +97,9 @@ function ChangePasswordModal({ onClose }) {
 // ─── Section 1: Profile Header (no card) ─────────────────────────────────────
 
 function ProfileHeader() {
-  const [photo, setPhoto]         = useState(null);
-  const [hovering, setHovering]   = useState(false);
-  const [pwVisible, setPwVisible] = useState(false);
-  const [changingPw, setChangingPw] = useState(false);
+  const [photo, setPhoto]       = useState(null);
+  const [hovering, setHovering] = useState(false);
   const fileRef = useRef(null);
-
-  // auto-hide the plain-text password after 3 s
-  useEffect(() => {
-    if (!pwVisible) return;
-    const t = setTimeout(() => setPwVisible(false), 3000);
-    return () => clearTimeout(t);
-  }, [pwVisible]);
 
   const handlePhoto = (e) => {
     const file = e.target.files?.[0];
@@ -119,7 +110,6 @@ function ProfileHeader() {
   };
 
   return (
-    <>
     <div className="flex items-center gap-10 py-10">
 
       {/* Avatar */}
@@ -169,34 +159,69 @@ function ProfileHeader() {
         <span className="rounded-full border border-[#5ac422]/30 bg-[#5ac422]/15 px-4 py-1.5 text-[13px] font-bold text-[#5ac422] w-fit">
           Super Admin
         </span>
+      </div>
+    </div>
+  );
+}
 
-        {/* Password display row */}
+function ProfileSection() {
+  const [form, setForm] = useState({
+    name:  "Raz Malka",
+    email: "raz@3dfly.io",
+    phone: "+972-50-0000000",
+  });
+  const [pwVisible, setPwVisible]     = useState(false);
+  const [changingPw, setChangingPw]   = useState(false);
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  return (
+    <div className="flex flex-col gap-5">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div>
+          <label className={LABEL}>Name</label>
+          <input className={INPUT} value={form.name} onChange={set("name")} placeholder="Name" />
+        </div>
+        <div>
+          <label className={LABEL}>Email</label>
+          <input type="email" className={INPUT} value={form.email} onChange={set("email")} placeholder="Email" />
+        </div>
+        <div>
+          <label className={LABEL}>Phone</label>
+          <input className={INPUT} value={form.phone} onChange={set("phone")} placeholder="Phone" />
+        </div>
+      </div>
+
+      <div className="h-px w-full bg-white/10" />
+
+      <div className="flex flex-col gap-3">
+        <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-zinc-400">Password</span>
         <div className="flex items-center gap-3">
-          <span className="text-base text-zinc-300 tracking-widest">
+          <span className="text-base tracking-widest text-zinc-300">
             {pwVisible ? "pass1234" : "••••••••"}
           </span>
           <button
             type="button"
             onClick={() => setPwVisible((v) => !v)}
-            className="text-zinc-500 hover:text-zinc-300 transition-colors"
+            className="text-zinc-500 transition-colors hover:text-zinc-300"
           >
             {pwVisible ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         </div>
-
-        {/* Change password button */}
         <button
           type="button"
           onClick={() => setChangingPw(true)}
-          className="text-[15px] font-semibold text-[#5ac422] hover:underline w-fit"
+          className="w-fit text-[15px] font-semibold text-[#5ac422] hover:underline"
         >
           Change Password
         </button>
       </div>
-    </div>
 
-    {changingPw && <ChangePasswordModal onClose={() => setChangingPw(false)} />}
-    </>
+      <div className="flex justify-end">
+        <button className={SAVE_BTN}>Save</button>
+      </div>
+
+      {changingPw && <ChangePasswordModal onClose={() => setChangingPw(false)} />}
+    </div>
   );
 }
 
@@ -481,26 +506,25 @@ export default function SettingsPage() {
   return (
     <DashboardLayout role="admin">
       <DashboardPage title="Settings">
-        {/* Section 1 — no card */}
         <ProfileHeader />
 
-        {/* Section 2 */}
-        <DashboardCard index={0} title="Admin Users" autoHeight>
+        <DashboardCard index={0} title="Profile" autoHeight>
+          <ProfileSection />
+        </DashboardCard>
+
+        <DashboardCard index={1} title="Admin Users" autoHeight>
           <AdminUsersSection />
         </DashboardCard>
 
-        {/* Section 3 */}
-        <DashboardCard index={1} title="Notifications" autoHeight>
+        <DashboardCard index={2} title="Notifications" autoHeight>
           <NotificationsSection />
         </DashboardCard>
 
-        {/* Section 4 */}
-        <DashboardCard index={2} title="Platform" autoHeight>
+        <DashboardCard index={3} title="Platform" autoHeight>
           <PlatformSection />
         </DashboardCard>
 
-        {/* Section 5 */}
-        <DashboardCard index={3} title="Roles & Permissions" autoHeight>
+        <DashboardCard index={4} title="Roles & Permissions" autoHeight>
           <RolesPermissionsSection />
         </DashboardCard>
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./registration-form.css";
 // @ts-expect-error js module
 import IconGoogle from "./icons/IconGoogle.jsx";
@@ -33,7 +33,14 @@ const INITIAL_FORM: FormState = {
 
 const compactInputClass = "py-1.5 text-sm";
 
+const DEMO_DASHBOARDS = [
+  { to: "/dashboard/supplier", label: "Supplier dashboard" },
+  { to: "/dashboard/seller", label: "Seller dashboard" },
+  { to: "/dashboard/admin", label: "Admin dashboard" },
+] as const;
+
 export default function LoginForm() {
+  const navigate = useNavigate();
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitted, setSubmitted] = useState(false);
@@ -82,6 +89,21 @@ export default function LoginForm() {
           <p className="text-gray text-sm uppercase tracking-wide">
             SIGNED IN SUCCESSFULLY.
           </p>
+          <div className="mt-4 flex w-full max-w-[320px] flex-col gap-2">
+            {DEMO_DASHBOARDS.map((dash) => (
+              <Button
+                key={dash.to}
+                type="button"
+                variant="primary"
+                size="sm"
+                hovering="darkBg"
+                className="w-full rounded-[12px] font-extrabold italic tracking-widest !text-sm"
+                onClick={() => navigate(dash.to)}
+              >
+                {dash.label}
+              </Button>
+            ))}
+          </div>
         </div>
       </div>
     );

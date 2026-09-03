@@ -6,18 +6,17 @@ import Modal from "../../../features/dashboard/components/Modal.js";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
 import Input from "../../../components/ui/Input.tsx";
+import { mockSuppliers } from "../../../data/mockSuppliers.js";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
-const INITIAL_SUPPLIERS = [
-  { id: "sup1", name: "PrintHub TLV",      city: "Tel Aviv, Israel",            email: "contact@printhub.io",     phone: "+972-3-555-0100",   active: true  },
-  { id: "sup2", name: "3D Masters London", city: "London, United Kingdom",       email: "hello@3dmasters.co.uk",   phone: "+44-20-7946-0958",  active: true  },
-  { id: "sup3", name: "FabLab Tokyo",      city: "Tokyo, Japan",                 email: "info@fablabtkyo.jp",      phone: "+81-3-1234-5678",   active: true  },
-  { id: "sup4", name: "MakerSpace NYC",    city: "New York City, United States", email: "ops@makerspacenyc.com",   phone: "+1-212-555-0174",   active: true  },
-  { id: "sup5", name: "Imprimerie Paris",  city: "Paris, France",                email: "bonjour@imprimerie3d.fr", phone: "+33-1-40-00-01-02", active: true  },
-  { id: "sup6", name: "PrintForge Dubai",  city: "Dubai, United Arab Emirates",  email: "info@printforgedxb.ae",   phone: "+971-4-555-0200",   active: true  },
-  { id: "sup7", name: "SGPrint Co.",       city: "Singapore, Singapore",         email: "sales@sgprint.sg",        phone: "+65-6321-4567",     active: false },
-  { id: "sup8", name: "FabBrasil",         city: "São Paulo, Brazil",            email: "contato@fabbrasil.com",   phone: "+55-11-2345-6789",  active: false },
-];
+const INITIAL_SUPPLIERS = mockSuppliers.map((s) => ({
+  id: s.id,
+  name: s.name,
+  city: `${s.city}, ${s.country}`,
+  email: s.email,
+  phone: "Unknown",
+  active: s.isActive,
+}));
 
 const EMPTY_FORM = { name: "", city: "", email: "", phone: "", active: true };
 

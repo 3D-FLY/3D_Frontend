@@ -12,31 +12,42 @@ import DashboardTable from "../../../features/dashboard/components/DashboardTabl
 import StatusBadge from "../../../features/dashboard/components/StatusBadge.js";
 import ScrollableContent from "../../../features/dashboard/components/ScrollableContent.js";
 import OrderStatusPill from "../../../features/dashboard/components/OrderStatusPill.js";
-import AlertListItem from "../../../features/dashboard/components/AlertListItem.js";
-import { getAlertsByRole } from "../../../data/mockAlerts.js";
+import NotificationListItem from "../../../features/dashboard/components/NotificationListItem.js";
+import { getNotificationsByRole } from "../../../data/mockNotifications.js";
 import { getStatusConfig, type OrderStatusKey as OrderStatus } from "../../../constants/orderStatusConfig.js";
 import soldierXPTImg from "../../../assets/soldierxpt.png?url";
-import { mockOrderDetails } from "./mockOrders.js";
+import { mockOrders } from "../../../data/mockOrders.js";
+import { mockProducts } from "../../../data/mockProducts.js";
+import { mockSuppliers } from "../../../data/mockSuppliers.js";
+import { CURRENT_SELLER_ID } from "../../../data/currentUser.js";
 import shopifyIcon     from "../../../assets/icons/shops/shopify-icon.svg?url";
 import ebayIcon        from "../../../assets/icons/shops/ebay-icon.svg?url";
 import woocommerceIcon from "../../../assets/icons/shops/woocommerce-icon.svg?url";
 import wixIcon         from "../../../assets/icons/shops/wix-company-icon.svg?url";
 
-// ── Mock data ───────────────────────────────────────────────────────────────
+// ── Derived seller data ──────────────────────────────────────────────────────
 
-const SELLER_STATUS: { status: OrderStatus; count: number }[] = [
-  { status: "in_production", count: 7  },
-  { status: "shipped",       count: 4  },
-  { status: "delivered",     count: 34 },
-  { status: "issue",         count: 1  },
-];
+const sellerOrders = mockOrders.filter((o) => o.sellerId === CURRENT_SELLER_ID);
 
-const platformChartData = [
-  { name: "Shopify",     orders: 127 },
-  { name: "eBay",        orders: 43  },
-  { name: "WooCommerce", orders: 28  },
-  { name: "Wix",         orders: 15  },
-];
+const HOME_STATUSES = ["pending", "in_production", "shipped", "issue"] as const satisfies readonly OrderStatus[];
+
+const SELLER_STATUS: { status: OrderStatus; count: number }[] = HOME_STATUSES.map((status) => ({
+  status,
+  count: sellerOrders.filter((o) => o.status === status).length,
+}));
+
+const PLATFORM_DISPLAY_NAME: Record<string, string> = {
+  shopify: "Shopify", ebay: "eBay", woocommerce: "WooCommerce", wix: "Wix", amazon: "Amazon", etsy: "Etsy",
+};
+
+const platformChartData = (() => {
+  const counts = new Map<string, number>();
+  for (const o of sellerOrders) {
+    const label = PLATFORM_DISPLAY_NAME[o.platform] ?? o.platform;
+    counts.set(label, (counts.get(label) ?? 0) + 1);
+  }
+  return Array.from(counts.entries()).map(([name, orders]) => ({ name, orders }));
+})();
 
 const PLATFORM_COLORS: Record<string, string> = {
   Shopify:     "#5ac422",
@@ -63,27 +74,20 @@ interface ProductionOrderRow {
   status: OrderStatus;
 }
 
-const fallbackProductionOrders: ProductionOrderRow[] = [
-  { id: "#0041", product: { name: "SoldierXPT", image: soldierXPTImg }, supplier: "PrintLab Berlin", date: "2025-05-12", status: "in_production" },
-  { id: "#0039", product: { name: "DragonMini", image: soldierXPTImg }, supplier: "FormLabs TLV",    date: "2025-05-10", status: "in_production" },
-  { id: "#0038", product: { name: "RocketBase", image: soldierXPTImg }, supplier: "PrintLab Berlin", date: "2025-05-08", status: "in_production" },
-  { id: "#0037", product: { name: "SoldierXPT", image: soldierXPTImg }, supplier: "3D Masters NY",   date: "2025-05-03", status: "in_production" },
-  { id: "#0036", product: { name: "MechBot",    image: soldierXPTImg }, supplier: "FormLabs TLV",    date: "2025-04-30", status: "in_production" },
-];
-
-const productionOrdersFromMock: ProductionOrderRow[] = mockOrderDetails
-  .filter((o) => o.status === "in_production")
-  .sort((a, b) => (a.date < b.date ? 1 : -1))
-  .map((o) => ({
-    id: o.id,
-    product: { name: o.product.name, image: o.product.image },
-    supplier: o.supplier.name,
-    date: o.date,
-    status: o.status,
-  }));
-
-const productionOrders =
-  productionOrdersFromMock.length > 0 ? productionOrdersFromMock : fallbackProductionOrders;
+const productionOrders: ProductionOrderRow[] = sellerOrders
+  .filter((o) => o.status === "accepted" || o.status === "in_production" || o.status === "ready")
+  .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+  .map((o) => {
+    const product = mockProducts.find((p) => p.id === o.productId);
+    const supplier = mockSuppliers.find((s) => s.id === o.supplierId);
+    return {
+      id: o.id,
+      product: { name: product?.name ?? "Unknown", image: product?.image ?? "" },
+      supplier: supplier?.name ?? "Unknown",
+      date: o.createdAt,
+      status: o.status,
+    };
+  });
 
 const PRODUCTION_TABLE_COLUMNS = [
   { key: "product",  header: "Product"   },
@@ -129,6 +133,49 @@ function formatProductionDate(dateStr: string): string {
   });
 }
 
+// ── Best seller ───────────────────────────────────────────────────────────
+
+const bestSeller = (() => {
+  const byProduct = new Map<string, { count: number; revenue: number }>();
+  for (const o of sellerOrders) {
+    const entry = byProduct.get(o.productId) ?? { count: 0, revenue: 0 };
+    entry.count += 1;
+    entry.revenue += o.sellerPrice * o.quantity;
+    byProduct.set(o.productId, entry);
+  }
+  let bestId: string | null = null;
+  let best = { count: 0, revenue: 0 };
+  for (const [id, stats] of byProduct) {
+    if (stats.count > best.count) {
+      bestId = id;
+      best = stats;
+    }
+  }
+  const product = bestId ? mockProducts.find((p) => p.id === bestId) : undefined;
+  return { product, ...best };
+})();
+
+// ── Monthly stats ─────────────────────────────────────────────────────────
+
+function isSameMonth(iso: string, ref: Date): boolean {
+  const d = new Date(iso);
+  return d.getFullYear() === ref.getFullYear() && d.getMonth() === ref.getMonth();
+}
+
+function pctChange(curr: number, prev: number): string {
+  if (prev === 0) return curr > 0 ? "+100%" : "0%";
+  const pct = Math.round(((curr - prev) / prev) * 100);
+  return `${pct >= 0 ? "+" : ""}${pct}%`;
+}
+
+const now = new Date();
+const lastMonthRef = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+const ordersThisMonth = sellerOrders.filter((o) => isSameMonth(o.createdAt, now));
+const ordersLastMonth = sellerOrders.filter((o) => isSameMonth(o.createdAt, lastMonthRef));
+const revenueThisMonth = ordersThisMonth.reduce((s, o) => s + o.sellerPrice * o.quantity, 0);
+const revenueLastMonth = ordersLastMonth.reduce((s, o) => s + o.sellerPrice * o.quantity, 0);
+
 // ── Derived data ────────────────────────────────────────────────────────────
 
 const dashboardCardSurface =
@@ -153,8 +200,8 @@ function PlatformTick({ x, y, payload }: any) {
 export default function MyStore() {
   const navigate = useNavigate();
 
-  const sellerAlerts = useMemo(
-    () => getAlertsByRole("seller").filter((a) => a.status !== "resolved"),
+  const sellerNotifications = useMemo(
+    () => getNotificationsByRole("seller").filter((a) => a.status !== "resolved"),
     [],
   );
 
@@ -185,10 +232,10 @@ export default function MyStore() {
                 className="text-[52px] font-bold leading-none text-white"
                 style={{ textShadow: "0 0 40px rgba(255, 255, 255, 0.15)" }}
               >
-                12
+                {ordersThisMonth.length}
               </span>
               <span className="text-[15px] font-semibold text-green">
-                +12% from last month
+                {pctChange(ordersThisMonth.length, ordersLastMonth.length)} from last month
               </span>
             </div>
 
@@ -206,10 +253,10 @@ export default function MyStore() {
                 className="text-[52px] font-bold leading-none text-white"
                 style={{ textShadow: "0 0 40px rgba(255, 255, 255, 0.15)" }}
               >
-                $1,084
+                ${revenueThisMonth.toLocaleString()}
               </span>
               <span className="text-[15px] font-semibold text-green">
-                +76% from last month
+                {pctChange(revenueThisMonth, revenueLastMonth)} from last month
               </span>
             </div>
 
@@ -224,22 +271,22 @@ export default function MyStore() {
                 Best Seller
               </span>
               <img
-                src={soldierXPTImg}
-                alt="SoldierXPT"
+                src={bestSeller.product?.image || soldierXPTImg}
+                alt={bestSeller.product?.name ?? "Best Seller"}
                 className="h-24 w-24 rounded-full object-cover"
               />
               <p className="font-staatliches text-[24px] uppercase leading-none text-white">
-                SoldierXPT
+                {bestSeller.product?.name ?? "—"}
               </p>
               <span className="text-[15px] font-semibold text-green-500">
-                34 orders · $1,428
+                {bestSeller.count} orders · ${bestSeller.revenue.toLocaleString()}
               </span>
             </div>
           </div>
     
 
           {/* ── 2. ORDER STATUS ──────────────────────────────────────────── */}
-          <div className="grid min-h-[180px] grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4 w-full">
+          <div className="grid w-full auto-rows-[minmax(240px,auto)] grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
             {SELLER_STATUS.map(({ status, count }) => {
               const cfg = getStatusConfig(status);
               return (
@@ -248,39 +295,30 @@ export default function MyStore() {
                   count={count}
                   label={cfg.label}
                   accentColor={cfg.accentColor}
+                  onClick={() => navigate(`/dashboard/seller/orders?status=${status}`)}
                 />
               );
             })}
           </div>
 
-          {/* ── 3 + 4. ALERTS + TOP PLATFORM (2-col) ────────────────────── */}
+          {/* ── 3 + 4. NOTIFICATIONS + TOP PLATFORM (2-col) ────────────────────── */}
           <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-3">
 
-            {/* ALERTS */}
-            <DashboardCard title="Alerts" autoHeight className="h-full col-span-2" index={2}>
+            {/* NOTIFICATIONS */}
+            <DashboardCard title="Notifications" autoHeight className="h-full col-span-2" index={2} viewAllTo="/dashboard/seller/notifications">
               <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
                 <ScrollableContent scrollbarSide="left">
-                  {sellerAlerts.map((alert) => (
-                    <AlertListItem
-                      key={alert.id}
-                      orderId={alert.orderId}
-                      title={alert.title}
-                      description={alert.description}
-                      reason={alert.reason}
-                      status={alert.status}
-                      onClick={() => navigate(`/dashboard/seller/alerts/${alert.id}`)}
+                  {sellerNotifications.map((notification) => (
+                    <NotificationListItem
+                      key={notification.id}
+                      orderId={notification.orderId}
+                      title={notification.title}
+                      description={notification.description}
+                      reason={notification.reason}
+                      onClick={() => navigate(`/dashboard/seller/notifications/${notification.id}`)}
                     />
                   ))}
                 </ScrollableContent>
-                <div className="mt-2 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => navigate("/dashboard/seller/alerts")}
-                    className="rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wide text-zinc-200 transition-colors hover:text-white"
-                  >
-                    View All →
-                  </button>
-                </div>
               </div>
             </DashboardCard>
 
@@ -322,7 +360,7 @@ export default function MyStore() {
           </div>
 
           {/* ── 5. ORDERS IN PRODUCTION ──────────────────────────────────── */}
-          <DashboardCard title="Orders in Production" index={4} autoHeight>
+          <DashboardCard title="Orders in Production" index={4} autoHeight viewAllTo="/dashboard/seller/orders">
             <DashboardTable
               variant="list"
               gridTemplateColumns={PRODUCTION_TABLE_GRID}

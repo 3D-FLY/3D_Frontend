@@ -15,15 +15,36 @@ import DashboardCard from "../../../features/dashboard/components/DashboardCard.
 import DashboardPage from "../../../features/dashboard/components/DashboardPage.js";
 import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
 import StatusBadge from "../../../features/dashboard/components/StatusBadge.js";
+import { mockOrders } from "../../../data/mockOrders.js";
+import { mockSellers } from "../../../data/mockSellers.js";
+import { mockSuppliers } from "../../../data/mockSuppliers.js";
+import type { OrderStatusKey } from "../../../constants/orderStatusConfig.js";
 
-const monthlyData = [
-  { month: "Jan", revenue: 18400, commissions: 1840, payouts: 14200 },
-  { month: "Feb", revenue: 21200, commissions: 2120, payouts: 16800 },
-  { month: "Mar", revenue: 19800, commissions: 1980, payouts: 15100 },
-  { month: "Apr", revenue: 24600, commissions: 2460, payouts: 19200 },
-  { month: "May", revenue: 27100, commissions: 2710, payouts: 21300 },
-  { month: "Jun", revenue: 31250, commissions: 3125, payouts: 24800 },
-];
+function monthKey(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
+}
+
+function monthLabel(iso: string) {
+  return new Date(iso).toLocaleDateString("en-US", { month: "short" });
+}
+
+const monthlyData = (() => {
+  const byMonth = new Map<string, { month: string; revenue: number; commissions: number; payouts: number }>();
+  for (const o of mockOrders) {
+    const key = monthKey(o.createdAt);
+    if (!byMonth.has(key)) {
+      byMonth.set(key, { month: monthLabel(o.createdAt), revenue: 0, commissions: 0, payouts: 0 });
+    }
+    const entry = byMonth.get(key)!;
+    entry.revenue += o.sellerPrice * o.quantity;
+    entry.commissions += o.platformFee;
+    entry.payouts += o.supplierCost * o.quantity;
+  }
+  return Array.from(byMonth.entries())
+    .sort(([a], [b]) => (a < b ? -1 : 1))
+    .map(([, v]) => v);
+})();
 
 interface Transaction {
   id: string;
@@ -33,16 +54,26 @@ interface Transaction {
   status: "paid" | "pending" | "failed";
 }
 
-const transactions: Transaction[] = [
-  { id: "1", date: "2026-06-01", store: "Galaxy Toys",  amount: 1240, status: "paid"    },
-  { id: "2", date: "2026-06-01", store: "Mini World",   amount: 860,  status: "pending" },
-  { id: "3", date: "2026-05-30", store: "Print & Play", amount: 2100, status: "paid"    },
-  { id: "4", date: "2026-05-29", store: "Galaxy Toys",  amount: 540,  status: "failed"  },
-  { id: "5", date: "2026-05-28", store: "Mini World",   amount: 1750, status: "paid"    },
-  { id: "6", date: "2026-05-27", store: "Print & Play", amount: 980,  status: "paid"    },
-  { id: "7", date: "2026-05-26", store: "Galaxy Toys",  amount: 320,  status: "pending" },
-  { id: "8", date: "2026-05-25", store: "Mini World",   amount: 1460, status: "paid"    },
-];
+const TX_STATUS_MAP: Record<OrderStatusKey, Transaction["status"]> = {
+  pending: "pending",
+  accepted: "pending",
+  in_production: "paid",
+  ready: "paid",
+  shipped: "paid",
+  delivered: "paid",
+  issue: "failed",
+  cancelled: "failed",
+};
+
+const transactions: Transaction[] = [...mockOrders]
+  .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+  .map((o) => ({
+    id: o.id,
+    date: o.createdAt.slice(0, 10),
+    store: mockSellers.find((s) => s.id === o.sellerId)?.name ?? "Unknown",
+    amount: o.sellerPrice * o.quantity,
+    status: TX_STATUS_MAP[o.status],
+  }));
 
 interface Payout {
   id: string;
@@ -52,19 +83,33 @@ interface Payout {
   status: "paid" | "pending";
 }
 
-const initialPayouts: Payout[] = [
-  { id: "1", supplier: "Alpha Print",  completedOrders: 42, amount: 7200, status: "paid"    },
-  { id: "2", supplier: "Maker Hub",    completedOrders: 31, amount: 5100, status: "pending" },
-  { id: "3", supplier: "3D Craft Co",  completedOrders: 28, amount: 4800, status: "paid"    },
-  { id: "4", supplier: "PrintFast",    completedOrders: 19, amount: 3200, status: "pending" },
-  { id: "5", supplier: "Fab Studio",   completedOrders: 26, amount: 4500, status: "paid"    },
-];
+const initialPayouts: Payout[] = mockSuppliers
+  .map((s) => {
+    const supplierOrders = mockOrders.filter((o) => o.supplierId === s.id);
+    const completedOrders = supplierOrders.filter(
+      (o) => o.status === "delivered" || o.status === "shipped",
+    ).length;
+    const amount = supplierOrders.reduce((sum, o) => sum + o.supplierCost * o.quantity, 0);
+    const hasPending = supplierOrders.some((o) => o.status === "pending" || o.status === "accepted" || o.status === "in_production");
+    return {
+      id: s.id,
+      supplier: s.name,
+      completedOrders,
+      amount,
+      status: hasPending ? ("pending" as const) : ("paid" as const),
+    };
+  })
+  .filter((p) => p.amount > 0);
+
+const totalRevenue = mockOrders.reduce((s, o) => s + o.sellerPrice * o.quantity, 0);
+const totalCommissions = mockOrders.reduce((s, o) => s + o.platformFee, 0);
+const totalPayouts = mockOrders.reduce((s, o) => s + o.supplierCost * o.quantity, 0);
 
 const statCards = [
-  { label: "Total Revenue This Month", value: "$31,250", color: "#5ac422" },
-  { label: "Commissions Collected",    value: "$3,125",  color: "#22a8c4" },
-  { label: "Supplier Payouts",         value: "$24,800", color: "#f87171" },
-  { label: "Net Balance",              value: "$6,450",  color: "#a855f7" },
+  { label: "Total Revenue",     value: `$${totalRevenue.toLocaleString()}`,     color: "#5ac422" },
+  { label: "Commissions Collected", value: `$${totalCommissions.toLocaleString()}`, color: "#22a8c4" },
+  { label: "Supplier Payouts",  value: `$${totalPayouts.toLocaleString()}`,     color: "#f87171" },
+  { label: "Net Balance",       value: `$${totalCommissions.toLocaleString()}`, color: "#a855f7" },
 ];
 
 const txStatusClass: Record<Transaction["status"], string> = {

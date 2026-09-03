@@ -15,17 +15,13 @@ import DashboardCard from "../../../features/dashboard/components/DashboardCard.
 import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
 import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
 import StatusBadge from "../../../features/dashboard/components/StatusBadge.js";
+import { mockOrders } from "../../../data/mockOrders.js";
+import { mockProducts } from "../../../data/mockProducts.js";
+import { CURRENT_SELLER_ID } from "../../../data/currentUser.js";
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
+// ─── Derived data ─────────────────────────────────────────────────────────────
 
-const revenueData = [
-  { month: "Jan", shopify: 320, ebay: 180, woocommerce:  90, wix:  60, amazon: 210, etsy:  45 },
-  { month: "Feb", shopify: 410, ebay: 220, woocommerce: 140, wix:  80, amazon: 270, etsy:  60 },
-  { month: "Mar", shopify: 380, ebay: 195, woocommerce: 110, wix:  70, amazon: 240, etsy:  55 },
-  { month: "Apr", shopify: 520, ebay: 260, woocommerce: 180, wix: 100, amazon: 310, etsy:  80 },
-  { month: "May", shopify: 610, ebay: 290, woocommerce: 200, wix: 120, amazon: 360, etsy:  95 },
-  { month: "Jun", shopify: 680, ebay: 310, woocommerce: 240, wix: 140, amazon: 400, etsy: 110 },
-];
+const sellerOrders = mockOrders.filter((o) => o.sellerId === CURRENT_SELLER_ID);
 
 const CHART_PLATFORMS = [
   { key: "shopify",     name: "Shopify",     color: "#5ac422", icon: shopifyIcon     },
@@ -36,13 +32,47 @@ const CHART_PLATFORMS = [
   { key: "etsy",        name: "Etsy",        color: "#f87171", icon: etsyIcon        },
 ];
 
-const productOrdersData = [
-  { name: "SoldierXPT", orders: 34, color: "#5ac422" },
-  { name: "WarriorX",   orders: 21, color: "#3b82f6" },
-  { name: "DragonMini", orders: 18, color: "#a855f7" },
-  { name: "RocketBase", orders: 12, color: "#f97316" },
-  { name: "MechBot",    orders:  9, color: "#22a8c4" },
-];
+function monthKey(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
+}
+
+function monthLabel(iso: string) {
+  return new Date(iso).toLocaleDateString("en-US", { month: "short" });
+}
+
+const revenueData = (() => {
+  const byMonth = new Map<string, Record<string, string | number>>();
+  for (const o of sellerOrders) {
+    const key = monthKey(o.createdAt);
+    if (!byMonth.has(key)) {
+      const row: Record<string, string | number> = { month: monthLabel(o.createdAt) };
+      for (const p of CHART_PLATFORMS) row[p.key] = 0;
+      byMonth.set(key, row);
+    }
+    const row = byMonth.get(key)!;
+    row[o.platform] = (Number(row[o.platform]) || 0) + o.sellerPrice * o.quantity;
+  }
+  return Array.from(byMonth.entries())
+    .sort(([a], [b]) => (a < b ? -1 : 1))
+    .map(([, row]) => row);
+})();
+
+const PRODUCT_CHART_COLORS = ["#5ac422", "#3b82f6", "#a855f7", "#f97316", "#22a8c4", "#f87171"];
+
+const productOrdersData = (() => {
+  const counts = new Map<string, number>();
+  for (const o of sellerOrders) {
+    counts.set(o.productId, (counts.get(o.productId) ?? 0) + 1);
+  }
+  return Array.from(counts.entries())
+    .map(([productId, orders], i) => ({
+      name: mockProducts.find((p) => p.id === productId)?.name ?? "Unknown",
+      orders,
+      color: PRODUCT_CHART_COLORS[i % PRODUCT_CHART_COLORS.length] ?? "#5ac422",
+    }))
+    .sort((a, b) => b.orders - a.orders);
+})();
 
 type InvoiceStatus = "paid" | "pending";
 
@@ -69,10 +99,18 @@ const PLAN_FEATURES = [
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
+const now = new Date();
+const ordersThisMonth = sellerOrders.filter((o) => {
+  const d = new Date(o.createdAt);
+  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+});
+const paymentsThisMonth = ordersThisMonth.reduce((s, o) => s + o.sellerPrice * o.quantity, 0);
+const profitsThisMonth = ordersThisMonth.reduce((s, o) => s + (o.sellerPrice - o.supplierCost) * o.quantity, 0);
+
 const primaryStatCards = [
-  { value: "12",     label: "Orders",         color: "#ffffff"  },
-  { value: "$1,084", label: "Total Payments", color: "#5ac422"  },
-  { value: "$976",   label: "Profits",        color: "#22a8c4"  },
+  { value: String(ordersThisMonth.length),         label: "Orders",         color: "#ffffff"  },
+  { value: `$${paymentsThisMonth.toLocaleString()}`, label: "Total Payments", color: "#5ac422"  },
+  { value: `$${profitsThisMonth.toLocaleString()}`,  label: "Profits",        color: "#22a8c4"  },
 ];
 
 function ProductTick({ x, y, payload }: { x?: number; y?: number; payload?: { value: string } }) {

@@ -1,4 +1,7 @@
 import type { OrderStatusKey } from "../../../constants/orderStatusConfig.js";
+import { mockProducts as sharedProducts, type Product as SharedProduct } from "../../../data/mockProducts.js";
+import { getOrdersByProductId } from "../../../data/mockOrders.js";
+import { CURRENT_SELLER_ID } from "../../../data/currentUser.js";
 
 export interface PrintSettings {
   tech: string;
@@ -37,6 +40,10 @@ export interface Product {
     colors: string[];
   };
   recentOrders: RecentOrder[];
+  /** Images for the supplier only — assembly/finishing guidance, not shown to customers. */
+  supplierInstructionImages?: string[] | undefined;
+  /** Filename of the 3D model (STL/OBJ/3MF) the supplier prints. */
+  modelFileName?: string | undefined;
 }
 
 export interface ProductForm {
@@ -57,17 +64,52 @@ export { DEFAULT_PRINT_SETTINGS };
 
 const STORAGE_KEY = "seller_products";
 
+function toLocalProduct(p: SharedProduct): Product {
+  return {
+    id: p.id,
+    name: p.name,
+    sku: p.sku,
+    image: p.image,
+    cost: p.supplierCost,
+    price: p.sellerPrice,
+    stores: p.platforms,
+    printSettings: p.printSettings,
+    details: {
+      printTime: p.estimatedPrintTime,
+      weight: p.estimatedWeight,
+      colors: p.variants.map((v) => v.colorName),
+    },
+    recentOrders: getOrdersByProductId(p.id).map((o) => ({
+      id: o.id,
+      date: o.createdAt,
+      status: o.status,
+      total: o.sellerPrice * o.quantity,
+    })),
+    supplierInstructionImages: p.supplierInstructionImages,
+    modelFileName: p.modelFileName,
+  };
+}
+
+const sellerSharedProducts: Product[] = sharedProducts
+  .filter((p) => p.sellerId === CURRENT_SELLER_ID)
+  .map(toLocalProduct);
+
 export function getProducts(): Product[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? (JSON.parse(stored) as Product[]) : mockProducts;
+    const localProducts: Product[] = stored ? (JSON.parse(stored) as Product[]) : [];
+    const localIds = new Set(localProducts.map((p) => p.id));
+    const sharedNotOverridden = sellerSharedProducts.filter((p) => !localIds.has(p.id));
+    return [...sharedNotOverridden, ...localProducts];
   } catch {
-    return mockProducts;
+    return sellerSharedProducts;
   }
 }
 
 export function saveProducts(products: Product[]): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+  const sharedIds = new Set(sellerSharedProducts.map((p) => p.id));
+  const localOnly = products.filter((p) => !sharedIds.has(p.id));
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(localOnly));
 }
 
 export const mockProducts: Product[] = [

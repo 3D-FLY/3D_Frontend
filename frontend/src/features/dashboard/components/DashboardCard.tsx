@@ -1,4 +1,5 @@
 import { type ReactNode } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import SectionLoader from "../../../components/ui/SectionLoader.js";
 
@@ -10,6 +11,7 @@ interface DashboardCardProps {
   autoHeight?: boolean;
   fill?: boolean;
   headerAction?: ReactNode;
+  viewAllTo?: string;
   titleSize?: string;
   clipContent?: boolean;
   index?: number;
@@ -24,6 +26,7 @@ export default function DashboardCard({
   autoHeight = false,
   fill = false,
   headerAction,
+  viewAllTo,
   titleSize,
   clipContent = false,
   index = 0,
@@ -51,7 +54,16 @@ export default function DashboardCard({
         >
           {title}
         </h2>
-        {headerAction && <div className="shrink-0">{headerAction}</div>}
+        {viewAllTo ? (
+          <Link
+            to={viewAllTo}
+            className="shrink-0 text-[11px] font-bold uppercase tracking-wide text-zinc-200 hover:text-white transition-colors"
+          >
+            View All →
+          </Link>
+        ) : (
+          headerAction && <div className="shrink-0">{headerAction}</div>
+        )}
       </div>
 
       {/* Divider */}

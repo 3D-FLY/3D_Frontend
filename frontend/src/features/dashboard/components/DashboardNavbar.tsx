@@ -4,8 +4,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Settings, LogOut } from "lucide-react";
 import LogoSvg from "../../../assets/icons/logo.svg?react";
 import GlobalIcon from "../../../components/icons/GlobalIcon.js";
-import { getNewAlertsCount, ALERTS_UPDATED_EVENT } from "../../../data/mockAlerts.js";
+import { getNewNotificationsCount, NOTIFICATIONS_UPDATED_EVENT } from "../../../data/mockNotifications.js";
 import type { SidebarRole } from "./Sidebar.js";
+import { roleInboxPath } from "./Sidebar.js";
 
 function BellIcon() {
   return (
@@ -119,13 +120,13 @@ interface DashboardNavbarProps {
 
 export default function DashboardNavbar({ role }: DashboardNavbarProps) {
   const navigate = useNavigate();
-  const [unreadCount, setUnreadCount] = useState(() => getNewAlertsCount(role));
+  const [unreadCount, setUnreadCount] = useState(() => getNewNotificationsCount(role));
 
   useEffect(() => {
-    const refresh = () => setUnreadCount(getNewAlertsCount(role));
+    const refresh = () => setUnreadCount(getNewNotificationsCount(role));
     refresh();
-    window.addEventListener(ALERTS_UPDATED_EVENT, refresh);
-    return () => window.removeEventListener(ALERTS_UPDATED_EVENT, refresh);
+    window.addEventListener(NOTIFICATIONS_UPDATED_EVENT, refresh);
+    return () => window.removeEventListener(NOTIFICATIONS_UPDATED_EVENT, refresh);
   }, [role]);
 
   return (
@@ -163,7 +164,7 @@ export default function DashboardNavbar({ role }: DashboardNavbarProps) {
       {/* Right icons */}
       <div className="flex flex-shrink-0 items-center gap-2 pr-3">
         <Link
-          to="/partner-map"
+          to={`/dashboard/${role}/map`}
           className="flex items-center justify-center rounded-full p-1 transition-opacity hover:opacity-70"
           aria-label="Open partner map"
         >
@@ -172,7 +173,7 @@ export default function DashboardNavbar({ role }: DashboardNavbarProps) {
         <div className="relative">
           <button
             type="button"
-            onClick={() => navigate(`/dashboard/${role}/alerts`)}
+            onClick={() => navigate(roleInboxPath(role))}
             className="flex items-center justify-center rounded-full p-1 transition-opacity hover:opacity-70"
             aria-label="Notifications"
           >

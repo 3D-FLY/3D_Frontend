@@ -27,6 +27,7 @@ interface StatusBadgeProps {
   accentColor?: AccentColor;
   color?: string;
   className?: string;
+  onClick?: () => void;
 }
 
 const accentClasses: Record<AccentColor, string> = {
@@ -43,6 +44,7 @@ export default function StatusBadge({
   accentColor = "green",
   color,
   className = "",
+  onClick,
 }: StatusBadgeProps) {
   const numericTarget = typeof count === "number" ? count : NaN;
   const animated = useCountUp(isNaN(numericTarget) ? 0 : numericTarget);
@@ -50,9 +52,16 @@ export default function StatusBadge({
     ? count
     : animated.toLocaleString("en-US");
 
+  const Tag = onClick ? "button" : "div";
+
   return (
-    <div
-      className={`flex h-full w-full flex-col items-center justify-center gap-2 py-2 text-center ${className}`}
+    <Tag
+      {...(onClick ? { type: "button" as const, onClick } : {})}
+      className={`flex h-full w-full flex-col items-center justify-center gap-2 py-2 text-center ${
+        onClick
+          ? "cursor-pointer border-0 bg-transparent p-0 font-inherit text-inherit transition-opacity hover:opacity-80"
+          : ""
+      } ${className}`}
     >
       <div className="@container flex h-[80%] w-full items-center justify-center rounded-2xl border border-white/10 bg-[rgba(149,149,149,0.1)] px-3 py-4">
         <span
@@ -65,6 +74,6 @@ export default function StatusBadge({
       <span className="text-[clamp(11px,1vw,14px)] font-semibold uppercase tracking-[0.05em] text-zinc-100">
         {label}
       </span>
-    </div>
+    </Tag>
   );
 }
