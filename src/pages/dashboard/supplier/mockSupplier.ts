@@ -1,4 +1,8 @@
-export type SupplierOrderStatus = "proposed" | "accepted" | "printing" | "done" | "shipped" | "cancelled";
+import { mockSuppliers } from "../../../data/mockSuppliers.js";
+import { mockOrders } from "../../../data/mockOrders.js";
+import { mockProducts } from "../../../data/mockProducts.js";
+import { CURRENT_SUPPLIER_ID } from "../../../data/currentUser.js";
+import type { OrderStatusKey } from "../../../constants/orderStatusConfig.js";
 
 export interface SupplierOrder {
   id: string;
@@ -9,65 +13,50 @@ export interface SupplierOrder {
   tech: string;
   material: string;
   color: string;
+  colorHex: string;
   quantity: number;
   shippingAddress: string;
   deadline: string;
   date: string;
-  status: SupplierOrderStatus;
+  status: OrderStatusKey;
   payment: number;
   printSettings: {
     tech: string; material: string; layerHeight: number; shells: number;
     infill: number; infillPattern: string; support: boolean; brim: string;
   };
+  supplierInstructionImages: string[];
+  modelFileName: string;
 }
 
-export const mockSupplierOrders: SupplierOrder[] = [
-  {
-    id: "#0041", productName: "SoldierXPT", productImage: "",
-    // storeName is intentionally hidden from the supplier UI
-    storeName: "Raz3DPrints",
-    tech: "FDM", material: "PLA", color: "Black", quantity: 2,
-    shippingAddress: "123 Main St, Tel Aviv, Israel",
-    deadline: "2025-05-15", date: "2025-05-12", status: "proposed", payment: 42.00,
-    printSettings: { tech: "FDM", material: "PLA", layerHeight: 0.24, shells: 2, infill: 15, infillPattern: "Grid", support: true, brim: "Auto" },
-  },
-  {
-    id: "#0039", productName: "DragonMini", productImage: "",
-    // storeName is intentionally hidden from the supplier UI
-    storeName: "Mini World",
-    tech: "FDM", material: "PETG", color: "Green", quantity: 1,
-    shippingAddress: "45 Oak Ave, Berlin, Germany",
-    deadline: "2025-05-14", date: "2025-05-10", status: "printing", payment: 34.99,
-    printSettings: { tech: "FDM", material: "PETG", layerHeight: 0.2, shells: 3, infill: 20, infillPattern: "Honeycomb", support: false, brim: "None" },
-  },
-  {
-    id: "#0038", productName: "RocketBase", productImage: "",
-    // storeName is intentionally hidden from the supplier UI
-    storeName: "Galaxy Toys",
-    tech: "SLS", material: "ABS", color: "White", quantity: 3,
-    shippingAddress: "78 Park Rd, New York, USA",
-    deadline: "2025-05-16", date: "2025-05-08", status: "accepted", payment: 89.00,
-    printSettings: { tech: "SLS", material: "ABS", layerHeight: 0.2, shells: 2, infill: 25, infillPattern: "Grid", support: true, brim: "Auto" },
-  },
-  {
-    id: "#0037", productName: "SoldierXPT", productImage: "",
-    // storeName is intentionally hidden from the supplier UI
-    storeName: "Raz3DPrints",
-    tech: "FDM", material: "PLA", color: "Yellow", quantity: 1,
-    shippingAddress: "123 Main St, Tel Aviv, Israel",
-    deadline: "2025-05-10", date: "2025-05-03", status: "shipped", payment: 42.00,
-    printSettings: { tech: "FDM", material: "PLA", layerHeight: 0.24, shells: 2, infill: 15, infillPattern: "Grid", support: true, brim: "Auto" },
-  },
-  {
-    id: "#0036", productName: "MechBot", productImage: "",
-    // storeName is intentionally hidden from the supplier UI
-    storeName: "Print & Play",
-    tech: "FDM", material: "TPU", color: "Gray", quantity: 2,
-    shippingAddress: "90 River St, London, UK",
-    deadline: "2025-05-09", date: "2025-04-30", status: "done", payment: 58.00,
-    printSettings: { tech: "FDM", material: "TPU", layerHeight: 0.3, shells: 2, infill: 10, infillPattern: "Lines", support: false, brim: "None" },
-  },
-];
+export function getSupplierOrders(supplierId = CURRENT_SUPPLIER_ID): SupplierOrder[] {
+  return mockOrders
+    .filter((o) => o.supplierId === supplierId)
+    .map((o) => {
+      const product = mockProducts.find((p) => p.id === o.productId);
+      return {
+        id: o.id,
+        productName: product?.name ?? "Unknown",
+        productImage: product?.image ?? "",
+        storeName: "Unknown",
+        tech: product?.printSettings.tech ?? "—",
+        material: o.material,
+        color: o.colorName,
+        colorHex: o.color,
+        quantity: o.quantity,
+        shippingAddress: `${o.shippingAddress.street}, ${o.shippingAddress.city}, ${o.shippingAddress.country}`,
+        deadline: o.createdAt,
+        date: o.createdAt,
+        status: o.status,
+        payment: o.supplierCost * o.quantity,
+        printSettings: product?.printSettings ?? {
+          tech: "FDM", material: "PLA", layerHeight: 0.2, shells: 2,
+          infill: 15, infillPattern: "Grid", support: false, brim: "None",
+        },
+        supplierInstructionImages: product?.supplierInstructionImages ?? [],
+        modelFileName: product?.modelFileName ?? "",
+      };
+    });
+}
 
 export interface SupplierCapabilities {
   isActive: boolean;
@@ -79,34 +68,16 @@ export interface SupplierCapabilities {
   workingHours: { from: string; to: string };
 }
 
+const currentSupplier = mockSuppliers.find((s) => s.id === CURRENT_SUPPLIER_ID);
+
 export const mockCapabilities: SupplierCapabilities = {
-  isActive: true,
-  technologies: ["FDM", "SLS"],
-  materials: ["PLA", "ABS", "PETG", "TPU"],
-  colors: ["#222222", "#ffffff", "#facc15", "#3b82f6", "#5ac422"],
-  printerCount: 3,
-  maxParallelJobs: 2,
-  workingHours: { from: "08:00", to: "18:00" },
-};
-
-// ─── Status display config ─────────────────────────────────────────────────────
-
-export const SUPPLIER_STATUS_LABEL: Record<SupplierOrderStatus, string> = {
-  proposed: "Proposed",
-  accepted: "Accepted",
-  printing: "Printing",
-  done: "Done",
-  shipped: "Shipped",
-  cancelled: "Cancelled",
-};
-
-export const SUPPLIER_STATUS_COLOR: Record<SupplierOrderStatus, string> = {
-  proposed: "#3b82f6",
-  accepted: "#22a8c4",
-  printing: "#5ac422",
-  done: "#a855f7",
-  shipped: "#6b7280",
-  cancelled: "#ef4444",
+  isActive: currentSupplier?.capabilities?.isActive ?? true,
+  technologies: currentSupplier?.technologies ?? ["FDM", "SLS"],
+  materials: currentSupplier?.materials ?? ["PLA", "ABS", "PETG", "TPU"],
+  colors: currentSupplier?.colors ?? ["#222222", "#ffffff", "#facc15", "#3b82f6", "#5ac422"],
+  printerCount: currentSupplier?.capabilities?.printerCount ?? 1,
+  maxParallelJobs: currentSupplier?.capabilities?.maxParallelJobs ?? 1,
+  workingHours: currentSupplier?.capabilities?.workingHours ?? { from: "09:00", to: "17:00" },
 };
 
 // ─── Payment history (mock) ────────────────────────────────────────────────────

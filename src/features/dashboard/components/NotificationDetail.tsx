@@ -7,16 +7,12 @@ import DashboardCard from "./DashboardCard.js";
 import DashboardPage, { DashboardPageTitle } from "./DashboardPage.js";
 import OrderStatusPill from "./OrderStatusPill.js";
 import {
-  mockAlerts,
+  mockNotifications,
   mockLinkedOrders,
-  ALERT_STATUS_LABEL,
-  ALERT_STATUS_DOT,
-  ALERT_STATUS_TEXT,
-  ALERT_STATUS_BORDER,
-  ALERT_STATUS_BG,
-  type AlertReason,
-} from "../../../data/mockAlerts.js";
+  type NotificationReason,
+} from "../../../data/mockNotifications.js";
 import type { SidebarRole } from "./Sidebar.js";
+import { roleInboxPath } from "./Sidebar.js";
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString("en-US", {
@@ -37,11 +33,11 @@ function InfoRow({ label, children }: { label: string; children: React.ReactNode
   );
 }
 
-const DISPUTE_ELIGIBLE: AlertReason[] = ["supplier_rejected", "shipping_issue"];
-const SUPPLIER_ASSIGNABLE: AlertReason[] = ["supplier_rejected", "no_supplier"];
-const SUPPLIER_DISPLAY_ONLY: AlertReason[] = ["payment_received", "order_cancelled"];
+const DISPUTE_ELIGIBLE: NotificationReason[] = ["supplier_rejected", "shipping_issue"];
+const SUPPLIER_ASSIGNABLE: NotificationReason[] = ["supplier_rejected", "no_supplier"];
+const SUPPLIER_DISPLAY_ONLY: NotificationReason[] = ["payment_received", "order_cancelled"];
 
-interface AlertDetailProps {
+interface NotificationDetailProps {
   role: SidebarRole;
 }
 
@@ -50,32 +46,32 @@ function NotFound({ role }: { role: SidebarRole }) {
   return (
     <DashboardLayout role={role}>
       <div className="flex flex-col items-center justify-center gap-4 py-24">
-        <p className="text-sm text-zinc-400">Alert not found.</p>
+        <p className="text-sm text-zinc-400">Notification not found.</p>
         <button
           type="button"
-          onClick={() => navigate(`/dashboard/${role}/alerts`)}
+          onClick={() => navigate(roleInboxPath(role))}
           className="flex items-center gap-2 text-sm text-green-500 hover:underline"
         >
-          <ArrowLeft size={15} /> Back to Alerts
+          <ArrowLeft size={15} /> Back to Notifications
         </button>
       </div>
     </DashboardLayout>
   );
 }
 
-export default function AlertDetail({ role }: AlertDetailProps) {
+export default function NotificationDetail({ role }: NotificationDetailProps) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [actionMsg, setActionMsg] = useState<string | null>(null);
   const [note, setNote] = useState("");
 
-  const alert = mockAlerts.find((a) => a.id === id && a.role === role);
+  const notification = mockNotifications.find((a) => a.id === id && a.role === role);
 
-  if (!alert) {
+  if (!notification) {
     return <NotFound role={role} />;
   }
 
-  const linkedOrder = mockLinkedOrders[alert.orderId];
+  const linkedOrder = mockLinkedOrders[notification.orderId];
 
   const fireMockAction = () => {
     setActionMsg("Action sent successfully.");
@@ -83,7 +79,7 @@ export default function AlertDetail({ role }: AlertDetailProps) {
   };
 
   const goToOrder = () => {
-    const rawId = alert.orderId.replace("#", "");
+    const rawId = notification.orderId.replace("#", "");
     if (role === "admin") {
       navigate(`/dashboard/admin/orders?order=${rawId}`);
     } else {
@@ -92,20 +88,8 @@ export default function AlertDetail({ role }: AlertDetailProps) {
   };
 
   const timelineSteps = [
-    { label: "Alert Created", done: true, date: `${formatDate(alert.date)} 09:14` },
-    { label: "Assigned to Team", done: true, date: `${formatDate(alert.date)} 09:20` },
-    {
-      label: "In Progress",
-      done: alert.status === "in_progress" || alert.status === "resolved",
-      active: alert.status === "in_progress",
-      date: alert.status === "open" ? null : "Currently being handled",
-    },
-    {
-      label: "Resolved",
-      done: alert.status === "resolved",
-      active: false,
-      date: alert.status === "resolved" ? formatDate(alert.date) : null,
-    },
+    { label: "Notification Created", done: true, date: `${formatDate(notification.date)} 09:14` },
+    { label: "Assigned to Team", done: true, date: `${formatDate(notification.date)} 09:20` },
   ];
 
   return (
@@ -118,46 +102,38 @@ export default function AlertDetail({ role }: AlertDetailProps) {
       >
         <DashboardPage
           header={
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex min-w-0 items-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => navigate(`/dashboard/${role}/alerts`)}
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 text-zinc-400 transition-colors hover:border-white/30 hover:text-white"
-                  title="Back to Alerts"
-                >
-                  <ArrowLeft size={18} />
-                </button>
-                <DashboardPageTitle className="truncate">
-                  {alert.title.toUpperCase()}
-                </DashboardPageTitle>
-              </div>
-              <span
-                className={`flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-[12px] font-bold uppercase tracking-wide ${ALERT_STATUS_TEXT[alert.status]} ${ALERT_STATUS_BORDER[alert.status]} ${ALERT_STATUS_BG[alert.status]}`}
+            <div className="flex min-w-0 items-center gap-4">
+              <button
+                type="button"
+                onClick={() => navigate(roleInboxPath(role))}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 text-zinc-400 transition-colors hover:border-white/30 hover:text-white"
+                title="Back to Notifications"
               >
-                <span className={`h-1.5 w-1.5 rounded-full ${ALERT_STATUS_DOT[alert.status]}`} />
-                {ALERT_STATUS_LABEL[alert.status]}
-              </span>
+                <ArrowLeft size={18} />
+              </button>
+              <DashboardPageTitle className="truncate">
+                {notification.title.toUpperCase()}
+              </DashboardPageTitle>
             </div>
           }
         >
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* ─── LEFT COLUMN ─────────────────────────────────────────── */}
             <div className="flex flex-col gap-6">
-              <DashboardCard index={0} title="ALERT DETAILS" autoHeight withBackground={false}>
+              <DashboardCard index={0} title="NOTIFICATION DETAILS" autoHeight withBackground={false}>
                 <div className="flex flex-col">
                   <InfoRow label="ORDER #">
-                    <span className="font-mono text-[13px] text-zinc-200">{alert.orderId}</span>
+                    <span className="font-mono text-[13px] text-zinc-200">{notification.orderId}</span>
                   </InfoRow>
                   <InfoRow label="TYPE">
-                    <span className="text-[13px] text-zinc-200">{alert.title}</span>
+                    <span className="text-[13px] text-zinc-200">{notification.title}</span>
                   </InfoRow>
                   <InfoRow label="DATE">
-                    <span className="text-[13px] text-zinc-200">{formatDate(alert.date)}</span>
+                    <span className="text-[13px] text-zinc-200">{formatDate(notification.date)}</span>
                   </InfoRow>
                   <InfoRow label="DESCRIPTION">
                     <span className="max-w-[280px] text-[13px] leading-relaxed text-zinc-200">
-                      {alert.description}
+                      {notification.description}
                     </span>
                   </InfoRow>
                 </div>
@@ -200,22 +176,13 @@ export default function AlertDetail({ role }: AlertDetailProps) {
                 <div className="flex flex-col gap-3">
                   {role === "admin" ? (
                     <>
-                      {SUPPLIER_ASSIGNABLE.includes(alert.reason) && (
+                      {SUPPLIER_ASSIGNABLE.includes(notification.reason) && (
                         <button
                           type="button"
                           onClick={fireMockAction}
                           className="rounded-md bg-green-500 py-2.5 text-[13px] font-extrabold uppercase italic tracking-wide text-black transition-all hover:brightness-110"
                         >
                           Assign to New Supplier
-                        </button>
-                      )}
-                      {alert.status !== "resolved" && (
-                        <button
-                          type="button"
-                          onClick={fireMockAction}
-                          className="rounded-md border border-green-500/40 py-2.5 text-[13px] font-bold uppercase tracking-wide text-green-500 transition-colors hover:bg-green-500/10"
-                        >
-                          Mark as Resolved
                         </button>
                       )}
                       <button
@@ -259,7 +226,7 @@ export default function AlertDetail({ role }: AlertDetailProps) {
                     </>
                   ) : role === "seller" ? (
                     <>
-                      {DISPUTE_ELIGIBLE.includes(alert.reason) && (
+                      {DISPUTE_ELIGIBLE.includes(notification.reason) && (
                         <button
                           type="button"
                           onClick={fireMockAction}
@@ -285,7 +252,7 @@ export default function AlertDetail({ role }: AlertDetailProps) {
                     </>
                   ) : (
                     <>
-                      {alert.reason === "new_order" && (
+                      {notification.reason === "new_order" && (
                         <>
                           <button
                             type="button"
@@ -303,7 +270,7 @@ export default function AlertDetail({ role }: AlertDetailProps) {
                           </button>
                         </>
                       )}
-                      {alert.reason === "deadline_soon" && (
+                      {notification.reason === "deadline_soon" && (
                         <button
                           type="button"
                           onClick={fireMockAction}
@@ -312,7 +279,7 @@ export default function AlertDetail({ role }: AlertDetailProps) {
                           Mark as Shipped
                         </button>
                       )}
-                      {alert.reason === "dispute_opened" && (
+                      {notification.reason === "dispute_opened" && (
                         <button
                           type="button"
                           onClick={fireMockAction}
@@ -321,8 +288,8 @@ export default function AlertDetail({ role }: AlertDetailProps) {
                           Contact Support
                         </button>
                       )}
-                      {SUPPLIER_DISPLAY_ONLY.includes(alert.reason) && (
-                        <p className="text-center text-[12px] text-zinc-500">No action needed for this alert.</p>
+                      {SUPPLIER_DISPLAY_ONLY.includes(notification.reason) && (
+                        <p className="text-center text-[12px] text-zinc-500">No action needed for this notification.</p>
                       )}
                       <button
                         type="button"
@@ -354,24 +321,17 @@ export default function AlertDetail({ role }: AlertDetailProps) {
                 <div className="flex flex-col">
                   {timelineSteps.map((step, i) => {
                     const isLast = i === timelineSteps.length - 1;
-                    const dotClass = step.done ? "bg-green-500" : step.active ? "bg-yellow-400" : "bg-zinc-700";
-                    const labelClass = step.active
-                      ? "text-white font-semibold"
-                      : step.done
-                        ? "text-zinc-400"
-                        : "text-zinc-600";
-                    const marker = step.done ? "✓" : step.active ? "●" : "○";
                     return (
                       <div key={step.label} className="flex gap-4">
                         <div className="flex flex-col items-center">
-                          <div className={`mt-1 h-3 w-3 shrink-0 rounded-full ${dotClass}`} />
+                          <div className="mt-1 h-3 w-3 shrink-0 rounded-full bg-green-500" />
                           {!isLast && <div className="my-1 w-px flex-1 bg-white/10" />}
                         </div>
                         <div className="pb-4">
-                          <p className={`text-[13px] ${labelClass}`}>
-                            {marker} {step.label}
+                          <p className="text-[13px] text-zinc-400">
+                            ✓ {step.label}
                           </p>
-                          <p className="text-[11px] text-zinc-600">{step.date ?? "—"}</p>
+                          <p className="text-[11px] text-zinc-600">{step.date}</p>
                         </div>
                       </div>
                     );

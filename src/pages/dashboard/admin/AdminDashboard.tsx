@@ -7,21 +7,26 @@ import type { OrderAttention } from "../../../features/dashboard/components/Orde
 import OrderAttentionList from "../../../features/dashboard/components/OrderAttentionList.js";
 import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
 import OrderStatusPill from "../../../features/dashboard/components/OrderStatusPill.js";
-import type { OrderStatusKey } from "../../../constants/orderStatusConfig.js";
+import { ORDER_STATUS_CONFIG, type OrderStatusKey } from "../../../constants/orderStatusConfig.js";
+import { mockNotifications } from "../../../data/mockNotifications.js";
+import { mockOrders } from "../../../data/mockOrders.js";
+import { mockSellers } from "../../../data/mockSellers.js";
 
-const attentionOrders: OrderAttention[] = [
-  { id: "a1", orderId: "3012", reason: "supplier_rejected", detail: "Rejected by: Supplier A",     timestamp: new Date(Date.now() - 5  * 60000).toISOString() },
-  { id: "a2", orderId: "3015", reason: "no_supplier",       detail: "No match in Tel Aviv area",   timestamp: new Date(Date.now() - 18 * 60000).toISOString() },
-  { id: "a3", orderId: "3009", reason: "missing_data",      detail: "Missing: print file",         timestamp: new Date(Date.now() - 40 * 60000).toISOString() },
-  { id: "a4", orderId: "3007", reason: "shipping_issue",    detail: "Stuck at courier for 3 days", timestamp: new Date(Date.now() - 2  * 3600000).toISOString() },
-  { id: "a5", orderId: "3001", reason: "production_delay",  detail: "Supplier B — 2 days overdue", timestamp: new Date(Date.now() - 5  * 3600000).toISOString(), status: "resolved" },
-];
+const attentionOrders: OrderAttention[] = mockNotifications
+  .filter((a) => a.role === "admin" && a.isNew)
+  .map((a) => ({
+    id: a.id,
+    orderId: a.orderId.replace("#", ""),
+    reason: a.reason as OrderAttention["reason"],
+    detail: a.description,
+    timestamp: a.date,
+  }));
 
 const statusCards = [
-  { count: 30125, label: "Total Orders", accentColor: "green" as const },
-  { count: 57, label: "Pending Match", accentColor: "orange" as const },
-  { count: 842, label: "In Production", accentColor: "blue" as const },
-  { count: 37, label: "Open Issues", accentColor: "red" as const },
+  { count: mockOrders.length, label: "Total Orders", accentColor: "green" as const },
+  { count: mockOrders.filter((o) => o.status === "pending").length, label: ORDER_STATUS_CONFIG.pending.label, accentColor: ORDER_STATUS_CONFIG.pending.accentColor },
+  { count: mockOrders.filter((o) => o.status === "in_production").length, label: ORDER_STATUS_CONFIG.in_production.label, accentColor: ORDER_STATUS_CONFIG.in_production.accentColor },
+  { count: mockOrders.filter((o) => o.status === "issue").length, label: ORDER_STATUS_CONFIG.issue.label, accentColor: ORDER_STATUS_CONFIG.issue.accentColor },
 ];
 
 interface RecentOrder {
@@ -44,16 +49,16 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-const recentOrders: RecentOrder[] = [
-  { id: "1",  orderId: "3015", store: "Galaxy Toys",    status: "pending",       date: new Date(Date.now() - 1  * 3600000).toISOString() },
-  { id: "2",  orderId: "3014", store: "Mini World",     status: "in_production", date: new Date(Date.now() - 2  * 3600000).toISOString() },
-  { id: "3",  orderId: "3013", store: "Galaxy Toys",    status: "shipped",       date: new Date(Date.now() - 5  * 3600000).toISOString() },
-  { id: "4",  orderId: "3012", store: "Print & Play",   status: "issue",         date: new Date(Date.now() - 8  * 3600000).toISOString() },
-  { id: "5",  orderId: "3011", store: "Mini World",     status: "delivered",     date: new Date(Date.now() - 12 * 3600000).toISOString() },
-  { id: "6",  orderId: "3010", store: "Galaxy Toys",    status: "shipped",       date: new Date(Date.now() - 18 * 3600000).toISOString() },
-  { id: "7",  orderId: "3009", store: "Print & Play",   status: "in_production", date: new Date(Date.now() - 24 * 3600000).toISOString() },
-  { id: "8",  orderId: "3008", store: "Mini World",     status: "delivered",     date: new Date(Date.now() - 30 * 3600000).toISOString() },
-];
+const recentOrders: RecentOrder[] = [...mockOrders]
+  .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+  .slice(0, 8)
+  .map((o) => ({
+    id: o.id,
+    orderId: o.id.replace("#", ""),
+    store: mockSellers.find((s) => s.id === o.sellerId)?.name ?? "Unknown",
+    status: o.status,
+    date: o.createdAt,
+  }));
 
 const searchInputClass =
   "w-full rounded-md border border-white/10 bg-[rgba(5,10,7,0.7)] px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-[#5ac422] transition-colors";
@@ -77,7 +82,7 @@ export default function AdminDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          <DashboardCard index={0} title="Alerts" autoHeight className="h-full">
+          <DashboardCard index={0} title="Notifications" autoHeight className="h-full" viewAllTo="/dashboard/admin/notifications">
             <OrderAttentionList items={attentionOrders} />
           </DashboardCard>
 
@@ -104,14 +109,7 @@ export default function AdminDashboard() {
           index={3}
           title="Recent Orders"
           autoHeight
-          headerAction={
-            <button
-              onClick={() => navigate("/dashboard/admin/orders")}
-              className="text-[11px] font-bold uppercase tracking-wide text-zinc-200 hover:text-white transition-colors"
-            >
-              View All →
-            </button>
-          }
+          viewAllTo="/dashboard/admin/orders"
         >
           <DashboardTable
             variant="list"

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { CreditCard } from "lucide-react";
+import { Building2 } from "lucide-react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from "recharts";
@@ -9,13 +9,77 @@ import DashboardCard from "../../../features/dashboard/components/DashboardCard.
 import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
 import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
 import StatusBadge from "../../../features/dashboard/components/StatusBadge.js";
-import { mockSupplierPayments, mockSupplierRevenue, type SupplierPayment } from "./mockSupplier.js";
+import { type SupplierPayment } from "./mockSupplier.js";
+import { mockOrders } from "../../../data/mockOrders.js";
+import { CURRENT_SUPPLIER_ID } from "../../../data/currentUser.js";
+
+const supplierOrders = mockOrders.filter((o) => o.supplierId === CURRENT_SUPPLIER_ID);
+
+const now = new Date();
+const isSameMonth = (iso: string) => {
+  const d = new Date(iso);
+  return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+};
+
+const totalEarned = supplierOrders
+  .filter((o) => o.status === "delivered")
+  .reduce((s, o) => s + o.supplierCost * o.quantity, 0);
+
+const earnedThisMonth = supplierOrders
+  .filter((o) => o.status === "delivered" && isSameMonth(o.createdAt))
+  .reduce((s, o) => s + o.supplierCost * o.quantity, 0);
+
+const pendingPayout = supplierOrders
+  .filter((o) => o.status !== "delivered")
+  .reduce((s, o) => s + o.supplierCost * o.quantity, 0);
 
 const statCards = [
-  { value: "$1,240", label: "Total Earned", color: "#5ac422" },
-  { value: "$340", label: "This Month", color: "#ffffff" },
-  { value: "$420", label: "Pending Payout", color: "#facc15" },
+  { value: `$${totalEarned.toLocaleString()}`, label: "Total Earned", color: "#5ac422" },
+  { value: `$${earnedThisMonth.toLocaleString()}`, label: "This Month", color: "#ffffff" },
+  { value: `$${pendingPayout.toLocaleString()}`, label: "Pending Payout", color: "#facc15" },
 ];
+
+const mockSupplierPayments: SupplierPayment[] = [...supplierOrders]
+  .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+  .map((o) => ({
+    orderId: o.id,
+    date: o.createdAt.slice(0, 10),
+    amount: `$${(o.supplierCost * o.quantity).toFixed(2)}`,
+    status: o.status === "delivered" ? "paid" : "pending",
+  }));
+
+function monthKey(iso: string) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+const FALLBACK_EARNINGS = [320, 410, 380, 520, 470, 610, 540, 680];
+
+const mockSupplierRevenue = (() => {
+  const byMonth = new Map<string, { month: string; earnings: number }>();
+
+  for (let i = 7; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    const label = d.toLocaleDateString("en-US", { month: "short" });
+    byMonth.set(key, { month: label, earnings: 0 });
+  }
+
+  for (const o of supplierOrders) {
+    const key = monthKey(o.createdAt);
+    if (byMonth.has(key)) {
+      byMonth.get(key)!.earnings += o.supplierCost * o.quantity;
+    }
+  }
+
+  let i = 0;
+  for (const point of byMonth.values()) {
+    if (point.earnings === 0) point.earnings = FALLBACK_EARNINGS[i] ?? 300;
+    i += 1;
+  }
+
+  return Array.from(byMonth.values());
+})();
 
 function PaymentStatusBadge({ status }: { status: SupplierPayment["status"] }) {
   if (status === "paid") {
@@ -53,7 +117,7 @@ export default function SupplierPayments() {
         transition={{ duration: 0.4, ease: "easeOut" }}
         className="w-full"
       >
-        <DashboardPage header={<DashboardPageTitle>PAYMENTS</DashboardPageTitle>}>
+        <DashboardPage header={<DashboardPageTitle>REVENUES</DashboardPageTitle>}>
           {/* ── Stat cards ────────────────────────────────────────────────── */}
           <div className="grid min-h-[180px] w-full grid-cols-1 gap-6 sm:grid-cols-3">
             {statCards.map((card) => (
@@ -94,12 +158,17 @@ export default function SupplierPayments() {
           <DashboardCard index={1} title="PAYOUT METHOD" autoHeight withBackground={false}>
             <div className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/[0.07] px-4 py-4">
               <div className="flex items-center gap-4">
-                <CreditCard size={24} className="shrink-0 text-white/40" />
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[14px] font-semibold tracking-widest text-white">
-                    •••• •••• 4242
+                <Building2 size={24} className="shrink-0 text-white/40" />
+                <div className="flex flex-col gap-1">
+                  <span className="text-[14px] font-semibold text-white">
+                    DE89 3704 0044 0532 0130 00
                   </span>
-                  <span className="text-[12px] text-white/40">Bank Transfer (IBAN)</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-[12px] text-white/40">IBAN · Commerzbank Berlin</span>
+                    <span className="rounded-full border border-white/10 bg-white/[0.05] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/40">
+                      SWIFT: COBADEFFXXX
+                    </span>
+                  </div>
                 </div>
               </div>
               <button
@@ -110,7 +179,7 @@ export default function SupplierPayments() {
                 }}
                 className="rounded-md border border-white/10 px-3 py-1.5 text-[12px] font-semibold uppercase tracking-wide text-white/40 transition-colors hover:border-white/30 hover:text-white/70"
               >
-                {changingAccount ? "Request Sent" : "Change Account"}
+                {changingAccount ? "Request Sent ✓" : "Change Account"}
               </button>
             </div>
           </DashboardCard>
@@ -126,7 +195,6 @@ export default function SupplierPayments() {
                 { key: "orderId", header: "Order #" },
                 { key: "date", header: "Date" },
                 { key: "amount", header: "Amount" },
-                { key: "status", header: "Status" },
                 { key: "action", header: "" },
               ]}
               rows={mockSupplierPayments}

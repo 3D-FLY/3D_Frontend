@@ -1,6 +1,6 @@
 import type { OrderStatusKey } from "../constants/orderStatusConfig.js";
 
-export type AlertReason =
+export type NotificationReason =
   | "supplier_rejected"
   | "no_supplier"
   | "production_delay"
@@ -13,23 +13,23 @@ export type AlertReason =
   | "payment_received"
   | "order_cancelled";
 
-export type AlertStatus = "open" | "in_progress" | "resolved";
+export type NotificationStatus = "open" | "in_progress" | "resolved";
 
-export type AlertRole = "admin" | "seller" | "supplier";
+export type NotificationRole = "admin" | "seller" | "supplier";
 
-export interface Alert {
+export interface Notification {
   id: string;
   orderId: string;
-  reason: AlertReason;
+  reason: NotificationReason;
   title: string;
   description: string;
   date: string;
-  status: AlertStatus;
+  status: NotificationStatus;
   isNew: boolean;
-  role: AlertRole;
+  role: NotificationRole;
 }
 
-export const mockAlerts: Alert[] = [
+export const mockNotifications: Notification[] = [
   { id: "a1", orderId: "#3012", reason: "supplier_rejected", title: "Supplier Rejected",    description: "Rejected by: Supplier A — reason: capacity full",     date: "2025-05-13", status: "open",        isNew: true,  role: "admin"  },
   { id: "a2", orderId: "#3015", reason: "no_supplier",       title: "No Supplier Found",   description: "No match found in Tel Aviv area for FDM/PLA",          date: "2025-05-12", status: "open",        isNew: true,  role: "admin"  },
   { id: "a3", orderId: "#3009", reason: "missing_data",      title: "Missing Data",        description: "Missing: print file for product SoldierXPT",           date: "2025-05-11", status: "in_progress", isNew: false, role: "admin"  },
@@ -46,57 +46,57 @@ export const mockAlerts: Alert[] = [
   { id: "s5", orderId: "#0036", reason: "order_cancelled",   title: "Order Cancelled",     description: "Order #0036 has been cancelled by the platform",       date: "2025-05-07", status: "resolved",    isNew: false, role: "supplier" },
 ];
 
-export function getAlertsByRole(role: AlertRole): Alert[] {
-  return mockAlerts.filter((a) => a.role === role);
+export function getNotificationsByRole(role: NotificationRole): Notification[] {
+  return mockNotifications.filter((a) => a.role === role);
 }
 
-export function getNewAlertsCount(role: AlertRole): number {
-  return mockAlerts.filter((a) => a.role === role && a.isNew).length;
+export function getNewNotificationsCount(role: NotificationRole): number {
+  return mockNotifications.filter((a) => a.role === role && a.isNew).length;
 }
 
-export const ALERTS_UPDATED_EVENT = "alerts:updated";
+export const NOTIFICATIONS_UPDATED_EVENT = "notifications:updated";
 
-/** Marks all alerts for a role as seen — mutates the shared mock array in place. */
-export function markAlertsSeen(role: AlertRole): void {
-  mockAlerts.forEach((a) => {
+/** Marks all notifications for a role as seen — mutates the shared mock array in place. */
+export function markNotificationsSeen(role: NotificationRole): void {
+  mockNotifications.forEach((a) => {
     if (a.role === role) a.isNew = false;
   });
-  window.dispatchEvent(new Event(ALERTS_UPDATED_EVENT));
+  window.dispatchEvent(new Event(NOTIFICATIONS_UPDATED_EVENT));
 }
 
 // ─── Display config ───────────────────────────────────────────────────────────
 
-export const ALERT_STATUS_LABEL: Record<AlertStatus, string> = {
+export const NOTIFICATION_STATUS_LABEL: Record<NotificationStatus, string> = {
   open: "Open",
   in_progress: "In Progress",
   resolved: "Resolved",
 };
 
-export const ALERT_STATUS_DOT: Record<AlertStatus, string> = {
+export const NOTIFICATION_STATUS_DOT: Record<NotificationStatus, string> = {
   open: "bg-red-400",
   in_progress: "bg-yellow-400",
   resolved: "bg-green-400",
 };
 
-export const ALERT_STATUS_TEXT: Record<AlertStatus, string> = {
+export const NOTIFICATION_STATUS_TEXT: Record<NotificationStatus, string> = {
   open: "text-red-400",
   in_progress: "text-yellow-400",
   resolved: "text-green-500",
 };
 
-export const ALERT_STATUS_BORDER: Record<AlertStatus, string> = {
+export const NOTIFICATION_STATUS_BORDER: Record<NotificationStatus, string> = {
   open: "border-red-400/30",
   in_progress: "border-yellow-400/30",
   resolved: "border-green-400/30",
 };
 
-export const ALERT_STATUS_BG: Record<AlertStatus, string> = {
+export const NOTIFICATION_STATUS_BG: Record<NotificationStatus, string> = {
   open: "bg-red-400/10",
   in_progress: "bg-yellow-400/10",
   resolved: "bg-green-400/10",
 };
 
-export const ALERT_REASON_LABEL: Record<AlertReason, string> = {
+export const NOTIFICATION_REASON_LABEL: Record<NotificationReason, string> = {
   supplier_rejected: "Supplier Rejected",
   no_supplier:       "No Supplier Found",
   production_delay:  "Production Delay",
@@ -110,7 +110,7 @@ export const ALERT_REASON_LABEL: Record<AlertReason, string> = {
   order_cancelled:   "Order Cancelled",
 };
 
-export const ALERT_REASON_ACCENT: Record<AlertReason, string> = {
+export const NOTIFICATION_REASON_ACCENT: Record<NotificationReason, string> = {
   supplier_rejected: "border-l-red-400",
   no_supplier:       "border-l-orange-400",
   production_delay:  "border-l-orange-400",
@@ -124,18 +124,14 @@ export const ALERT_REASON_ACCENT: Record<AlertReason, string> = {
   order_cancelled:   "border-l-red-400",
 };
 
-/** Returns card classes — left border = issue type; resolved alerts are visually muted. */
-export function getAlertCardClasses(reason: AlertReason, status?: AlertStatus): string {
-  const base = [
+/** Returns card classes — left border = notification type. */
+export function getNotificationCardClasses(reason: NotificationReason): string {
+  return [
     "mb-3 flex min-h-[60px] cursor-pointer items-center gap-3 rounded-2xl",
     "border border-white/10 border-l-4 bg-[rgba(149,149,149,0.05)] px-5 py-2",
     "transition-colors hover:bg-[rgba(149,149,149,0.1)]",
-    ALERT_REASON_ACCENT[reason],
-  ];
-  if (status === "resolved") {
-    base.push("opacity-50 hover:opacity-70");
-  }
-  return base.join(" ");
+    NOTIFICATION_REASON_ACCENT[reason],
+  ].join(" ");
 }
 
 // ─── Linked order info (mock) ──────────────────────────────────────────────────

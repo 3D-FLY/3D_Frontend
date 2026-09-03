@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Package, MoreHorizontal } from "lucide-react";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
@@ -8,8 +8,11 @@ import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/c
 import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
 import OrderStatusPill from "../../../features/dashboard/components/OrderStatusPill.js";
 import Modal from "../../../features/dashboard/components/Modal.js";
-import type { OrderStatusKey as OrderStatus } from "../../../constants/orderStatusConfig.js";
-import { ORDER_STATUS_CONFIG } from "../../../constants/orderStatusConfig.js";
+import { ORDER_STATUS_CONFIG, ORDER_STATUS_KEYS, type OrderStatusKey as OrderStatus } from "../../../constants/orderStatusConfig.js";
+import { mockOrders as sharedOrders } from "../../../data/mockOrders.js";
+import { mockProducts } from "../../../data/mockProducts.js";
+import { mockSuppliers } from "../../../data/mockSuppliers.js";
+import { CURRENT_SELLER_ID } from "../../../data/currentUser.js";
 import shopifyIcon from "../../../assets/icons/shops/shopify-icon.svg?url";
 import ebayIcon from "../../../assets/icons/shops/ebay-icon.svg?url";
 import woocommerceIcon from "../../../assets/icons/shops/woocommerce-icon.svg?url";
@@ -49,24 +52,37 @@ interface SellerOrder {
   total: number;
 }
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
+// ─── Derived data ─────────────────────────────────────────────────────────────
 
-const mockOrders: SellerOrder[] = [
-  { id: "#0041", product: { name: "SoldierXPT",  image: "/mock/soldier.png"  }, platform: "shopify",     supplier: { city: "Berlin",    country: "Germany" }, date: "2025-05-12", status: "in_production", total: 42.00  },
-  { id: "#0040", product: { name: "WarriorX",    image: "/mock/warrior.png"  }, platform: "woocommerce", supplier: { city: "New York",  country: "USA"     }, date: "2025-05-10", status: "shipped",        total: 67.50  },
-  { id: "#0039", product: { name: "DragonMini",  image: "/mock/dragon.png"   }, platform: "wix",         supplier: { city: "Tel Aviv",  country: "Israel"  }, date: "2025-05-08", status: "delivered",      total: 34.99  },
-  { id: "#0038", product: { name: "RocketBase",  image: "/mock/rocket.png"   }, platform: "amazon",      supplier: { city: "Berlin",    country: "Germany" }, date: "2025-05-06", status: "issue",          total: 89.00  },
-  { id: "#0037", product: { name: "SoldierXPT",  image: "/mock/soldier.png"  }, platform: "shopify",     supplier: { city: "New York",  country: "USA"     }, date: "2025-05-03", status: "delivered",      total: 42.00  },
-  { id: "#0036", product: { name: "DragonMini",  image: "/mock/dragon.png"   }, platform: "etsy",        supplier: { city: "Tel Aviv",  country: "Israel"  }, date: "2025-04-30", status: "shipped",        total: 34.99  },
-  { id: "#0035", product: { name: "MechBot",     image: "/mock/mech.png"     }, platform: "shopify",     supplier: { city: "Berlin",    country: "Germany" }, date: "2025-04-28", status: "delivered",      total: 58.00  },
-  { id: "#0034", product: { name: "WarriorX",    image: "/mock/warrior.png"  }, platform: "woocommerce", supplier: { city: "New York",  country: "USA"     }, date: "2025-04-25", status: "in_production",  total: 67.50  },
-  { id: "#0033", product: { name: "RocketBase",  image: "/mock/rocket.png"   }, platform: "shopify",     supplier: { city: "Berlin",    country: "Germany" }, date: "2025-04-22", status: "delivered",      total: 89.00  },
-  { id: "#0032", product: { name: "PhoenixV2",   image: "/mock/phoenix.png"  }, platform: "ebay",        supplier: { city: "Tel Aviv",  country: "Israel"  }, date: "2025-04-19", status: "issue",          total: 75.00  },
-];
+const mockOrders: SellerOrder[] = sharedOrders
+  .filter((o) => o.sellerId === CURRENT_SELLER_ID)
+  .map((o) => {
+    const product = mockProducts.find((p) => p.id === o.productId);
+    const supplier = mockSuppliers.find((s) => s.id === o.supplierId);
+    return {
+      id: o.id,
+      product: { name: product?.name ?? "Unknown", image: product?.image ?? "" },
+      platform: o.platform,
+      supplier: { city: supplier?.city ?? "Unknown", country: supplier?.country ?? "Unknown" },
+      date: o.createdAt,
+      status: o.status,
+      total: o.sellerPrice * o.quantity,
+    };
+  });
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const FILTER_STATUSES: OrderStatus[] = ["in_production", "shipped", "delivered", "issue", "cancelled"];
+const FILTER_STATUSES = ORDER_STATUS_KEYS.filter((s) => s !== "delivered");
+
+const PAST_ORDERS_COLUMNS = [
+  { key: "order",   header: "Order #" },
+  { key: "product", header: "Product" },
+  { key: "date",    header: "Date"    },
+  { key: "total",   header: "Total", align: "right" as const },
+  { key: "action",  header: ""       },
+];
+
+const PAST_ORDERS_GRID = "0.7fr 2.2fr 1fr 0.7fr 40px";
 
 const TABLE_COLUMNS = [
   { key: "order",    header: "Order #"  },
@@ -279,10 +295,22 @@ function DisputeModal({
 
 export default function SellerOrdersPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const statusParam = searchParams.get("status");
+  const statusFilter =
+    statusParam && (ORDER_STATUS_KEYS as readonly string[]).includes(statusParam)
+      ? statusParam
+      : "all";
   const [search, setSearch]           = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
   const [disputeOrder, setDisputeOrder] = useState<SellerOrder | null>(null);
   const [disputeText, setDisputeText]   = useState("");
+
+  const setStatusFilter = (s: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (s === "all") next.delete("status");
+    else next.set("status", s);
+    setSearchParams(next, { replace: true });
+  };
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -292,9 +320,20 @@ export default function SellerOrdersPage() {
         o.id.toLowerCase().includes(q) ||
         o.product.name.toLowerCase().includes(q);
       const matchStatus = statusFilter === "all" || o.status === statusFilter;
-      return matchSearch && matchStatus;
+      return matchSearch && matchStatus && o.status !== "delivered";
     });
   }, [search, statusFilter]);
+
+  const pastOrders = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return mockOrders.filter((o) => {
+      const matchSearch =
+        !q ||
+        o.id.toLowerCase().includes(q) ||
+        o.product.name.toLowerCase().includes(q);
+      return matchSearch && o.status === "delivered";
+    });
+  }, [search]);
 
   return (
     <DashboardLayout role="seller">
@@ -398,6 +437,65 @@ export default function SellerOrdersPage() {
                   }
                   if (key === "status") {
                     return <OrderStatusPill status={o.status} />;
+                  }
+                  if (key === "total") {
+                    return (
+                      <span className="text-[clamp(12px,1vw,14px)] font-semibold text-[#5ac422]">
+                        ${o.total.toFixed(2)}
+                      </span>
+                    );
+                  }
+                  if (key === "action") {
+                    return (
+                      <RowMenu
+                        order={o}
+                        onViewOrder={() =>
+                          navigate(`/dashboard/seller/orders/${o.id.replace("#", "")}`)
+                        }
+                        onOpenDispute={() => {
+                          setDisputeOrder(o);
+                          setDisputeText("");
+                        }}
+                      />
+                    );
+                  }
+                  return null;
+                }}
+              />
+            )}
+          </DashboardCard>
+
+          {/* ── Past Orders — everything marked DONE ───────────────────── */}
+          <DashboardCard title="PAST ORDERS" autoHeight>
+            {pastOrders.length === 0 ? (
+              <p className="py-10 text-center text-sm text-zinc-500">No past orders yet.</p>
+            ) : (
+              <DashboardTable
+                variant="list"
+                gridTemplateColumns={PAST_ORDERS_GRID}
+                columns={PAST_ORDERS_COLUMNS}
+                rows={pastOrders}
+                getRowKey={(o) => o.id}
+                hoverable
+                scrollable={false}
+                onRowClick={(o) =>
+                  navigate(`/dashboard/seller/orders/${o.id.replace("#", "")}`)
+                }
+                renderCell={(o, key) => {
+                  if (key === "order") {
+                    return (
+                      <span className="truncate text-[clamp(12px,1vw,14px)] font-semibold text-zinc-100">
+                        {o.id}
+                      </span>
+                    );
+                  }
+                  if (key === "product") {
+                    return <ProductCell product={o.product} />;
+                  }
+                  if (key === "date") {
+                    return (
+                      <span className="text-[11px] text-zinc-300">{formatDate(o.date)}</span>
+                    );
                   }
                   if (key === "total") {
                     return (

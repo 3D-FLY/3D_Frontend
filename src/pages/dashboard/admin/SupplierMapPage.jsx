@@ -21,6 +21,7 @@ import WorldMap, {
   DEFAULT_ZOOM,
   FOCUS_ZOOM,
 } from "../../../features/network/WorldMap.jsx";
+import { mockSuppliers } from "../../../data/mockSuppliers.js";
 
 // ─── react-select dark theme ──────────────────────────────────────────────────
 const selectStyles = {
@@ -70,16 +71,13 @@ const selectStyles = {
 };
 
 // ─── Mock supplier data ───────────────────────────────────────────────────────
-const MOCK_SUPPLIERS = [
-  { id: "sup1", name: "PrintHub TLV",      city: "Tel Aviv, Israel",         email: "contact@printhub.io",     phone: "+972-3-555-0100" },
-  { id: "sup2", name: "3D Masters London", city: "London, United Kingdom",    email: "hello@3dmasters.co.uk",   phone: "+44-20-7946-0958" },
-  { id: "sup3", name: "FabLab Tokyo",      city: "Tokyo, Japan",              email: "info@fablabtkyo.jp",      phone: "+81-3-1234-5678" },
-  { id: "sup4", name: "MakerSpace NYC",    city: "New York City, United States", email: "ops@makerspacenyc.com", phone: "+1-212-555-0174" },
-  { id: "sup5", name: "Imprimerie Paris",  city: "Paris, France",             email: "bonjour@imprimerie3d.fr", phone: "+33-1-40-00-01-02" },
-  { id: "sup6", name: "PrintForge Dubai",  city: "Dubai, United Arab Emirates", email: "info@printforgedxb.ae",  phone: "+971-4-555-0200" },
-  { id: "sup7", name: "SGPrint Co.",       city: "Singapore, Singapore",      email: "sales@sgprint.sg",        phone: "+65-6321-4567" },
-  { id: "sup8", name: "FabBrasil",         city: "São Paulo, Brazil",         email: "contato@fabbrasil.com",   phone: "+55-11-2345-6789" },
-];
+const MOCK_SUPPLIERS = mockSuppliers.map((s) => ({
+  id: s.id,
+  name: s.name,
+  city: s.city,
+  email: s.email,
+  phone: "Unknown",
+}));
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function splitPartnerName(name) {

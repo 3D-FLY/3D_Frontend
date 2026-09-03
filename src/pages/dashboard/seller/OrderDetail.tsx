@@ -6,7 +6,9 @@ import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
 import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
 import { getStatusConfig } from "../../../constants/orderStatus.js";
-import { mockOrderDetails } from "./mockOrders.js";
+import { mockOrders } from "../../../data/mockOrders.js";
+import { mockProducts } from "../../../data/mockProducts.js";
+import { mockSuppliers } from "../../../data/mockSuppliers.js";
 import shopifyIcon     from "../../../assets/icons/shops/shopify-icon.svg?url";
 import ebayIcon        from "../../../assets/icons/shops/ebay-icon.svg?url";
 import woocommerceIcon from "../../../assets/icons/shops/woocommerce-icon.svg?url";
@@ -106,13 +108,60 @@ function formatSupplierLocation({ city, country }: { city: string; country: stri
   return `${city}, ${country}`;
 }
 
+function formatTimelineDate(iso: string): string {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
+}
+
+function buildOrderDetail(id: string | undefined) {
+  const rawOrder = mockOrders.find((o) => o.id.replace("#", "") === id);
+  if (!rawOrder) return undefined;
+  const product = mockProducts.find((p) => p.id === rawOrder.productId);
+  if (!product) return undefined;
+  const supplier = mockSuppliers.find((s) => s.id === rawOrder.supplierId);
+  const subtotal = rawOrder.sellerPrice * rawOrder.quantity;
+
+  return {
+    id: rawOrder.id,
+    product: {
+      name: product.name,
+      sku: product.sku,
+      image: product.image,
+      printSettings: product.printSettings,
+    },
+    customerSelection: {
+      color: rawOrder.colorName,
+      colorHex: rawOrder.color,
+      quantity: rawOrder.quantity,
+    },
+    platforms: [rawOrder.platform],
+    supplier: { city: supplier?.city ?? "Unknown", country: supplier?.country ?? "Unknown" },
+    printTime: product.estimatedPrintTime,
+    weight: product.estimatedWeight,
+    date: rawOrder.createdAt,
+    status: rawOrder.status,
+    pricing: {
+      unitPrice: rawOrder.sellerPrice,
+      quantity: rawOrder.quantity,
+      platformFeePercent: subtotal > 0 ? (rawOrder.platformFee / subtotal) * 100 : 0,
+    },
+    timeline: rawOrder.timeline.map((t) => ({
+      step: t.step,
+      date: t.date ? formatTimelineDate(t.date) : null,
+      done: t.done,
+      active: t.active,
+    })),
+  };
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SellerOrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const order = mockOrderDetails.find((o) => o.id.replace("#", "") === id);
+  const order = buildOrderDetail(id);
   const [imgError, setImgError] = useState(false);
 
   if (!order) {

@@ -9,44 +9,55 @@ import OrderStatusPill from "../../../features/dashboard/components/OrderStatusP
 import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
 import ActiveBadge from "../../../features/dashboard/components/ActiveBadge.js";
 import Modal from "../../../features/dashboard/components/Modal.js";
+import { mockSuppliers } from "../../../data/mockSuppliers.js";
+import { mockOrders } from "../../../data/mockOrders.js";
+import { mockSellers } from "../../../data/mockSellers.js";
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
-const MOCK_SUPPLIERS = [
-  { id: "sup1", name: "PrintHub TLV",      city: "Tel Aviv, Israel",            email: "contact@printhub.io",     phone: "+972-3-555-0100",   active: true  },
-  { id: "sup2", name: "3D Masters London", city: "London, United Kingdom",       email: "hello@3dmasters.co.uk",   phone: "+44-20-7946-0958",  active: true  },
-  { id: "sup3", name: "FabLab Tokyo",      city: "Tokyo, Japan",                 email: "info@fablabtkyo.jp",      phone: "+81-3-1234-5678",   active: true  },
-  { id: "sup4", name: "MakerSpace NYC",    city: "New York City, United States", email: "ops@makerspacenyc.com",   phone: "+1-212-555-0174",   active: true  },
-  { id: "sup5", name: "Imprimerie Paris",  city: "Paris, France",                email: "bonjour@imprimerie3d.fr", phone: "+33-1-40-00-01-02", active: true  },
-  { id: "sup6", name: "PrintForge Dubai",  city: "Dubai, United Arab Emirates",  email: "info@printforgedxb.ae",   phone: "+971-4-555-0200",   active: true  },
-  { id: "sup7", name: "SGPrint Co.",       city: "Singapore, Singapore",         email: "sales@sgprint.sg",        phone: "+65-6321-4567",     active: false },
-  { id: "sup8", name: "FabBrasil",         city: "São Paulo, Brazil",            email: "contato@fabbrasil.com",   phone: "+55-11-2345-6789",  active: false },
-];
+const MOCK_SUPPLIERS = mockSuppliers.map((s) => ({
+  id: s.id,
+  name: s.name,
+  city: `${s.city}, ${s.country}`,
+  email: s.email,
+  phone: "Unknown",
+  active: s.isActive,
+}));
 
-const SUPPLIER_ORDERS = {
-  "PrintHub TLV": [
-    { id: "1", orderId: "3011", store: "Mini World",       status: "delivered",       total: 89.97  },
-    { id: "2", orderId: "3010", store: "Galaxy Toys",      status: "shipped",         total: 34.99  },
-    { id: "3", orderId: "3009", store: "Print & Play",     status: "in_production",   total: 54.98  },
-    { id: "4", orderId: "3008", store: "Mini World",       status: "delivered",       total: 149.99 },
-    { id: "5", orderId: "3012", store: "Print & Play",     status: "issue",           total: 19.99  },
-  ],
-  "3D Masters London": [
-    { id: "1", orderId: "3015", store: "Galaxy Toys",      status: "pending",         total: 79.99  },
-    { id: "2", orderId: "3014", store: "Mini World",       status: "in_production",   total: 22.99  },
-    { id: "3", orderId: "3013", store: "Galaxy Toys",      status: "shipped",         total: 39.99  },
-  ],
-  "FabLab Tokyo": [
-    { id: "1", orderId: "3007", store: "Galaxy Toys",      status: "issue",           total: 44.99  },
-    { id: "2", orderId: "3006", store: "Print & Play",     status: "delivered",       total: 59.99  },
-    { id: "3", orderId: "3005", store: "Mini World",       status: "shipped",         total: 79.99  },
-  ],
-};
+function getSupplierOrders(supplierId) {
+  return mockOrders
+    .filter((o) => o.supplierId === supplierId)
+    .map((o) => ({
+      id: o.id,
+      orderId: o.id.replace("#", ""),
+      store: mockSellers.find((s) => s.id === o.sellerId)?.name ?? "Unknown",
+      status: o.status,
+      total: o.sellerPrice * o.quantity,
+    }));
+}
 
-const SUPPLIER_STATS = {
-  "PrintHub TLV":      { totalOrders: 412, completionRate: 98, avgDeliveryDays: 3.8, rating: 4.9 },
-  "3D Masters London": { totalOrders: 287, completionRate: 97, avgDeliveryDays: 4.5, rating: 4.7 },
-  "FabLab Tokyo":      { totalOrders: 198, completionRate: 95, avgDeliveryDays: 5.2, rating: 4.5 },
-};
+function computeAvgDeliveryDays(orders) {
+  const delivered = orders.filter((o) => o.status === "delivered");
+  if (delivered.length === 0) return 0;
+  const totalDays = delivered.reduce((sum, o) => {
+    const placed = o.timeline.find((t) => t.step === "Order Placed")?.date;
+    const deliveredDate = o.timeline.find((t) => t.step === "DONE")?.date;
+    if (!placed || !deliveredDate) return sum;
+    return sum + (new Date(deliveredDate).getTime() - new Date(placed).getTime()) / 86400000;
+  }, 0);
+  return +(totalDays / delivered.length).toFixed(1);
+}
+
+function getSupplierStats(supplierId) {
+  const supplier = mockSuppliers.find((s) => s.id === supplierId);
+  const orders = mockOrders.filter((o) => o.supplierId === supplierId);
+  const delivered = orders.filter((o) => o.status === "delivered").length;
+  return {
+    totalOrders: orders.length,
+    completionRate: orders.length ? Math.round((delivered / orders.length) * 100) : 0,
+    avgDeliveryDays: computeAvgDeliveryDays(orders),
+    rating: supplier?.rating ?? 0,
+  };
+}
 
 
 const EMPTY_FORM = { name: "", city: "", email: "", phone: "", active: true };
@@ -104,8 +115,8 @@ export default function SupplierDetailPage() {
     );
   }
 
-  const orders = SUPPLIER_ORDERS[supplier.name] ?? [];
-  const stats  = SUPPLIER_STATS[supplier.name]  ?? { totalOrders: 0, completionRate: 0, avgDeliveryDays: 0, rating: 0 };
+  const orders = getSupplierOrders(supplier.id);
+  const stats  = getSupplierStats(supplier.id);
 
   const handleSave = (form) => {
     setSupplier((prev) => (prev ? { ...prev, ...form } : prev));

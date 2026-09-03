@@ -7,6 +7,8 @@ import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
 import Input from "../../../components/ui/Input.js";
 import EntityCard from "../../../features/dashboard/components/EntityCard.js";
+import { mockSellers, type Seller } from "../../../data/mockSellers.js";
+import { getProductsBySellerId } from "../../../data/mockProducts.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Plan = "basic" | "pro" | "enterprise";
@@ -42,16 +44,21 @@ const PLAN_BADGE: Record<Plan, string> = {
 const EMPTY_FORM: StoreForm = { name: "", city: "", email: "", phone: "", plan: "basic", active: true };
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
-const INITIAL_STORES: StoreRecord[] = [
-  { id: "usr1", name: "UrbanPrints NYC",    city: "New York City, United States",  email: "hello@urbanprints.com",     phone: "+1-212-555-0190",   active: true,  plan: "enterprise", productCount: 142, joinedAt: "2023-02-14" },
-  { id: "usr2", name: "Tokyo 3D Shop",      city: "Tokyo, Japan",                  email: "contact@tokyo3d.jp",        phone: "+81-3-5678-9012",   active: true,  plan: "pro",        productCount: 87,  joinedAt: "2023-05-22" },
-  { id: "usr3", name: "Berlin Makers",      city: "Berlin, Germany",               email: "info@berlinmakers.de",      phone: "+49-30-1234-5678",  active: true,  plan: "pro",        productCount: 63,  joinedAt: "2023-08-01" },
-  { id: "usr4", name: "Cape Crafts Co.",    city: "Cape Town, South Africa",       email: "orders@capecrafts.co.za",   phone: "+27-21-555-0134",   active: true,  plan: "basic",      productCount: 28,  joinedAt: "2024-01-10" },
-  { id: "usr5", name: "Sydney Space Print", city: "Sydney, Australia",             email: "hi@sydneyspaceprint.au",    phone: "+61-2-9876-5432",   active: true,  plan: "pro",        productCount: 54,  joinedAt: "2023-11-30" },
-  { id: "usr6", name: "São Paulo Fab Lab",  city: "São Paulo, Brazil",             email: "contato@spfablab.com",      phone: "+55-11-9876-5432",  active: false, plan: "basic",      productCount: 19,  joinedAt: "2024-03-05" },
-  { id: "usr7", name: "Dubai 3D Hub",       city: "Dubai, United Arab Emirates",   email: "info@dubai3dhub.ae",        phone: "+971-4-555-0310",   active: true,  plan: "enterprise", productCount: 211, joinedAt: "2022-09-18" },
-  { id: "usr8", name: "Paris Design Lab",   city: "Paris, France",                 email: "bonjour@parisdesignlab.fr", phone: "+33-1-55-00-01-23", active: false, plan: "basic",      productCount: 11,  joinedAt: "2024-06-20" },
-];
+function toStoreRecord(seller: Seller): StoreRecord {
+  return {
+    id: seller.id,
+    name: seller.name,
+    city: `${seller.city}, ${seller.country}`,
+    email: seller.email,
+    phone: "Unknown",
+    active: seller.isActive,
+    plan: seller.plan.toLowerCase() as Plan,
+    productCount: getProductsBySellerId(seller.id).length,
+    joinedAt: seller.joinedAt,
+  };
+}
+
+const INITIAL_STORES: StoreRecord[] = mockSellers.map(toStoreRecord);
 
 // ─── Modal ────────────────────────────────────────────────────────────────────
 function StoreModal({

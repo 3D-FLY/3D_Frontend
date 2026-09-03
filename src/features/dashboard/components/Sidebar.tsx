@@ -3,6 +3,11 @@ import { type LucideIcon, LayoutDashboard, Users, Truck, MapPin, ShoppingCart, S
 
 export type SidebarRole = "admin" | "seller" | "supplier";
 
+export function roleInboxPath(role: SidebarRole, id?: string) {
+  const page = "notifications";
+  return id ? `/dashboard/${role}/${page}/${id}` : `/dashboard/${role}/${page}`;
+}
+
 interface NavItem {
   label: string;
   to: string;
@@ -19,7 +24,7 @@ const adminItems: NavItem[] = [
   { label: "Suppliers",    to: "/dashboard/admin/suppliers",    icon: Truck           },
   { label: "Supplier Map", to: "/dashboard/admin/supplier-map", icon: MapPin          },
   { label: "Orders",       to: "/dashboard/admin/orders",       icon: ShoppingCart    },
-  { label: "Alerts",       to: "/dashboard/admin/alerts",       icon: Bell            },
+  { label: "Notifications", to: "/dashboard/admin/notifications", icon: Bell           },
   { label: "Payments",     to: "/dashboard/admin/payments",     icon: DollarSign      },
   { label: "Store",        to: "/dashboard/admin/stores",        icon: Store           },
   { label: "Settings",     to: "/dashboard/admin/settings",     icon: Settings        },
@@ -28,7 +33,7 @@ const adminItems: NavItem[] = [
 const sellerItems: NavItem[] = [
   { label: "My Store",    to: "/dashboard/seller",             icon: Store           },
   { label: "Orders",      to: "/dashboard/seller/orders",      icon: ShoppingCart    },
-  { label: "Alerts",      to: "/dashboard/seller/alerts",      icon: Bell            },
+  { label: "Notifications", to: "/dashboard/seller/notifications", icon: Bell          },
   { label: "Products",    to: "/dashboard/seller/products",    icon: Package         },
   { label: "Integration", to: "/dashboard/seller/integration", icon: Plug            },
   { label: "Billing",     to: "/dashboard/seller/billing",     icon: CreditCard      },
@@ -39,8 +44,8 @@ const supplierItems: NavItem[] = [
   { label: "Home",         to: "/dashboard/supplier",              icon: Home       },
   { label: "Orders",       to: "/dashboard/supplier/orders",        icon: ShoppingCart },
   { label: "Capabilities", to: "/dashboard/supplier/capabilities",  icon: Settings2  },
-  { label: "Payments",     to: "/dashboard/supplier/payments",      icon: CreditCard },
-  { label: "Alerts",       to: "/dashboard/supplier/alerts",        icon: Bell       },
+  { label: "Revenues",     to: "/dashboard/supplier/revenue",       icon: DollarSign },
+  { label: "Notifications", to: "/dashboard/supplier/notifications", icon: Bell      },
   { label: "Settings",     to: "/dashboard/supplier/settings",      icon: Settings   },
 ];
 

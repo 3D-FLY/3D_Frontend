@@ -13,7 +13,7 @@ export default function OrderStatusPill({ status, size = "sm" }: OrderStatusPill
       <span className={`h-2 w-2 shrink-0 rounded-full ${cfg.dot}`} />
       <span
         className={`font-semibold uppercase tracking-wide ${cfg.text} ${
-          size === "lg" ? "text-sm" : "text-[clamp(11px,0.9vw,13px)]"
+          size === "lg" ? "text-sm" : "text-[clamp(12px,1vw,14px)]"
         } truncate`}
       >
         {cfg.label}

@@ -208,6 +208,10 @@ export default function AddProductPage() {
   const [imagePreviews, setImagePreviews] = useState<(string | null)[]>(
     existing?.image ? [existing.image, null, null, null] : [null, null, null, null],
   );
+  const [supplierImagePreviews, setSupplierImagePreviews] = useState<(string | null)[]>(() => {
+    const existingImages = existing?.supplierInstructionImages ?? [];
+    return [0, 1, 2, 3].map((i) => existingImages[i] ?? null);
+  });
   const [description, setDescription] = useState("");
 
   // Product details
@@ -290,11 +294,23 @@ export default function AddProductPage() {
     });
   };
 
+  const handleSupplierImageUpload = (index: number, file: File | null) => {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setSupplierImagePreviews((prev) => {
+      const next = [...prev];
+      next[index] = url;
+      return next;
+    });
+  };
+
   const handleSubmit = () => {
     if (!productName.trim()) return;
     const printSettings = { tech, material, layerHeight, shells, infill, infillPattern, topShellLayers, bottomShellLayers, support, brim, brimWidth, seam };
     const all = getProducts();
     const primaryImage = imagePreviews.find((p) => p) ?? "";
+    const supplierInstructionImages = supplierImagePreviews.filter((p): p is string => !!p);
+    const modelFileName = modelFile?.name ?? existing?.modelFileName;
 
     if (isEdit && existing) {
       const updated = all.map((p) =>
@@ -308,6 +324,8 @@ export default function AddProductPage() {
               stores: selectedStores,
               printSettings,
               details: { ...p.details, colors },
+              supplierInstructionImages,
+              modelFileName,
             }
           : p,
       );
@@ -328,6 +346,8 @@ export default function AddProductPage() {
           colors,
         },
         recentOrders: [],
+        supplierInstructionImages,
+        modelFileName,
       };
       saveProducts([...all, newProduct]);
     }
@@ -717,7 +737,17 @@ export default function AddProductPage() {
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                   {/* Left column */}
                   <div className="flex flex-col gap-6">
-                    <DashboardCard index={0} title="PRODUCT IMAGE" autoHeight withBackground={false}>
+                    <DashboardCard
+                      index={0}
+                      title="PRODUCT IMAGE"
+                      autoHeight
+                      withBackground={false}
+                      headerAction={
+                        <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-zinc-400">
+                          For Customer
+                        </span>
+                      }
+                    >
                       <div className="grid grid-cols-2 gap-3">
                         {[0, 1, 2, 3].map((i) => (
                           <div key={i} className="relative aspect-square">
@@ -868,7 +898,17 @@ export default function AddProductPage() {
                       </div>
                     </DashboardCard>
 
-                    <DashboardCard index={2} title="SUPPLIER INSTRUCTIONS" autoHeight withBackground={false}>
+                    <DashboardCard
+                      index={2}
+                      title="SUPPLIER INSTRUCTIONS"
+                      autoHeight
+                      withBackground={false}
+                      headerAction={
+                        <span className="rounded-full border border-green-500/30 bg-green-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-green-500">
+                          For Supplier
+                        </span>
+                      }
+                    >
                       {/* Guidance text */}
                       <div className="mb-4 rounded-xl border border-white/[0.06] bg-white/[0.03] px-4 py-3">
                         <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-white/40">
@@ -881,6 +921,34 @@ export default function AddProductPage() {
                           <li>• <span className="text-white/70">Special packaging</span> — fragile parts, protective wrapping</li>
                           <li>• <span className="text-white/70">Reference file</span> — attach a PDF with diagrams or assembly instructions</li>
                         </ul>
+                      </div>
+
+                      {/* Assembly / finishing reference images */}
+                      <div className="mb-4 grid grid-cols-4 gap-3">
+                        {[0, 1, 2, 3].map((i) => (
+                          <div key={i} className="relative aspect-square">
+                            <input
+                              type="file"
+                              accept="image/png,image/jpeg,image/webp"
+                              className="absolute inset-0 z-10 cursor-pointer opacity-0"
+                              onChange={(e) => handleSupplierImageUpload(i, e.target.files?.[0] ?? null)}
+                            />
+                            {supplierImagePreviews[i] ? (
+                              <div className="h-full w-full overflow-hidden rounded-xl">
+                                <img
+                                  src={supplierImagePreviews[i]!}
+                                  alt={`Supplier reference ${i + 1}`}
+                                  className="h-full w-full object-cover"
+                                />
+                              </div>
+                            ) : (
+                              <div className="flex h-full w-full flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-white/15 bg-dark transition-colors hover:border-green-500/30">
+                                <Camera size={16} className="text-white/25" />
+                                <span className="text-lg leading-none text-white/30">+</span>
+                              </div>
+                            )}
+                          </div>
+                        ))}
                       </div>
 
                       {/* Instructions textarea */}

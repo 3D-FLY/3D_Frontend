@@ -10,6 +10,9 @@ import ActiveBadge from "../../../features/dashboard/components/ActiveBadge.js";
 import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
 import StatusBadge from "../../../features/dashboard/components/StatusBadge.js";
 import OrderStatusPill from "../../../features/dashboard/components/OrderStatusPill.js";
+import { mockSellers, type Seller } from "../../../data/mockSellers.js";
+import { mockProducts } from "../../../data/mockProducts.js";
+import { mockOrders } from "../../../data/mockOrders.js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type Plan = "basic" | "pro" | "enterprise";
@@ -72,143 +75,49 @@ const PLAN_BADGE: Record<Plan, string> = {
 const EMPTY_FORM: StoreForm = { name: "", city: "", email: "", phone: "", plan: "basic", active: true };
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
-const MOCK_STORES: StoreRecord[] = [
-  { id: "usr1", name: "UrbanPrints NYC",    city: "New York City, United States",  email: "hello@urbanprints.com",     phone: "+1-212-555-0190",   active: true,  plan: "enterprise", productCount: 142, joinedAt: "2023-02-14" },
-  { id: "usr2", name: "Tokyo 3D Shop",      city: "Tokyo, Japan",                  email: "contact@tokyo3d.jp",        phone: "+81-3-5678-9012",   active: true,  plan: "pro",        productCount: 87,  joinedAt: "2023-05-22" },
-  { id: "usr3", name: "Berlin Makers",      city: "Berlin, Germany",               email: "info@berlinmakers.de",      phone: "+49-30-1234-5678",  active: true,  plan: "pro",        productCount: 63,  joinedAt: "2023-08-01" },
-  { id: "usr4", name: "Cape Crafts Co.",    city: "Cape Town, South Africa",       email: "orders@capecrafts.co.za",   phone: "+27-21-555-0134",   active: true,  plan: "basic",      productCount: 28,  joinedAt: "2024-01-10" },
-  { id: "usr5", name: "Sydney Space Print", city: "Sydney, Australia",             email: "hi@sydneyspaceprint.au",    phone: "+61-2-9876-5432",   active: true,  plan: "pro",        productCount: 54,  joinedAt: "2023-11-30" },
-  { id: "usr6", name: "São Paulo Fab Lab",  city: "São Paulo, Brazil",             email: "contato@spfablab.com",      phone: "+55-11-9876-5432",  active: false, plan: "basic",      productCount: 19,  joinedAt: "2024-03-05" },
-  { id: "usr7", name: "Dubai 3D Hub",       city: "Dubai, United Arab Emirates",   email: "info@dubai3dhub.ae",        phone: "+971-4-555-0310",   active: true,  plan: "enterprise", productCount: 211, joinedAt: "2022-09-18" },
-  { id: "usr8", name: "Paris Design Lab",   city: "Paris, France",                 email: "bonjour@parisdesignlab.fr", phone: "+33-1-55-00-01-23", active: false, plan: "basic",      productCount: 11,  joinedAt: "2024-06-20" },
-];
+function toStoreRecord(seller: Seller): StoreRecord {
+  return {
+    id: seller.id,
+    name: seller.name,
+    city: `${seller.city}, ${seller.country}`,
+    email: seller.email,
+    phone: "Unknown",
+    active: seller.isActive,
+    plan: seller.plan.toLowerCase() as Plan,
+    productCount: mockProducts.filter((p) => p.sellerId === seller.id).length,
+    joinedAt: seller.joinedAt,
+  };
+}
 
-const STORE_PRODUCTS: Record<string, Product[]> = {
-  usr1: [
-    { id: "p1-1", name: "Mini Eiffel Tower",   price: 34.99, category: "Decor",        status: "published" },
-    { id: "p1-2", name: "Custom Nameplate",    price: 19.99, category: "Personalized", status: "published" },
-    { id: "p1-3", name: "Dragon Figurine",     price: 49.99, category: "Collectibles", status: "draft"     },
-    { id: "p1-4", name: "Phone Stand Pro",     price: 14.99, category: "Accessories",  status: "published" },
-    { id: "p1-5", name: "Skull Candle Holder", price: 27.99, category: "Decor",        status: "published" },
-  ],
-  usr2: [
-    { id: "p2-1", name: "Samurai Helmet",      price: 79.99, category: "Collectibles", status: "published" },
-    { id: "p2-2", name: "Bonsai Tree Stand",   price: 22.99, category: "Decor",        status: "published" },
-    { id: "p2-3", name: "Cable Organizer",     price: 12.99, category: "Accessories",  status: "draft"     },
-    { id: "p2-4", name: "Origami Crane Model", price: 39.99, category: "Art",          status: "published" },
-  ],
-  usr3: [
-    { id: "p3-1", name: "Bauhaus Wall Clock",  price: 44.99, category: "Decor",        status: "published" },
-    { id: "p3-2", name: "Desk Organizer Set",  price: 29.99, category: "Accessories",  status: "published" },
-    { id: "p3-3", name: "Robot Toy Kit",       price: 59.99, category: "Toys",         status: "draft"     },
-    { id: "p3-4", name: "Planter Pot",         price: 18.99, category: "Decor",        status: "published" },
-    { id: "p3-5", name: "Gear Necklace",       price: 24.99, category: "Jewelry",      status: "published" },
-    { id: "p3-6", name: "Modular Shelf Clip",  price: 9.99,  category: "Accessories",  status: "published" },
-  ],
-  usr4: [
-    { id: "p4-1", name: "Cape Elephant Deco",  price: 34.99, category: "Decor",        status: "published" },
-    { id: "p4-2", name: "Safari Keychain Set", price: 12.99, category: "Accessories",  status: "published" },
-    { id: "p4-3", name: "Tribal Mask Wall Art",price: 64.99, category: "Art",          status: "draft"     },
-    { id: "p4-4", name: "Beaded Phone Case",   price: 21.99, category: "Accessories",  status: "published" },
-  ],
-  usr5: [
-    { id: "p5-1", name: "Surf Board Miniature",price: 42.99, category: "Collectibles", status: "published" },
-    { id: "p5-2", name: "Koala Figure",        price: 29.99, category: "Toys",         status: "published" },
-    { id: "p5-3", name: "Solar System Kit",    price: 74.99, category: "Educational",  status: "published" },
-    { id: "p5-4", name: "Boomerang Decor",     price: 19.99, category: "Decor",        status: "draft"     },
-    { id: "p5-5", name: "Wave Lamp Shade",     price: 54.99, category: "Decor",        status: "published" },
-  ],
-  usr6: [
-    { id: "p6-1", name: "Carnival Mask",       price: 28.99, category: "Art",          status: "published" },
-    { id: "p6-2", name: "Caipirinha Cup Set",  price: 39.99, category: "Kitchen",      status: "draft"     },
-    { id: "p6-3", name: "Jungle Animal Pack",  price: 19.99, category: "Toys",         status: "published" },
-    { id: "p6-4", name: "Hammock Hook",        price: 14.99, category: "Accessories",  status: "published" },
-  ],
-  usr7: [
-    { id: "p7-1", name: "Gold Camel Figure",   price: 89.99,  category: "Collectibles", status: "published" },
-    { id: "p7-2", name: "Falconry Hood",       price: 59.99,  category: "Collectibles", status: "published" },
-    { id: "p7-3", name: "Arabic Coffee Set",   price: 124.99, category: "Kitchen",      status: "published" },
-    { id: "p7-4", name: "Mosque Miniature",    price: 149.99, category: "Art",          status: "published" },
-    { id: "p7-5", name: "Date Palm Stand",     price: 34.99,  category: "Decor",        status: "draft"     },
-    { id: "p7-6", name: "Desert Rose Crystal", price: 44.99,  category: "Decor",        status: "published" },
-  ],
-  usr8: [
-    { id: "p8-1", name: "Eiffel Keychain",     price: 9.99,  category: "Accessories",  status: "published" },
-    { id: "p8-2", name: "Louvre Puzzle",       price: 34.99, category: "Art",          status: "draft"     },
-    { id: "p8-3", name: "French Bulldog Fig.", price: 19.99, category: "Collectibles", status: "published" },
-    { id: "p8-4", name: "Macaron Display",     price: 24.99, category: "Decor",        status: "published" },
-  ],
-};
+function computeAvgDeliveryDays(orders: { status: OrderStatus; timeline: { step: string; date: string | null }[] }[]): number {
+  const delivered = orders.filter((o) => o.status === "delivered");
+  if (delivered.length === 0) return 0;
+  const totalDays = delivered.reduce((sum, o) => {
+    const placed = o.timeline.find((t) => t.step === "Order Placed")?.date;
+    const deliveredDate = o.timeline.find((t) => t.step === "DONE")?.date;
+    if (!placed || !deliveredDate) return sum;
+    return sum + (new Date(deliveredDate).getTime() - new Date(placed).getTime()) / 86400000;
+  }, 0);
+  return +(totalDays / delivered.length).toFixed(1);
+}
 
-const STORE_ORDERS: Record<string, Order[]> = {
-  usr1: [
-    { id: "#00341", customer: "Alice Johnson",  status: "delivered",  total: 89.97  },
-    { id: "#00340", customer: "Bob Martinez",   status: "shipped",    total: 34.99  },
-    { id: "#00339", customer: "Carol White",    status: "in_production", total: 54.98  },
-    { id: "#00338", customer: "David Lee",      status: "delivered",  total: 149.99 },
-    { id: "#00337", customer: "Emma Wilson",    status: "issue",      total: 19.99  },
-  ],
-  usr2: [
-    { id: "#00221", customer: "Yuki Tanaka",    status: "delivered",  total: 79.99  },
-    { id: "#00220", customer: "Hiroshi Sato",   status: "shipped",    total: 22.99  },
-    { id: "#00219", customer: "Aiko Yamamoto",  status: "delivered",  total: 39.99  },
-    { id: "#00218", customer: "Ken Watanabe",   status: "in_production", total: 12.99  },
-    { id: "#00217", customer: "Mei Fujiwara",   status: "issue",      total: 79.99  },
-  ],
-  usr3: [
-    { id: "#00183", customer: "Klaus Müller",   status: "delivered",  total: 44.99  },
-    { id: "#00182", customer: "Lena Schmidt",   status: "shipped",    total: 59.99  },
-    { id: "#00181", customer: "Hans Weber",     status: "delivered",  total: 29.99  },
-    { id: "#00180", customer: "Greta Fischer",  status: "in_production", total: 18.99  },
-    { id: "#00179", customer: "Otto Bauer",     status: "delivered",  total: 9.99   },
-  ],
-  usr4: [
-    { id: "#00089", customer: "Sipho Dlamini",  status: "delivered",  total: 34.99  },
-    { id: "#00088", customer: "Nomsa Nkosi",    status: "shipped",    total: 12.99  },
-    { id: "#00087", customer: "Thabo Mokoena",  status: "issue",      total: 64.99  },
-    { id: "#00086", customer: "Zanele Khumalo", status: "in_production", total: 21.99  },
-    { id: "#00085", customer: "Bongani Zulu",   status: "delivered",  total: 34.99  },
-  ],
-  usr5: [
-    { id: "#00267", customer: "Liam Nguyen",    status: "delivered",  total: 42.99  },
-    { id: "#00266", customer: "Chloe Smith",    status: "shipped",    total: 74.99  },
-    { id: "#00265", customer: "Jack Brown",     status: "delivered",  total: 29.99  },
-    { id: "#00264", customer: "Olivia Taylor",  status: "in_production", total: 54.99  },
-    { id: "#00263", customer: "Noah Anderson",  status: "delivered",  total: 19.99  },
-  ],
-  usr6: [
-    { id: "#00045", customer: "Lucas Silva",    status: "delivered",  total: 28.99  },
-    { id: "#00044", customer: "Ana Costa",      status: "shipped",    total: 19.99  },
-    { id: "#00043", customer: "Pedro Santos",   status: "issue",      total: 39.99  },
-    { id: "#00042", customer: "Maria Oliveira", status: "in_production", total: 14.99  },
-    { id: "#00041", customer: "Joao Ferreira",  status: "delivered",  total: 28.99  },
-  ],
-  usr7: [
-    { id: "#00519", customer: "Ahmed Al-Rashid", status: "delivered",  total: 149.99 },
-    { id: "#00518", customer: "Fatima Al-Zahra", status: "shipped",    total: 124.99 },
-    { id: "#00517", customer: "Khalid Al-Farsi", status: "delivered",  total: 89.99  },
-    { id: "#00516", customer: "Layla Hassan",    status: "in_production", total: 59.99  },
-    { id: "#00515", customer: "Omar Saeed",      status: "delivered",  total: 44.99  },
-  ],
-  usr8: [
-    { id: "#00023", customer: "Camille Dupont",  status: "delivered",  total: 9.99   },
-    { id: "#00022", customer: "Pierre Martin",   status: "shipped",    total: 34.99  },
-    { id: "#00021", customer: "Sophie Bernard",  status: "issue",      total: 19.99  },
-    { id: "#00020", customer: "Louis Dubois",    status: "in_production", total: 24.99  },
-    { id: "#00019", customer: "Marie Laurent",   status: "delivered",  total: 9.99   },
-  ],
-};
+function getStoreStats(sellerId: string): StoreStats {
+  const orders = mockOrders.filter((o) => o.sellerId === sellerId);
+  const totalOrders = orders.length;
+  const revenue = orders.reduce((s, o) => s + o.sellerPrice * o.quantity, 0);
+  const issues = orders.filter((o) => o.status === "issue").length;
+  const delivered = orders.filter((o) => o.status === "delivered").length;
+  return {
+    totalOrders,
+    revenue,
+    issues,
+    completionRate: totalOrders ? Math.round((delivered / totalOrders) * 100) : 0,
+    avgDeliveryDays: computeAvgDeliveryDays(orders),
+    rating: 4.5,
+  };
+}
 
-const STORE_STATS: Record<string, StoreStats> = {
-  usr1: { totalOrders: 342, revenue: 24830, issues: 3,  completionRate: 97,  avgDeliveryDays: 4.2, rating: 4.8 },
-  usr2: { totalOrders: 189, revenue: 18340, issues: 2,  completionRate: 99,  avgDeliveryDays: 3.5, rating: 4.9 },
-  usr3: { totalOrders: 145, revenue: 12890, issues: 1,  completionRate: 98,  avgDeliveryDays: 5.1, rating: 4.6 },
-  usr4: { totalOrders: 67,  revenue: 4920,  issues: 4,  completionRate: 91,  avgDeliveryDays: 7.8, rating: 4.2 },
-  usr5: { totalOrders: 132, revenue: 11760, issues: 0,  completionRate: 100, avgDeliveryDays: 4.0, rating: 4.7 },
-  usr6: { totalOrders: 38,  revenue: 2140,  issues: 6,  completionRate: 84,  avgDeliveryDays: 9.3, rating: 3.9 },
-  usr7: { totalOrders: 521, revenue: 67890, issues: 2,  completionRate: 99,  avgDeliveryDays: 2.8, rating: 4.9 },
-  usr8: { totalOrders: 21,  revenue: 1230,  issues: 3,  completionRate: 86,  avgDeliveryDays: 8.5, rating: 3.7 },
-};
+const MOCK_STORES: StoreRecord[] = mockSellers.map(toStoreRecord);
 
 // ─── Modal ────────────────────────────────────────────────────────────────────
 function StoreModal({
@@ -360,9 +269,24 @@ export default function UserDetailPage() {
     );
   }
 
-  const products = STORE_PRODUCTS[store.id] ?? [];
-  const orders   = STORE_ORDERS[store.id]   ?? [];
-  const stats    = STORE_STATS[store.id]    ?? { totalOrders: 0, revenue: 0, issues: 0, completionRate: 0, avgDeliveryDays: 0, rating: 0 };
+  const products: Product[] = mockProducts
+    .filter((p) => p.sellerId === store.id)
+    .map((p) => ({
+      id: p.id,
+      name: p.name,
+      price: p.sellerPrice,
+      category: "3D Print",
+      status: p.isActive ? "published" : "draft",
+    }));
+  const orders: Order[] = mockOrders
+    .filter((o) => o.sellerId === store.id)
+    .map((o) => ({
+      id: o.id,
+      customer: "Unknown",
+      status: o.status,
+      total: o.sellerPrice * o.quantity,
+    }));
+  const stats = getStoreStats(store.id);
 
   const handleSave = (form: StoreForm) => {
     setStore((prev) => prev ? { ...prev, ...form } : prev);
