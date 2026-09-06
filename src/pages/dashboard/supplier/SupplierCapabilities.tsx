@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
 import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
-// @ts-ignore — JSX component without declarations
-import ShellsStepper from "../../../features/home/FileUploader/ShellsStepper.jsx";
 import { mockCapabilities } from "./mockSupplier.js";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -37,6 +36,132 @@ interface PrinterEntry {
   count: number;
 }
 
+function PrinterBrandSelect({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (brand: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
+
+  const placeMenu = () => {
+    const el = triggerRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    setPos({ top: r.bottom + 6, left: r.left, width: r.width });
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    placeMenu();
+    function onPointer(e: MouseEvent) {
+      const t = e.target as Node;
+      if (triggerRef.current?.contains(t) || menuRef.current?.contains(t)) return;
+      setOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("keydown", onKey);
+    window.addEventListener("scroll", placeMenu, true);
+    window.addEventListener("resize", placeMenu);
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("keydown", onKey);
+      window.removeEventListener("scroll", placeMenu, true);
+      window.removeEventListener("resize", placeMenu);
+    };
+  }, [open]);
+
+  return (
+    <div className="relative w-fit">
+      <span
+        aria-hidden
+        className="invisible block whitespace-nowrap rounded-md border border-transparent px-3 py-2 pr-12 text-sm uppercase"
+      >
+        Select printer brand
+      </span>
+      <button
+        ref={triggerRef}
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+        className={`absolute inset-0 flex h-full w-full items-center rounded-md border bg-dark px-3 py-2 pr-10 text-left text-sm outline-none transition-colors ${
+          open ? "border-green-500" : "border-white/10 hover:border-white/20"
+        } ${value ? "text-white" : "text-white/25 uppercase"}`}
+      >
+        {value || "Select printer brand"}
+      </button>
+      <span
+        aria-hidden
+        className={`pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-white/40 transition-transform duration-200 ${
+          open ? "rotate-180" : ""
+        }`}
+      >
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <path
+            d="M2.5 4.5L6 8L9.5 4.5"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
+
+      {createPortal(
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              ref={menuRef}
+              role="listbox"
+              initial={{ opacity: 0, y: -8, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.97 }}
+              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+              style={{ top: pos.top, left: pos.left, minWidth: pos.width }}
+              className="fixed z-[200] origin-top overflow-hidden rounded-xl border border-white/10 bg-[rgba(10,18,12,0.97)] py-1.5 shadow-xl backdrop-blur-md"
+            >
+              {PRINTER_BRANDS.map((b, i) => {
+                const selected = b === value;
+                return (
+                  <motion.button
+                    key={b}
+                    type="button"
+                    role="option"
+                    aria-selected={selected}
+                    initial={{ opacity: 0, x: -6 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.2, ease: "easeOut", delay: 0.04 + i * 0.028 }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      onChange(b);
+                      setOpen(false);
+                    }}
+                    className={`flex w-full items-center px-3.5 py-2 text-left text-sm transition-colors hover:bg-white/[0.06] ${
+                      selected ? "text-green-500" : "text-white/80 hover:text-white"
+                    }`}
+                  >
+                    {b}
+                    {selected && <span className="ml-auto text-[10px]">✓</span>}
+                  </motion.button>
+                );
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body,
+      )}
+    </div>
+  );
+}
+
 function ColorSwatch({ color, onRemove }: { color: string; onRemove: () => void }) {
   return (
     <div className="group relative">
@@ -63,10 +188,8 @@ export default function SupplierCapabilities() {
   const [activeDays, setActiveDays] = useState<string[]>(["Mon", "Tue", "Wed", "Thu", "Fri"]);
   const [technologies, setTechnologies] = useState<string[]>(mockCapabilities.technologies);
   const [printers, setPrinters] = useState<PrinterEntry[]>([
-    { id: "p1", brand: "Creality", customBrand: "", model: "Ender 3 Pro", count: 2 },
-    { id: "p2", brand: "Bambu Lab", customBrand: "", model: "X1 Carbon",  count: 1 },
+    { id: "p1", brand: "", customBrand: "", model: "", count: 1 },
   ]);
-  const [maxParallelJobs, setMaxParallelJobs] = useState(mockCapabilities.maxParallelJobs);
   const [saved, setSaved] = useState(false);
 
   // State: materials per technology
@@ -132,7 +255,7 @@ export default function SupplierCapabilities() {
   const addPrinter = () => {
     setPrinters((prev) => [
       ...prev,
-      { id: `p_${Date.now()}`, brand: "Creality", customBrand: "", model: "", count: 1 },
+      { id: `p_${Date.now()}`, brand: "", customBrand: "", model: "", count: 1 },
     ]);
   };
 
@@ -426,16 +549,10 @@ export default function SupplierCapabilities() {
                   >
                     <div className="pb-4">
                     <div className="flex flex-wrap items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3">
-                  {/* Brand dropdown */}
-                  <select
+                  <PrinterBrandSelect
                     value={printer.brand}
-                    onChange={(e) => updatePrinter(printer.id, { brand: e.target.value, customBrand: "" })}
-                    className="rounded-md border border-white/10 bg-dark px-3 py-2 text-sm text-white outline-none transition-colors focus:border-green-500 cursor-pointer min-w-[140px]"
-                  >
-                    {PRINTER_BRANDS.map((b) => (
-                      <option key={b} value={b}>{b}</option>
-                    ))}
-                  </select>
+                    onChange={(brand) => updatePrinter(printer.id, { brand, customBrand: "" })}
+                  />
 
                   {/* Custom brand input — only when "Other" is selected */}
                   <AnimatePresence initial={false}>
@@ -464,8 +581,8 @@ export default function SupplierCapabilities() {
                     type="text"
                     value={printer.model}
                     onChange={(e) => updatePrinter(printer.id, { model: e.target.value })}
-                    placeholder="Model..."
-                    className="rounded-md border border-white/10 bg-dark px-3 py-2 text-sm text-white outline-none transition-colors focus:border-green-500 placeholder:text-white/25 min-w-[160px] flex-1"
+                    placeholder="printer model"
+                    className="rounded-md border border-white/10 bg-dark px-3 py-2 text-sm text-white outline-none transition-colors focus:border-green-500 placeholder:text-white/25 placeholder:uppercase min-w-[160px] flex-1"
                   />
 
                   {/* Count stepper */}
@@ -512,17 +629,6 @@ export default function SupplierCapabilities() {
               >
                 + Add Printer
               </button>
-
-              {/* Divider */}
-              <div className="mt-4 h-px w-full bg-white/10" />
-
-              {/* Max parallel jobs */}
-              <div className="mt-4 flex flex-col gap-2 w-fit">
-                <span className="text-[10px] uppercase tracking-wider text-white/40">
-                  Max Parallel Jobs
-                </span>
-                <ShellsStepper value={maxParallelJobs} onChange={setMaxParallelJobs} min={1} max={20} />
-              </div>
 
             </div>
           </DashboardCard>

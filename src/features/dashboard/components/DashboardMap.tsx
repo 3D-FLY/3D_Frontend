@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import DashboardLayout from "../DashboardLayout.js";
-import DashboardPage, { DashboardPageTitle } from "./DashboardPage.js";
+import DashboardPage from "./DashboardPage.js";
 import LogoLoaderOverlay from "../../../components/ui/LogoLoaderOverlay.js";
 import { usePartnerLocations } from "../../network/PartnerLocationsContext.jsx";
 import { isWorldGeoReady } from "../../network/worldGeoCache.js";
@@ -37,21 +37,16 @@ export default function DashboardMap({ role }: DashboardMapProps) {
 
   return (
     <DashboardLayout role={role}>
-      <DashboardPage header={<DashboardPageTitle>GLOBAL NETWORK</DashboardPageTitle>}>
+      <DashboardPage
+        header={
+          <h1 className="w-full text-center text-[clamp(28px,4vw,48px)] font-semibold text-white">
+            GLOBAL NETWORK
+          </h1>
+        }
+      >
 
-        {/* Partner count */}
-        <div className="flex items-baseline gap-3">
-          <span className="text-[clamp(2rem,6vw,64px)] font-extrabold italic leading-none text-green-500">
-            {partners.length}
-          </span>
-          <span className="text-sm font-bold uppercase tracking-widest text-white/40">
-            Worldwide Partners
-          </span>
-        </div>
-
-        {/* Map */}
         <motion.div
-          className="relative w-full overflow-hidden rounded-2xl border border-white/10"
+          className="relative w-full overflow-hidden border-none bg-transparent"
           style={{ height: "70vh", minHeight: "400px" }}
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: mapReady ? 1 : 0, scale: mapReady ? 1 : 0.98 }}
@@ -67,6 +62,25 @@ export default function DashboardMap({ role }: DashboardMapProps) {
             hideLoadingOverlay
             className="h-full"
           />
+        </motion.div>
+
+        <motion.div
+          className="flex flex-col items-center text-center"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.5 }}
+        >
+          <div className="flex flex-col items-center justify-center gap-1">
+            <p
+              className="m-0 font-sans text-[clamp(3rem,7vw,88px)] font-extrabold italic leading-none tracking-[0.02em] text-[#5AC422]"
+              aria-live="polite"
+            >
+              {partners.length}
+            </p>
+            <p className="text-gray font-extrabold uppercase tracking-wide leading-tight text-[clamp(14px,2vw,28px)]">
+              Worldwide partners!
+            </p>
+          </div>
         </motion.div>
 
       </DashboardPage>

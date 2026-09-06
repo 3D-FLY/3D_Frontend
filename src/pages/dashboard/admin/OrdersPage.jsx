@@ -405,7 +405,7 @@ export default function OrdersPage() {
         </DashboardCard>
 
         {/* Past Orders — everything marked DONE */}
-        <DashboardCard title="Past Orders" autoHeight>
+        <DashboardCard title="Print History" autoHeight>
           {pastOrders.length === 0 ? (
             <p className="py-10 text-center text-sm text-zinc-500">No past orders yet.</p>
           ) : (

@@ -173,7 +173,20 @@ export default function WorldMap({
   const [mapWidth,  setMapWidth]  = useState(null);
   const [mapHeight, setMapHeight] = useState(null);
   const [geoLoaded, setGeoLoaded] = useState(isWorldGeoReady);
-  const wasDraggingRef = useRef(false);
+  const [canPan, setCanPan] = useState(false);
+
+  useEffect(() => {
+    const sync = (e) => setCanPan(Boolean(e.ctrlKey || e.metaKey));
+    const clear = () => setCanPan(false);
+    window.addEventListener("keydown", sync);
+    window.addEventListener("keyup", sync);
+    window.addEventListener("blur", clear);
+    return () => {
+      window.removeEventListener("keydown", sync);
+      window.removeEventListener("keyup", sync);
+      window.removeEventListener("blur", clear);
+    };
+  }, []);
 
   // Notify parent once geo is ready (stable ref avoids stale closure)
   const onLoadRef = useRef(onLoad);
@@ -286,7 +299,7 @@ export default function WorldMap({
   return (
     <div
       ref={frameRef}
-      className={`relative w-full overflow-hidden bg-transparent ${className}`}
+      className={`relative w-full overflow-hidden bg-transparent ${canPan ? "cursor-grab" : "cursor-default"} ${className}`}
       style={height != null ? { height } : { height: "100%" }}
     >
       {/* Loading overlay — shown until the world atlas GeoJSON is fetched */}
@@ -307,7 +320,13 @@ export default function WorldMap({
           zoom={zoom}
           minZoom={MIN_ZOOM}
           maxZoom={MAX_ZOOM}
-          filterZoomEvent={(e) => e.type !== "wheel"}
+          filterZoomEvent={(e) => {
+            // Wheel zoom is handled separately via Ctrl/Cmd + wheel.
+            if (e.type === "wheel") return false;
+            // Pan only while Ctrl (Windows) or Cmd (Mac) is held.
+            if (e.button) return false;
+            return Boolean(e.ctrlKey || e.metaKey);
+          }}
           onMoveStart={handleMoveStart}
           onMove={handleMove}
           onMoveEnd={handleMoveEnd}
