@@ -40,5 +40,5 @@ Small page-level maps are fine inline (see `INITIAL_SUPPLIERS` in `src/pages/das
 
 ## Open questions
 - `src/pages/dashboard/seller/mockOrders.ts` has no importers, so it duplicates `src/data/mockOrders.ts` as dead code. Don't extend it.
-- Dead code: the exported `mockSupplierPayments` in `src/pages/dashboard/supplier/mockSupplier.ts` has no importers (`SupplierPayments.tsx` builds its own). Don't extend it.
+- Dead code: the exported `mockSupplierPayments` and `mockSupplierRevenue` in `src/pages/dashboard/supplier/mockSupplier.ts` have no importers (`SupplierPayments.tsx` builds its own). Don't extend them.
 - `AdminDashboard.tsx` hardcodes "Welcome, Raz" instead of deriving it from a current-user record (there's no `CURRENT_ADMIN`).
