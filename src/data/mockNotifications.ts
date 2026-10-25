@@ -30,20 +30,20 @@ export interface Notification {
 }
 
 export const mockNotifications: Notification[] = [
-  { id: "a1", orderId: "#3012", reason: "supplier_rejected", title: "Supplier Rejected",    description: "Rejected by: Supplier A — reason: capacity full",     date: "2025-05-13", status: "open",        isNew: true,  role: "admin"  },
-  { id: "a2", orderId: "#3015", reason: "no_supplier",       title: "No Supplier Found",   description: "No match found in Tel Aviv area for FDM/PLA",          date: "2025-05-12", status: "open",        isNew: true,  role: "admin"  },
-  { id: "a3", orderId: "#3009", reason: "missing_data",      title: "Missing Data",        description: "Missing: print file for product SoldierXPT",           date: "2025-05-11", status: "in_progress", isNew: false, role: "admin"  },
-  { id: "a4", orderId: "#3007", reason: "shipping_issue",    title: "Shipping Delay",      description: "Package stuck at courier for 3 days",                  date: "2025-05-10", status: "open",        isNew: true,  role: "admin"  },
-  { id: "a5", orderId: "#3005", reason: "production_delay",  title: "Production Delay",    description: "Supplier reported 2-day delay on order #3005",         date: "2025-05-09", status: "resolved",    isNew: false, role: "admin"  },
+  { id: "a1", orderId: "#0046", reason: "supplier_rejected", title: "Supplier Rejected",    description: "Rejected by: Supplier A — reason: capacity full",     date: "2025-05-13", status: "open",        isNew: true,  role: "admin"  },
+  { id: "a2", orderId: "#0042", reason: "no_supplier",       title: "No Supplier Found",   description: "No match found in Tel Aviv area for FDM/PLA",          date: "2025-05-12", status: "open",        isNew: true,  role: "admin"  },
+  { id: "a3", orderId: "#0032", reason: "missing_data",      title: "Missing Data",        description: "Missing: print file for product SoldierXPT",           date: "2025-05-11", status: "in_progress", isNew: false, role: "admin"  },
+  { id: "a4", orderId: "#0040", reason: "shipping_issue",    title: "Shipping Delay",      description: "Package stuck at courier for 3 days",                  date: "2025-05-10", status: "open",        isNew: true,  role: "admin"  },
+  { id: "a5", orderId: "#0034", reason: "production_delay",  title: "Production Delay",    description: "Supplier reported 2-day delay on order #0034",         date: "2025-05-09", status: "resolved",    isNew: false, role: "admin"  },
   { id: "a6", orderId: "#0041", reason: "supplier_rejected", title: "Supplier Rejected",   description: "Your order was rejected by PrintLab Berlin",           date: "2025-05-13", status: "open",        isNew: true,  role: "seller" },
   { id: "a7", orderId: "#0038", reason: "shipping_issue",    title: "Shipping Delay",      description: "Your package has been delayed at the courier",         date: "2025-05-10", status: "open",        isNew: true,  role: "seller" },
   { id: "a8", orderId: "#0036", reason: "dispute_opened",    title: "Dispute Opened",      description: "A dispute has been opened on order #0036",             date: "2025-05-08", status: "in_progress", isNew: false, role: "seller" },
   { id: "a9", orderId: "#0035", reason: "order_delivered",   title: "Order Delivered",     description: "Order #0035 has been delivered successfully",          date: "2025-05-07", status: "resolved",    isNew: false, role: "seller" },
   { id: "s1", orderId: "#0041", reason: "new_order",         title: "New Order Proposed",  description: "A new print order has been assigned to you",           date: "2025-05-13", status: "open",        isNew: true,  role: "supplier" },
-  { id: "s2", orderId: "#0039", reason: "deadline_soon",     title: "Deadline Approaching", description: "Order #0039 must be shipped by tomorrow",             date: "2025-05-12", status: "open",        isNew: true,  role: "supplier" },
+  { id: "s2", orderId: "#0043", reason: "deadline_soon",     title: "Deadline Approaching", description: "Order #0043 must be shipped by tomorrow",             date: "2025-05-12", status: "open",        isNew: true,  role: "supplier" },
   { id: "s3", orderId: "#0038", reason: "dispute_opened",    title: "Dispute Opened",      description: "A dispute has been opened on order #0038",             date: "2025-05-10", status: "in_progress", isNew: false, role: "supplier" },
-  { id: "s4", orderId: "#0037", reason: "payment_received",  title: "Payment Received",    description: "Payment of $42.00 received for order #0037",           date: "2025-05-08", status: "resolved",    isNew: false, role: "supplier" },
-  { id: "s5", orderId: "#0036", reason: "order_cancelled",   title: "Order Cancelled",     description: "Order #0036 has been cancelled by the platform",       date: "2025-05-07", status: "resolved",    isNew: false, role: "supplier" },
+  { id: "s4", orderId: "#0033", reason: "payment_received",  title: "Payment Received",    description: "Payment of $14.00 received for order #0033",           date: "2025-05-08", status: "resolved",    isNew: false, role: "supplier" },
+  { id: "s5", orderId: "#0046", reason: "order_cancelled",   title: "Order Cancelled",     description: "Order #0046 has been cancelled by the platform",       date: "2025-05-07", status: "resolved",    isNew: false, role: "supplier" },
 ];
 
 export function getNotificationsByRole(role: NotificationRole): Notification[] {
@@ -144,15 +144,15 @@ export interface LinkedOrderInfo {
 }
 
 export const mockLinkedOrders: Record<string, LinkedOrderInfo> = {
-  "#3012": { product: "Anime Character",    supplier: "FabLab Tokyo",     status: "issue",         total: 55.00 },
-  "#3015": { product: "Robot Warrior",      supplier: "Unassigned",       status: "pending",       total: 57.00 },
-  "#3009": { product: "Samurai Warrior",    supplier: "FabLab Tokyo",     status: "in_production", total: 74.00 },
-  "#3007": { product: "Eiffel Tower Model", supplier: "Imprimerie Paris", status: "issue",         total: 48.50 },
-  "#3005": { product: "Pirate Ship Mini",   supplier: "PrintHub TLV",     status: "shipped",       total: 29.99 },
+  "#0046": { product: "RocketBase",         supplier: "PrintLab Berlin",  status: "pending",       total: 70.00 },
+  "#0042": { product: "SoldierXPT",         supplier: "PrintLab Berlin",  status: "pending",       total: 22.00 },
+  "#0032": { product: "PhoenixV2",          supplier: "FormLabs TLV",     status: "issue",         total: 75.00 },
+  "#0040": { product: "WarriorX",           supplier: "3D Masters NY",    status: "shipped",       total: 67.50 },
+  "#0034": { product: "WarriorX",           supplier: "3D Masters NY",    status: "in_production", total: 67.50 },
   "#0041": { product: "SoldierXPT",         supplier: "PrintLab Berlin",  status: "in_production", total: 42.00 },
   "#0038": { product: "RocketBase",         supplier: "FabLab Tokyo",     status: "issue",         total: 89.00 },
   "#0036": { product: "DragonMini",         supplier: "PrintHub TLV",     status: "shipped",       total: 34.99 },
   "#0035": { product: "MechBot",            supplier: "PrintLab Berlin",  status: "delivered",     total: 58.00 },
-  "#0039": { product: "DragonMini",         supplier: "PrintLab Berlin",  status: "in_production", total: 34.99 },
-  "#0037": { product: "SoldierXPT",         supplier: "PrintLab Berlin",  status: "delivered",     total: 42.00 },
+  "#0043": { product: "DragonMini",         supplier: "PrintLab Berlin",  status: "accepted",      total: 18.00 },
+  "#0033": { product: "RocketBase",         supplier: "PrintLab Berlin",  status: "delivered",     total: 89.00 },
 };

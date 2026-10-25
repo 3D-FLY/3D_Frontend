@@ -30,7 +30,7 @@ paths:
 When a role needs a different shape, write a **derive-only adapter** next to the pages. It maps from `src/data` and never holds its own copy of the records:
 - `src/pages/dashboard/supplier/mockSupplier.ts` → `getSupplierOrders()` maps `mockOrders` + `mockProducts` into `SupplierOrder` (and keeps `storeName` hidden from supplier UI).
 - `src/pages/dashboard/seller/mockProducts.ts` maps shared products into the seller `Product` form shape.
-Data with no shared entity behind it (a revenue time series, payout history) lives in the role's adapter file as plain mock arrays (`mockSupplierRevenue`, `mockSupplierPayments` in `mockSupplier.ts`). Any order IDs it references must still be real.
+Aggregates such as payout history or a revenue time series are derived from `mockOrders` in the page (`mockSupplierPayments` and `mockSupplierRevenue` inside `src/pages/dashboard/supplier/SupplierPayments.tsx`). Any order IDs a role-only array references must still be real.
 Small page-level maps are fine inline (see `INITIAL_SUPPLIERS` in `src/pages/dashboard/admin/SuppliersPage.jsx`).
 
 ## Order status
@@ -40,6 +40,5 @@ Small page-level maps are fine inline (see `INITIAL_SUPPLIERS` in `src/pages/das
 
 ## Open questions
 - `src/pages/dashboard/seller/mockOrders.ts` has no importers, so it duplicates `src/data/mockOrders.ts` as dead code. Don't extend it.
-- Admin notification `orderId`s (`#3005`, `#3007`, `#3009`, `#3012`, `#3015`) don't match any order in `mockOrders` (`#0032…#0047`). Seller/supplier notifications reference real orders.
-- `mockSupplierPayments` lists `#0037`, which belongs to `SUP-002`, not the current supplier `SUP-001`. Its `amount` values are hand-typed strings instead of being derived from `supplierCost * quantity`.
+- Dead code: the exported `mockSupplierPayments` in `src/pages/dashboard/supplier/mockSupplier.ts` has no importers (`SupplierPayments.tsx` builds its own). Don't extend it.
 - `AdminDashboard.tsx` hardcodes "Welcome, Raz" instead of deriving it from a current-user record (there's no `CURRENT_ADMIN`).

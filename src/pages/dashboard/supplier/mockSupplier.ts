@@ -92,7 +92,7 @@ export interface SupplierPayment {
 }
 
 export const mockSupplierPayments: SupplierPayment[] = [
-  { orderId: "#0037", date: "2025-05-08", amount: "$42.00", status: "paid" },
+  { orderId: "#0047", date: "2025-05-14", amount: "$10.00", status: "pending" },
   { orderId: "#0035", date: "2025-05-01", amount: "$58.00", status: "paid" },
   { orderId: "#0033", date: "2025-04-22", amount: "$34.99", status: "paid" },
   { orderId: "#0041", date: "2025-05-12", amount: "$42.00", status: "pending" },

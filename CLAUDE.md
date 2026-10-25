@@ -64,7 +64,7 @@ assets/icons/            icons shared across features
 - Two admin map routes (`/supplier-map` via `AdminDashboardShell`, `/map` via `DashboardMap`).
 - Suspense fallback: `null` (admin/seller) vs `<LoadingPage />` (supplier).
 - Mobile breakpoint: `md` (landing sections) vs `lg` (HowItWorks) vs 1280px (Navbar). The dashboard has no mobile shell yet.
-- Dead/duplicate code: `pages/SellerDashboard.tsx`, `pages/dashboard/seller/mockOrders.ts`, `HorizontalCarousel`, `NotificationList` vs `NotificationsList`.
+- Dead/duplicate code: `pages/SellerDashboard.tsx`, `pages/dashboard/seller/mockOrders.ts`, `HorizontalCarousel`, `NotificationList` vs `NotificationsList`, `mockSupplierPayments` in `pages/dashboard/supplier/mockSupplier.ts` (unused; `SupplierPayments.tsx` builds its own from `mockOrders`).
 
 ## Context files
 **Edit only `.claude/` (and this CLAUDE.md). Cursor files are pointers.**
