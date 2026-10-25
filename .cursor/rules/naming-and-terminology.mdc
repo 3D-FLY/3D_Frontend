@@ -1,0 +1,6 @@
+---
+description: File/component naming, UI terminology (Notifications, My Store), title case, English comments
+globs: src/**
+alwaysApply: false
+---
+@.claude/rules/naming-and-terminology.md

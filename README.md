@@ -1,75 +1,38 @@
 # 3D-Fly — Frontend
 
-> 3DFLY is a smart 3D-printing marketplace that connects online stores with nearby suppliers, enabling products to be printed and shipped faster without managing inventory or logistics.
+3D-Fly is a 3D-printing marketplace. It connects online stores with nearby print-farm suppliers, so products are printed and shipped on demand with no inventory.
+This repo is the web frontend: the public landing site plus the Admin, Seller and Supplier dashboards. All data is currently mock data (`src/data/`).
 
-## Overview
+**Stack:** React 18 · TypeScript (migrating from JS) · Vite 7 · React Router 7 · Tailwind CSS v4 · Framer Motion · Recharts
 
-3D-Fly is a platform that bridges the gap between e-commerce stores and local 3D-printing suppliers. Store owners can list products without holding physical inventory, while nearby print farms fulfil orders on demand. This repository contains the web frontend built with React and TypeScript.
-
-## Tech Stack
-
-| Layer | Technology |
-|---|---|
-| UI Framework | React 18 + TypeScript |
-| Styling | Tailwind CSS |
-| Routing | React Router v6 |
-| Animations | Framer Motion |
-| Build Tool | Vite |
-| Backend | Spring Boot (separate repo) |
-| Mobile | Expo / React Native (separate repo) |
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js >= 18
-- npm >= 9
-
-### Installation
+## Getting started
+Requires Node.js ≥ 18.
 
 ```bash
-git clone https://github.com/your-org/3D_Frontend.git
-cd 3D_Frontend
 npm install
-npm run dev
+npm run dev        # http://localhost:5173
 ```
 
-The dev server starts at `http://localhost:5173` by default.
-
-## Project Structure
-
-```
-src/
-├── features/           # Domain-driven feature modules
-│   ├── dashboard/      # Admin & shop dashboard components
-│   ├── network/        # Supplier map and partner network
-│   ├── home/           # Landing page sections
-│   ├── auth/           # Login / registration
-│   └── Store/          # Store-front feature
-├── pages/              # Route-level page components
-│   ├── admin/          # Admin-only pages
-│   └── shop/           # Shop-owner pages
-├── components/         # Shared UI & layout primitives
-│   ├── ui/
-│   └── layout/
-├── assets/             # Global images and icons
-│   └── icons/
-├── types/              # Shared TypeScript types
-└── hooks/              # Shared custom hooks
-```
-
-## Dashboard Roles
-
-| Role | Description |
+| Command | What it does |
 |---|---|
-| **Admin** | Full platform management — users, suppliers, orders, settings, and the global supplier map |
-| **Shop** | Store-level view — own orders, production status, and shop settings |
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm run preview` | Serve the production build |
+| `npm run lint` | ESLint (`.js`/`.jsx`) |
+| `npx tsc --noEmit` | Typecheck |
 
-The dashboard layout adapts automatically based on the `role` prop passed to `DashboardLayout`.
+## Dashboards
+| Role | Entry URL |
+|---|---|
+| Admin | `/dashboard/admin` |
+| Seller | `/dashboard/seller` |
+| Supplier | `/dashboard/supplier` |
 
-## Related Repos
+## Conventions
+Project structure, coding rules and workflows are documented in [CLAUDE.md](CLAUDE.md) and `.claude/rules/`. They're used by Claude Code and Cursor and are the source of truth for contributors too.
 
-| Repo | Stack | Description |
-|---|---|---|
-| `3D_Backend` | Spring Boot | REST API, business logic, database |
-| `3D_Mobile` | Expo / React Native | iOS & Android companion app |
+## Related repos
+| Repo | Stack |
+|---|---|
+| `3D_Backend` | Spring Boot |
+| `3D_Mobile` | Expo / React Native |

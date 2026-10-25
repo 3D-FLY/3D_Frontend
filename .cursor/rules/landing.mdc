@@ -1,0 +1,6 @@
+---
+description: Landing site sections, mobile/desktop component split, Explore, maps, file upload
+globs: src/features/home/**,src/features/Explore/**,src/features/auth/**,src/features/network/**,src/pages/*.jsx,src/pages/*.tsx,src/components/layout/**
+alwaysApply: false
+---
+@.claude/rules/landing.md

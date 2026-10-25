@@ -1,0 +1,6 @@
+---
+description: 3D-Fly project context (stack, commands, folder map, critical rules)
+globs:
+alwaysApply: true
+---
+@CLAUDE.md

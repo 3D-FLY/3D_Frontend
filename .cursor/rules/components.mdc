@@ -1,0 +1,6 @@
+---
+description: Component structure, props typing, where shared vs feature components live, reuse list
+globs: src/components/**,src/features/**/*.tsx,src/features/**/*.jsx
+alwaysApply: false
+---
+@.claude/rules/components.md

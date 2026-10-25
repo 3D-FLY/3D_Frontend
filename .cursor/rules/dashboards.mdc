@@ -1,0 +1,6 @@
+---
+description: Role dashboards (admin/seller/supplier): routing in App.jsx, Sidebar items, DashboardLayout/DashboardPage anatomy
+globs: src/pages/dashboard/**,src/features/dashboard/**,src/App.jsx
+alwaysApply: false
+---
+@.claude/rules/dashboards.md

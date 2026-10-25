@@ -1,0 +1,6 @@
+---
+description: Mock data in src/data, ID formats, cross-role consistency, role adapters, order status constants
+globs: src/data/**,src/constants/**,src/pages/dashboard/**/mock*.ts
+alwaysApply: false
+---
+@.claude/rules/data.md

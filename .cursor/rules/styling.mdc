@@ -1,0 +1,6 @@
+---
+description: Color tokens (green-500), Tailwind v4 conventions, dark theme, Framer Motion and Recharts styling
+globs: src/**/*.tsx,src/**/*.jsx,src/**/*.css,tailwind.config.js
+alwaysApply: false
+---
+@.claude/rules/styling.md
