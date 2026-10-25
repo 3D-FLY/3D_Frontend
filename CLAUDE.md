@@ -40,7 +40,6 @@ assets/icons/            icons shared across features
 7. **Brand green `#5ac422` is written as `*-green-500`** in classes. Raw hex is allowed only where classes can't reach (inline `style`, Recharts props, Framer `animate` values).
 8. **Terminology:** "Notifications" (never "Alerts"). UI strings are in title case in source, and uppercasing is done with CSS `uppercase`.
 9. **New code comments are in English.** Leave existing Hebrew comments as they are.
-10. **Don't use `docs/DOCS.md` or old README content as a source of truth.** It describes routes, roles, and props that don't exist. This file and `.claude/rules/` win.
 
 ## Path-scoped rules (load automatically for matching files)
 - `.claude/rules/components.md`: component structure, props, where shared components go
