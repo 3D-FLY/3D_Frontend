@@ -63,7 +63,7 @@ assets/icons/            icons shared across features
 - Admin sidebar label "Store" vs route `/stores`; "seller" in code vs "store" in UI copy.
 - Two admin map routes (`/supplier-map` via `AdminDashboardShell`, `/map` via `DashboardMap`).
 - Suspense fallback: `null` (admin/seller) vs `<LoadingPage />` (supplier).
-- Mobile breakpoint: `md` (landing sections) vs `lg` (HowItWorks) vs 1280px (Navbar). The dashboard has no mobile shell yet.
+- Landing mobile breakpoint: `md` (most sections) vs `lg` (HowItWorks) vs 1280px (Navbar). Dashboards use `md`, and their mobile shell is configured per role in `src/features/dashboard/mobileNav.ts` (Seller/Supplier still to be designed).
 - Dead/duplicate code: `pages/SellerDashboard.tsx`, `pages/dashboard/seller/mockOrders.ts`, `HorizontalCarousel`, `NotificationList` vs `NotificationsList`, `mockSupplierPayments` and `mockSupplierRevenue` in `pages/dashboard/supplier/mockSupplier.ts` (unused; `SupplierPayments.tsx` builds its own from `mockOrders`).
 
 ## Context files

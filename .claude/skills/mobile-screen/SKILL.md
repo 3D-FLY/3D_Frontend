@@ -6,11 +6,12 @@ description: Use when adapting an existing dashboard page (Admin/Seller/Supplier
 # Mobile screen
 
 ## Current state (read before starting)
-- **The dashboard shell has no mobile layout.** `src/features/dashboard/DashboardLayout.tsx` uses a fixed 210px sidebar (`SIDEBAR_W`), a fixed 72px navbar, `marginLeft: SIDEBAR_W`, and 50px side padding, all as inline-style constants. On a phone, page content gets ~100px of width.
+- **Dashboard shell:** below `md`, `DashboardLayout.tsx` uses a mobile shell (top bar + bottom nav) for roles configured in `MOBILE_NAV` (`src/features/dashboard/mobileNav.ts`). Admin has one. Seller and Supplier are `null` (to be designed), so they still render the desktop layout (fixed 210px sidebar) on phones. See "Mobile shell" in `.claude/rules/dashboards.md`.
 - Inside pages, grids are already mostly mobile-first (`grid-cols-1 sm:grid-cols-2 xl:grid-cols-4` in `AdminDashboard.tsx`). `DashboardTable` uses fixed `gridTemplateColumns` (e.g. 11 columns in `SupplierOrders.tsx`), so it won't fit a phone.
 - Landing already has a working pattern: `src/features/home/WhatCanYouSell/WhatCanYouSell.tsx`.
 
-**Step 0: settle the shell first.** If the task touches any dashboard page and DashboardLayout still has no mobile branch, stop and ask the user how the sidebar should behave on mobile (e.g. drawer like `Navbar.jsx`'s menu, or a bottom bar) and at which breakpoint. The repo uses `md` (landing sections), `lg` (HowItWorks) and 1280px (Navbar), and there's no decided standard. Record the answer in `.claude/rules/dashboards.md` before writing code.
+**Step 0: check the role's shell.** Dashboard breakpoint is `md`. If `MOBILE_NAV[role]` is `null`, that role's mobile design isn't ready: stop and ask the user for its bottom-bar and profile-menu items (and the Figma frame) before adapting its pages. Never invent them. Once you have them, fill in the config entry, which is the only change needed to turn the shell on.
+Content padding on mobile is already handled by the shell (16px sides, room for both bars). Don't add page-level offsets.
 
 ## Pattern A: structural split (different layout on mobile)
 Use this when the mobile UI is a different composition (cards instead of a table, a pager instead of a grid).

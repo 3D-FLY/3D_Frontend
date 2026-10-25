@@ -48,9 +48,18 @@ export default function SupplierExample() {
 - Role-agnostic features (Notifications, Global map) are shared components with `role`. The page file is a 5-line wrapper: see `src/pages/dashboard/supplier/SupplierNotifications.tsx` and `src/pages/dashboard/admin/MapPage.tsx`.
 - Placeholder pages use the "Coming Soon" card from `src/pages/dashboard/admin/StoresPage.tsx`.
 
+## Mobile shell (below `md`)
+- `DashboardLayout` switches to the mobile shell **only for roles that have an entry in `MOBILE_NAV`** (`src/features/dashboard/mobileNav.ts`). Right now that's Admin. Seller and Supplier are `null` (to be designed) and keep the desktop layout at every width.
+- Below `md`, the shell hides the desktop navbar, green banner, sidebar, and `FooterSlim`, and renders `MobileTopBar` (logo, role title from `roleLabels`, profile `UserMenu`) + `MobileBottomNav` (icon with the label under it, unread badge on Notifications). Both are in `src/features/dashboard/components/`.
+- **Order and contents come only from `MOBILE_NAV[role]`.** `bottomBar` and `profileMenu` list route paths of existing sidebar items (label and icon come from `adminItems` / `sellerItems` / `supplierItems`). `profileMenu` also accepts `"profile"` (→ the role's Settings page) and `"signout"` (→ `/login`). To reorder or add items, edit that array and nothing else.
+- To give a role its mobile shell, replace its `null` with a config. If an item isn't a sidebar item yet, add it to the role's sidebar array first.
+- Admin pages with no place on mobile: Supplier Map, Store(s). Detail pages are reached from the lists.
+- Layout offsets: desktop values (`NAVBAR_H`, `SIDEBAR_W`, `BANNER_SLOT`, `MAIN_PL`) and mobile values (`MOBILE_TOPBAR_H`, `MOBILE_BOTTOM_NAV_H`) are passed as CSS variables and switched with `md:` classes (`MOBILE_SHELL_MAIN_CLASS`). Change the constants, not the classes.
+- Account menu copy is "Sign out" (never "Log Out").
+
 ## Open questions
 - Seller and supplier pages wrap `DashboardPage` in an extra page-enter `motion.div`, and admin pages don't (see styling.md).
 - Suspense fallback differs: `null` (admin/seller) vs `<LoadingPage />` (supplier). Follow the role you're working in until this is decided.
 - `AdminDashboardShell` (layout in the route, `/dashboard/admin/supplier-map`) vs layout inside the page (everything else). Use layout-inside-page for new pages.
 - Admin has both `/supplier-map` and `/map`. The sidebar label "Store" points at `/stores`.
-- There's no mobile dashboard shell yet (see the `mobile-screen` skill).
+- Profile-menu "Payments" for Seller/Supplier (Billing / Revenues?) is still open, to decide when their mobile designs are ready.

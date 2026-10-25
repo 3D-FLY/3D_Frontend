@@ -1,9 +1,12 @@
-import { type ReactNode, useState, useEffect, useCallback } from "react";
+import { type CSSProperties, type ReactNode, useState, useEffect, useCallback } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardNavbar from "./components/DashboardNavbar.js";
-import Sidebar from "./components/Sidebar.js";
+import Sidebar, { roleLabels } from "./components/Sidebar.js";
 import type { SidebarRole } from "./components/Sidebar.js";
+import MobileTopBar, { MOBILE_TOPBAR_H } from "./components/MobileTopBar.js";
+import MobileBottomNav, { MOBILE_BOTTOM_NAV_H } from "./components/MobileBottomNav.js";
+import { MOBILE_NAV } from "./mobileNav.js";
 import Turtle from "../../components/ui/Turtle.jsx";
 import FooterSlim from "../../components/layout/FooterSlim.js";
 
@@ -21,14 +24,26 @@ const BANNER_SLOT     = BANNER_MT + BANNER_H + BANNER_MB;
 const MAIN_PL         = 50;
 const BANNER_OVERFLOW = 100; // extends off-screen to the left
 
-const roleLabels: Record<SidebarRole, string> = {
-  admin: "ADMIN",
-  seller: "MY STORE",
-  supplier: "SUPPLIER",
-};
+// Desktop offsets exposed as CSS variables so the mobile shell can switch them on at `md`.
+const MOBILE_SHELL_MAIN_VARS = {
+  "--d-top": `${NAVBAR_H}px`,
+  "--d-left": `${SIDEBAR_W}px`,
+  "--d-pt": `${BANNER_SLOT}px`,
+  "--d-px": `${MAIN_PL}px`,
+  "--m-top": `${MOBILE_TOPBAR_H}px`,
+  "--m-bottom": `${MOBILE_BOTTOM_NAV_H}px`,
+} as CSSProperties;
+
+const MOBILE_SHELL_MAIN_CLASS = [
+  "ml-0 mt-[var(--m-top)] px-4 pt-6 pb-[calc(var(--m-bottom)+env(safe-area-inset-bottom)+24px)] min-h-[calc(100dvh-var(--m-top))]",
+  "md:ml-[var(--d-left)] md:mt-[var(--d-top)] md:px-[var(--d-px)] md:pt-[var(--d-pt)] md:pb-[150px] md:min-h-[calc(100dvh-var(--d-top))]",
+].join(" ");
 
 export default function DashboardLayout({ role, children }: DashboardLayoutProps) {
   const label    = roleLabels[role];
+  // null = no mobile design for this role yet: keep the desktop layout at every width
+  const mobileNav = MOBILE_NAV[role];
+  const desktopOnly = mobileNav ? "hidden md:block" : "";
   const { pathname } = useLocation();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -46,9 +61,20 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
     <div className="bg-dark font-sans text-white">
 
       {/* NAVBAR — fixed, full width */}
-      <DashboardNavbar role={role} />
+      <div className={desktopOnly}>
+        <DashboardNavbar role={role} />
+      </div>
+
+      {/* MOBILE SHELL — top bar + bottom nav below md, only for roles with a MOBILE_NAV config */}
+      {mobileNav && (
+        <>
+          <MobileTopBar role={role} profileMenu={mobileNav.profileMenu} className="md:hidden" />
+          <MobileBottomNav role={role} items={mobileNav.bottomBar} className="md:hidden" />
+        </>
+      )}
 
       {/* BANNER — fixed, expands/collapses on scroll */}
+      <div className={desktopOnly}>
       <motion.div
         className="flex items-center bg-green overflow-hidden"
         initial={false}
@@ -81,9 +107,10 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
           <span className="whitespace-nowrap">{label}</span>
         </motion.div>
       </motion.div>
+      </div>
       {/* SIDEBAR — fixed, always visible, z:100 */}
       <aside
-        className="flex flex-col bg-dark"
+        className={`${mobileNav ? "hidden md:flex" : "flex"} flex-col bg-dark`}
         style={{
           position: "fixed",
           top: NAVBAR_H,
@@ -101,7 +128,8 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
 
       {/* MAIN — normal page flow, pushed right of sidebar and below navbar */}
       <main
-        style={{
+        className={mobileNav ? MOBILE_SHELL_MAIN_CLASS : undefined}
+        style={mobileNav ? { position: "relative", boxSizing: "border-box", ...MOBILE_SHELL_MAIN_VARS } : {
           position: "relative",
           marginTop: NAVBAR_H,
           marginLeft: SIDEBAR_W,
@@ -152,7 +180,7 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
       </main>
 
       {/* FOOTER — full width, z:1100 → floats above sidebar+navbar when scrolled to */}
-      <div style={{ position: "relative", zIndex: 1100 }}>
+      <div className={desktopOnly} style={{ position: "relative", zIndex: 1100 }}>
         <FooterSlim />
       </div>
 

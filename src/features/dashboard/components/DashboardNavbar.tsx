@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
 import { Settings, LogOut } from "lucide-react";
 import LogoSvg from "../../../assets/icons/logo.svg?react";
 import GlobalIcon from "../../../components/icons/GlobalIcon.js";
 import { getNewNotificationsCount, NOTIFICATIONS_UPDATED_EVENT } from "../../../data/mockNotifications.js";
 import type { SidebarRole } from "./Sidebar.js";
 import { roleInboxPath } from "./Sidebar.js";
+import UserMenu, { type UserMenuItem } from "./UserMenu.js";
 
 function BellIcon() {
   return (
@@ -25,93 +25,11 @@ function SearchIcon() {
   );
 }
 
-const DROPDOWN_USER: Record<SidebarRole, { name: string; email: string; initials: string; plan: string }> = {
-  admin:    { name: "Raz Malka",   email: "raz@3dfly.io",    initials: "RM", plan: "Super Admin" },
-  seller:   { name: "Raz Store",   email: "raz@3dfly.com",   initials: "RS", plan: "Pro Plan"    },
-  supplier: { name: "David Print", email: "david@printlab.io", initials: "DP", plan: "Supplier"  },
-};
-
-function UserDropdown({ role }: { role: SidebarRole }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
-  const user = DROPDOWN_USER[role];
-
-  useEffect(() => {
-    if (!open) return;
-    function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
-
-  return (
-    <div ref={ref} className="relative not-italic">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-green-500/30 bg-green-500/20 text-sm font-bold text-green-500 transition-colors hover:bg-green-500/30"
-        aria-label="Profile"
-      >
-        {user.initials}
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -8, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -8, scale: 0.97 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
-            className="absolute right-0 top-11 z-50 w-[220px] overflow-hidden rounded-2xl border border-white/10 bg-[rgba(10,18,12,0.97)] shadow-2xl backdrop-blur-md"
-          >
-            {/* User info */}
-            <div className="border-b border-white/10 px-4 py-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-green-500/30 bg-green-500/20 text-sm font-bold text-green-500">
-                  {user.initials}
-                </div>
-                <div className="flex min-w-0 flex-col">
-                  <span className="truncate text-sm font-semibold text-white">{user.name}</span>
-                  <span className="truncate text-[11px] text-white/40">{user.email}</span>
-                  <span className="mt-1 text-[10px] font-bold uppercase tracking-wider text-green-500">{user.plan}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Menu items */}
-            <div className="py-1.5">
-              <button
-                type="button"
-                onClick={() => {
-                  navigate(`/dashboard/${role}/settings`);
-                  setOpen(false);
-                }}
-                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-white/60 transition-colors hover:bg-white/[0.06] hover:text-white"
-              >
-                <Settings size={15} />
-                Account Settings
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setOpen(false);
-                  navigate("/login");
-                }}
-                className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-400 transition-colors hover:bg-red-400/5 hover:text-red-300"
-              >
-                <LogOut size={15} />
-                Log Out
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+function desktopMenuItems(role: SidebarRole): UserMenuItem[] {
+  return [
+    { label: "Account Settings", to: `/dashboard/${role}/settings`, icon: Settings },
+    { label: "Sign out", to: "/login", icon: LogOut, danger: true },
+  ];
 }
 
 interface DashboardNavbarProps {
@@ -185,7 +103,7 @@ export default function DashboardNavbar({ role }: DashboardNavbarProps) {
             </span>
           )}
         </div>
-        <UserDropdown role={role} />
+        <UserMenu role={role} items={desktopMenuItems(role)} />
       </div>
     </header>
   );

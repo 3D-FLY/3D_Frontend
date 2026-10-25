@@ -3,12 +3,19 @@ import { type LucideIcon, LayoutDashboard, Users, Truck, MapPin, ShoppingCart, S
 
 export type SidebarRole = "admin" | "seller" | "supplier";
 
+/** Role title shown in the desktop banner and the mobile top bar. */
+export const roleLabels: Record<SidebarRole, string> = {
+  admin: "ADMIN",
+  seller: "MY STORE",
+  supplier: "SUPPLIER",
+};
+
 export function roleInboxPath(role: SidebarRole, id?: string) {
   const page = "notifications";
   return id ? `/dashboard/${role}/${page}/${id}` : `/dashboard/${role}/${page}`;
 }
 
-interface NavItem {
+export interface NavItem {
   label: string;
   to: string;
   icon: LucideIcon;
@@ -18,7 +25,7 @@ interface SidebarProps {
   role: SidebarRole;
 }
 
-const adminItems: NavItem[] = [
+export const adminItems: NavItem[] = [
   { label: "Home",         to: "/dashboard/admin",              icon: LayoutDashboard },
   { label: "Users",        to: "/dashboard/admin/users",        icon: Users           },
   { label: "Suppliers",    to: "/dashboard/admin/suppliers",    icon: Truck           },
@@ -30,7 +37,7 @@ const adminItems: NavItem[] = [
   { label: "Settings",     to: "/dashboard/admin/settings",     icon: Settings        },
 ];
 
-const sellerItems: NavItem[] = [
+export const sellerItems: NavItem[] = [
   { label: "My Store",    to: "/dashboard/seller",             icon: Store           },
   { label: "Orders",      to: "/dashboard/seller/orders",      icon: ShoppingCart    },
   { label: "Notifications", to: "/dashboard/seller/notifications", icon: Bell          },
@@ -40,7 +47,7 @@ const sellerItems: NavItem[] = [
   { label: "Settings",    to: "/dashboard/seller/settings",    icon: Settings        },
 ];
 
-const supplierItems: NavItem[] = [
+export const supplierItems: NavItem[] = [
   { label: "Home",         to: "/dashboard/supplier",              icon: Home       },
   { label: "Orders",       to: "/dashboard/supplier/orders",        icon: ShoppingCart },
   { label: "Capabilities", to: "/dashboard/supplier/capabilities",  icon: Settings2  },
@@ -49,8 +56,17 @@ const supplierItems: NavItem[] = [
   { label: "Settings",     to: "/dashboard/supplier/settings",      icon: Settings   },
 ];
 
+export function getNavItems(role: SidebarRole): NavItem[] {
+  return role === "admin" ? adminItems : role === "seller" ? sellerItems : supplierItems;
+}
+
+/** Role home links need exact (`end`) matching so they aren't active on every sub-page. */
+export function isRoleHome(to: string) {
+  return to === "/dashboard/admin" || to === "/dashboard/seller" || to === "/dashboard/supplier";
+}
+
 export default function Sidebar({ role }: SidebarProps) {
-  const items = role === "admin" ? adminItems : role === "seller" ? sellerItems : supplierItems;
+  const items = getNavItems(role);
 
   return (
     <nav className="flex flex-col gap-1 w-full">
@@ -60,11 +76,7 @@ export default function Sidebar({ role }: SidebarProps) {
           <NavLink
             key={item.to}
             to={item.to}
-            end={
-              item.to === "/dashboard/admin" ||
-              item.to === "/dashboard/seller" ||
-              item.to === "/dashboard/supplier"
-            }
+            end={isRoleHome(item.to)}
             className={({ isActive }) =>
               [
                 "group relative flex items-center gap-2.5 w-full px-4 py-2",
