@@ -5,6 +5,7 @@ import Modal from "../../../features/dashboard/components/Modal.js";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardPage from "../../../features/dashboard/components/DashboardPage.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
+import StaggerItem from "../../../features/dashboard/components/StaggerItem.js";
 import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
 import Input from "../../../components/ui/Input.js";
 
@@ -249,6 +250,7 @@ function AdminUsersSection() {
 
       <DashboardTable
         variant="data"
+        animateRows
         scrollable={false}
         subtle
         columns={[
@@ -470,6 +472,7 @@ function RolesPermissionsSection() {
   return (
     <DashboardTable
       variant="data"
+      animateRows
       scrollable={false}
       subtle
       hoverable={false}
@@ -506,7 +509,9 @@ export default function SettingsPage() {
   return (
     <DashboardLayout role="admin">
       <DashboardPage title="Settings">
-        <ProfileHeader />
+        <StaggerItem>
+          <ProfileHeader />
+        </StaggerItem>
 
         <DashboardCard index={0} title="Profile" autoHeight>
           <ProfileSection />

@@ -1,4 +1,6 @@
 import { type ReactNode } from "react";
+import { motion } from "framer-motion";
+import { EASE_SOFT, staggerDelay } from "../motion.js";
 import ScrollableContent from "./ScrollableContent.js";
 
 export interface DashboardTableColumn {
@@ -28,6 +30,8 @@ export interface DashboardTableProps<TRow> {
   subtle?: boolean;
   /** Row hover highlight (default: true) */
   hoverable?: boolean;
+  /** Rows fade/slide in one after another on mount. */
+  animateRows?: boolean;
 }
 
 const alignClass = (align: DashboardTableColumn["align"] = "left") => {
@@ -59,6 +63,7 @@ function ListTable<TRow>({
   emptyMessage,
   scrollbarSide,
   hoverable,
+  animateRows = false,
 }: DashboardTableProps<TRow>) {
   const visibleRows = cap != null ? rows.slice(0, cap) : rows;
   const gridStyle = { gridTemplateColumns: gridTemplateColumns ?? "1fr" };
@@ -86,9 +91,14 @@ function ListTable<TRow>({
       visibleRows.map((row, index) => {
         const interactive = Boolean(onRowClick);
         return (
-          <div
+          <motion.div
             key={getRowKey(row)}
             role="row"
+            {...(animateRows && {
+              initial: { opacity: 0, y: 10 },
+              animate: { opacity: 1, y: 0 },
+              transition: { duration: 0.4, ease: EASE_SOFT, delay: 0.1 + staggerDelay(index, 0.05) },
+            })}
             tabIndex={interactive ? 0 : undefined}
             onClick={interactive ? () => onRowClick!(row) : undefined}
             onKeyDown={
@@ -113,7 +123,7 @@ function ListTable<TRow>({
                 {renderCell(row, col.key)}
               </div>
             ))}
-          </div>
+          </motion.div>
         );
       })
     );
@@ -173,6 +183,7 @@ function DataTable<TRow>({
   scrollbarSide,
   subtle = false,
   hoverable = true,
+  animateRows = false,
 }: DashboardTableProps<TRow>) {
   const visibleRows = cap != null ? rows.slice(0, cap) : rows;
   const trClass = dataTrClass(subtle, hoverable);
@@ -200,11 +211,16 @@ function DataTable<TRow>({
             </td>
           </tr>
         ) : (
-          visibleRows.map((row) => {
+          visibleRows.map((row, index) => {
             const interactive = Boolean(onRowClick);
             return (
-              <tr
+              <motion.tr
                 key={getRowKey(row)}
+                {...(animateRows && {
+                  initial: { opacity: 0, y: 10 },
+                  animate: { opacity: 1, y: 0 },
+                  transition: { duration: 0.4, ease: EASE_SOFT, delay: 0.1 + staggerDelay(index, 0.05) },
+                })}
                 className={`${trClass}${interactive ? " cursor-pointer" : ""}`}
                 onClick={interactive ? () => onRowClick!(row) : undefined}
               >
@@ -216,7 +232,7 @@ function DataTable<TRow>({
                     {renderCell(row, col.key)}
                   </td>
                 ))}
-              </tr>
+              </motion.tr>
             );
           })
         )}

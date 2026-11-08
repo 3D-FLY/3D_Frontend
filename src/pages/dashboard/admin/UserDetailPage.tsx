@@ -427,6 +427,7 @@ export default function UserDetailPage() {
 
             <DashboardTable
               variant="data"
+              animateRows
               scrollable={false}
               subtle
               hoverable={false}

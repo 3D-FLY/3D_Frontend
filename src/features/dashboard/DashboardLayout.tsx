@@ -1,6 +1,7 @@
 import { type CSSProperties, type ReactNode, useState, useEffect, useCallback } from "react";
-import { Outlet, useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { Outlet, useLocation, useNavigationType } from "react-router-dom";
+import { motion } from "framer-motion";
+import { EASE_SOFT } from "./motion.js";
 import DashboardNavbar from "./components/DashboardNavbar.js";
 import Sidebar, { roleLabels } from "./components/Sidebar.js";
 import type { SidebarRole } from "./components/Sidebar.js";
@@ -45,6 +46,8 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
   const mobileNav = MOBILE_NAV[role];
   const desktopOnly = mobileNav ? "hidden md:block" : "";
   const { pathname } = useLocation();
+  // Back/forward (POP) enters from the left, new navigation enters from the right.
+  const enterX = useNavigationType() === "POP" ? -14 : 14;
   const [collapsed, setCollapsed] = useState(false);
 
   const handleScroll = useCallback(() => {
@@ -153,7 +156,15 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
             filter: "blur(150px)", opacity: 0.4, transform: "translate(-20%, -5%)" }} />
           <div style={{ position: "absolute", top: "50%", right: 0, width: 300, height: 300, background: "radial-gradient(circle, #6B7280 0%, transparent 80%)", filter: "blur(110px)", opacity: 0.4, transform: "translate(40%, -50%)" }} />
           <div style={{ position: "absolute", bottom: 0, left: 0, width: 300, height: 300, background: "radial-gradient(circle, #6B7280 0%, transparent 80%)", filter: "blur(140px)", opacity: 0.4, transform: "translate(-20%, 30%)" }} />
-          <Turtle right="0" bottom="0" width="100vw" translateX="50%" translateY="25%" opacity={0.15} zIndex={0} />
+          {mobileNav ? (
+            <>
+              {/* Mobile: horizontally centered so the whole top of the turtle shows */}
+              <Turtle left="50%" bottom="0" width="100vw" translateX="-50%" translateY="25%" opacity={0.15} zIndex={0} className="md:hidden" />
+              <Turtle right="0" bottom="0" width="100vw" translateX="50%" translateY="25%" opacity={0.15} zIndex={0} className="hidden md:block" />
+            </>
+          ) : (
+            <Turtle right="0" bottom="0" width="100vw" translateX="50%" translateY="25%" opacity={0.15} zIndex={0} />
+          )}
         </div>
 
         <div
@@ -165,17 +176,14 @@ export default function DashboardLayout({ role, children }: DashboardLayoutProps
             marginInline: "auto",
           }}
         >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={pathname}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-            >
-              {children ?? <Outlet />}
-            </motion.div>
-          </AnimatePresence>
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, x: enterX, y: 12 }}
+            animate={{ opacity: 1, x: 0, y: 0 }}
+            transition={{ duration: 0.4, ease: EASE_SOFT }}
+          >
+            {children ?? <Outlet />}
+          </motion.div>
         </div>
       </main>
 

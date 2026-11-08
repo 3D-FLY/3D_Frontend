@@ -28,11 +28,17 @@ paths:
 
 ## Animation (Framer Motion)
 Reuse the existing motion values:
-- `DashboardLayout` already animates every page enter (`opacity 0→1, y 16→0, 0.3s, easeOut`, keyed by pathname).
+- `DashboardLayout` already animates every page enter (`opacity 0→1`, small `x`/`y` offset, 0.4s `EASE_SOFT`, keyed by pathname).
 - Open question: all seller and supplier pages *also* wrap their content in a second `motion.div` (`y 12→0, 0.4s easeOut`, e.g. `src/pages/dashboard/supplier/SupplierOrders.tsx`), while admin pages don't (`AdminDashboard.tsx`). Match the role you're working in until this is decided.
 - Cards: `DashboardCard` animates `y 12→0, 0.25s easeOut, delay index*0.05`. Pass an increasing `index` prop to stagger cards (see `AdminDashboard.tsx`: `index={0..3}`).
 - Layout chrome uses `duration 0.55, ease [0.4, 0, 0.2, 1]` (DashboardLayout banner). Keep that only for chrome.
 - A variants object literal with `ease: "easeOut"` widens to `string` and fails typecheck (existing errors in `src/pages/dashboard/seller/Integration.tsx` and `Products.tsx`). Write `transition` inline on the element as `DashboardCard` does, or annotate the object as `Variants` from framer-motion.
+
+- Shared motion values live in `src/features/dashboard/motion.ts`: `EASE_SOFT` (entrance easing) and `staggerDelay(index, step, cap)`. Use them for staggered entrances (`StatusBadge` `index`, `DashboardTable` `animateRows`, notification and mobile order lists). `MotionConfig reducedMotion="user"` in `main.jsx` honors the OS "reduce motion" setting.
+- `DashboardLayout` animates the page enter by navigation direction (`useNavigationType`): new navigation slides in from the right, Back (POP) from the left. There is no exit animation, because every page renders its own `DashboardLayout`.
+- `StaggerItem` (`src/features/dashboard/components/StaggerItem.tsx`) gives any block the standard staggered entrance; `DashboardTable animateRows` does the same for rows (both variants). Admin pages use them everywhere.
+- Form fields in the dashboard use `FormField` (`src/features/dashboard/components/FormField.tsx`), the Settings-page look. Do not use the landing `src/components/ui/Input.tsx` inside the dashboard.
+- `DashboardCard bareOnMobile`: below `md` the card loses its glass surface and divider so its children (glass cards) sit directly on the page background. Desktop is unchanged.
 
 ## Charts (Recharts)
 Follow `src/pages/dashboard/supplier/SupplierPayments.tsx`: wrap in `ResponsiveContainer width="100%"` inside a `DashboardCard autoHeight`; grid `stroke="rgba(255,255,255,0.06)"`; axis ticks `{ fill: "#71717a", fontSize: 12 }`, `axisLine={false} tickLine={false}`; tooltip `contentStyle={{ background: "#0d1a10", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "8px" }}`; series stroke `#5ac422`, `strokeWidth={2}`, `dot={false}`.
