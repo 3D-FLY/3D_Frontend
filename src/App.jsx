@@ -44,6 +44,9 @@ const SellerNotificationDetailPage = lazy(() => import("./pages/dashboard/seller
 const AdminNotificationsPage       = lazy(() => import("./pages/dashboard/admin/NotificationsPage.tsx"));
 const AdminNotificationDetailPage  = lazy(() => import("./pages/dashboard/admin/NotificationDetailPage.tsx"));
 const OrdersPage      = lazy(() => import("./pages/dashboard/admin/OrdersPage.jsx"));
+const AdminOrderDetailPage = lazy(() => import("./pages/dashboard/admin/AdminOrderDetail.tsx"));
+const AdminSupplierFormPage = lazy(() => import("./pages/dashboard/admin/AdminSupplierForm.tsx"));
+const AdminStoreFormPage = lazy(() => import("./pages/dashboard/admin/AdminStoreForm.tsx"));
 const SettingsPage    = lazy(() => import("./pages/dashboard/admin/SettingsPage.jsx"));
 const UsersPage       = lazy(() => import("./pages/dashboard/admin/UsersPage.tsx"));
 const UserDetailPage    = lazy(() => import("./pages/dashboard/admin/UserDetailPage.tsx"));
@@ -179,6 +182,22 @@ function App() {
         <Route path="/dashboard/seller/*" element={<MyStore />} />
         <Route path="/dashboard/store" element={<MyStore />} />
         <Route
+          path="/dashboard/admin/suppliers/new"
+          element={
+            <Suspense fallback={null}>
+              <AdminSupplierFormPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/admin/suppliers/:id/edit"
+          element={
+            <Suspense fallback={null}>
+              <AdminSupplierFormPage />
+            </Suspense>
+          }
+        />
+        <Route
           path="/dashboard/admin/suppliers/:id"
           element={
             <Suspense fallback={null}>
@@ -203,6 +222,14 @@ function App() {
           }
         />
         <Route
+          path="/dashboard/admin/orders/:id"
+          element={
+            <Suspense fallback={null}>
+              <AdminOrderDetailPage />
+            </Suspense>
+          }
+        />
+        <Route
           path="/dashboard/admin/orders"
           element={
             <Suspense fallback={null}>
@@ -223,6 +250,22 @@ function App() {
           element={
             <Suspense fallback={null}>
               <UsersPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/admin/users/new"
+          element={
+            <Suspense fallback={null}>
+              <AdminStoreFormPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/dashboard/admin/users/:id/edit"
+          element={
+            <Suspense fallback={null}>
+              <AdminStoreFormPage />
             </Suspense>
           }
         />
