@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
 import DashboardPage, { DashboardPageTitle } from "../../../features/dashboard/components/DashboardPage.js";
-import { getStatusConfig } from "../../../constants/orderStatus.js";
+import { getStatusConfig } from "../../../constants/orderStatusConfig.js";
 import { mockOrders } from "../../../data/mockOrders.js";
 import { mockProducts } from "../../../data/mockProducts.js";
 import { mockSuppliers } from "../../../data/mockSuppliers.js";
