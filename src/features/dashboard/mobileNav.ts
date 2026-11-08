@@ -23,7 +23,7 @@ export const MOBILE_NAV: Record<SidebarRole, MobileNavConfig | null> = {
       "/dashboard/admin/users",
       "/dashboard/admin",
     ],
-    profileMenu: ["profile", "/dashboard/admin/payments", "/dashboard/admin/settings", "signout"],
+    profileMenu: ["/dashboard/admin/payments", "/dashboard/admin/settings", "signout"],
   },
   seller: null, // to be designed
   supplier: null, // to be designed

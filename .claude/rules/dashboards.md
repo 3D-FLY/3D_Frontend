@@ -56,6 +56,11 @@ export default function SupplierExample() {
 - Admin pages with no place on mobile: Supplier Map, Store(s). Detail pages are reached from the lists.
 - Layout offsets: desktop values (`NAVBAR_H`, `SIDEBAR_W`, `BANNER_SLOT`, `MAIN_PL`) and mobile values (`MOBILE_TOPBAR_H`, `MOBILE_BOTTOM_NAV_H`) are passed as CSS variables and switched with `md:` classes (`MOBILE_SHELL_MAIN_CLASS`). Change the constants, not the classes.
 - Account menu copy is "Sign out" (never "Log Out").
+- KPI tiles on mobile: wrap `StatusBadge`s in `StatusBadgeGrid` (2 per row below `md`, fixed tile height). Admin Home and Payments use it.
+- Tables on mobile: render cards instead (`hidden md:block` table + `md:hidden` list). Example: `OrdersListMobile.tsx` next to `OrdersPage.jsx`.
+- Admin order details are a page (`/dashboard/admin/orders/:id`, `AdminOrderDetail.tsx`) with a Back button, not a popup. The order rows come from the `adminOrders.ts` adapter.
+
+- Admin add/edit for suppliers and stores are pages, not popups: `/dashboard/admin/suppliers/new|:id/edit` and `/dashboard/admin/users/new|:id/edit` (`AdminSupplierForm.tsx`, `AdminStoreForm.tsx`, shared `EntityFormPage.tsx`). Their lists come from the in-memory adapters `adminSuppliers.ts` / `adminStores.ts`.
 
 ## Open questions
 - Seller and supplier pages wrap `DashboardPage` in an extra page-enter `motion.div`, and admin pages don't (see styling.md).

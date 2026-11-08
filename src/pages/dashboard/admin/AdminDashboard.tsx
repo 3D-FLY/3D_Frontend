@@ -3,6 +3,7 @@ import DashboardLayout from "../../../features/dashboard/DashboardLayout.js";
 import DashboardCard from "../../../features/dashboard/components/DashboardCard.js";
 import DashboardPage from "../../../features/dashboard/components/DashboardPage.js";
 import StatusBadge from "../../../features/dashboard/components/StatusBadge.js";
+import StatusBadgeGrid from "../../../features/dashboard/components/StatusBadgeGrid.js";
 import type { OrderAttention } from "../../../features/dashboard/components/OrderAttentionList.js";
 import OrderAttentionList from "../../../features/dashboard/components/OrderAttentionList.js";
 import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
@@ -69,19 +70,21 @@ export default function AdminDashboard() {
   return (
     <DashboardLayout role="admin">
       <DashboardPage title="Welcome, Raz">
-        <div className="grid min-h-[180px] w-full grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {statusCards.map((card) => (
+        <StatusBadgeGrid>
+          {statusCards.map((card, i) => (
             <StatusBadge
               key={card.label}
+              index={i}
               count={card.count}
               label={card.label}
               accentColor={card.accentColor}
               {...(card.label === "Pending Match" && { onClick: () => navigate("/admin/matching") })}
             />
           ))}
-        </div>
+        </StatusBadgeGrid>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        {/* Marketing view on mobile: only the status tiles; the rest is desktop-only */}
+        <div className="hidden items-stretch gap-6 md:grid lg:grid-cols-2">
           <DashboardCard index={0} title="Notifications" autoHeight className="h-full" viewAllTo="/dashboard/admin/notifications">
             <OrderAttentionList items={attentionOrders} />
           </DashboardCard>
@@ -105,6 +108,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
+        <div className="hidden md:block">
         <DashboardCard
           index={3}
           title="Recent Orders"
@@ -113,12 +117,13 @@ export default function AdminDashboard() {
         >
           <DashboardTable
             variant="list"
+            animateRows
             columns={RECENT_ORDERS_COLUMNS}
             gridTemplateColumns="1fr 1.5fr 1.2fr 1fr 24px"
             rows={recentOrders}
             cap={30}
             getRowKey={(o) => o.id}
-            onRowClick={(o) => navigate(`/dashboard/admin/orders?order=${o.orderId}`)}
+            onRowClick={(o) => navigate(`/dashboard/admin/orders/${o.orderId}`)}
             renderCell={(o, key) => {
               switch (key) {
                 case "order":  return <span className="truncate text-[clamp(12px,1vw,14px)] font-semibold text-zinc-100">#{o.orderId}</span>;
@@ -131,6 +136,7 @@ export default function AdminDashboard() {
             }}
           />
         </DashboardCard>
+        </div>
       </DashboardPage>
     </DashboardLayout>
   );

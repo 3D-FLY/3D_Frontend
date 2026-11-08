@@ -42,9 +42,11 @@ const REASON_FILTERS_BY_ROLE: Record<SidebarRole, ReasonFilter[]> = {
 
 interface NotificationsListProps {
   role: SidebarRole;
+  /** Below md: list items sit directly on the page background (no outer card). */
+  bareOnMobile?: boolean;
 }
 
-export default function NotificationsList({ role }: NotificationsListProps) {
+export default function NotificationsList({ role, bareOnMobile = false }: NotificationsListProps) {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [reasonFilter, setReasonFilter] = useState("all");
@@ -126,20 +128,22 @@ export default function NotificationsList({ role }: NotificationsListProps) {
           </div>
 
           {/* ── List ────────────────────────────────────────────────────── */}
-          <DashboardCard title="ALL NOTIFICATIONS" autoHeight>
+          <DashboardCard title="ALL NOTIFICATIONS" autoHeight bareOnMobile={bareOnMobile}>
             {filtered.length === 0 ? (
               <p className="py-10 text-center text-sm text-zinc-500">
                 No notifications found.
               </p>
             ) : (
               <div className="flex w-full flex-col">
-                {filtered.map((notification) => (
+                {filtered.map((notification, i) => (
                   <NotificationListItem
                     key={notification.id}
                     orderId={notification.orderId}
                     title={notification.title}
                     description={notification.description}
                     reason={notification.reason}
+                    index={i}
+                    glassOnMobile={bareOnMobile}
                     onClick={() => navigate(roleInboxPath(role, notification.id))}
                   />
                 ))}

@@ -15,6 +15,7 @@ import DashboardCard from "../../../features/dashboard/components/DashboardCard.
 import DashboardPage from "../../../features/dashboard/components/DashboardPage.js";
 import DashboardTable from "../../../features/dashboard/components/DashboardTable.js";
 import StatusBadge from "../../../features/dashboard/components/StatusBadge.js";
+import StatusBadgeGrid from "../../../features/dashboard/components/StatusBadgeGrid.js";
 import { mockOrders } from "../../../data/mockOrders.js";
 import { mockSellers } from "../../../data/mockSellers.js";
 import { mockSuppliers } from "../../../data/mockSuppliers.js";
@@ -134,11 +135,11 @@ export default function FinancePage() {
     <DashboardLayout role="admin">
       <DashboardPage title="Payments">
         {/* SECTION 1 — Stat Cards */}
-        <div className="grid min-h-[180px] w-full grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {statCards.map((card) => (
-            <StatusBadge key={card.label} count={card.value} label={card.label} color={card.color} />
+        <StatusBadgeGrid>
+          {statCards.map((card, i) => (
+            <StatusBadge key={card.label} index={i} count={card.value} label={card.label} color={card.color} />
           ))}
-        </div>
+        </StatusBadgeGrid>
 
         {/* SECTION 2 — Revenue Chart */}
         <DashboardCard
@@ -234,6 +235,7 @@ export default function FinancePage() {
           <DashboardCard index={1} title="Recent Transactions" autoHeight>
             <DashboardTable
               variant="data"
+              animateRows
               scrollable
               maxHeight={300}
               columns={[
@@ -264,6 +266,7 @@ export default function FinancePage() {
           <DashboardCard index={2} title="Supplier Payouts" autoHeight>
             <DashboardTable
               variant="data"
+              animateRows
               scrollable
               maxHeight={300}
               columns={[

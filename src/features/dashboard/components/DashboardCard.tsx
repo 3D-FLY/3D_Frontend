@@ -16,6 +16,8 @@ interface DashboardCardProps {
   clipContent?: boolean;
   index?: number;
   loading?: boolean;
+  /** Below md: no glass surface, border or divider; the title becomes a plain heading and children sit on the page background. */
+  bareOnMobile?: boolean;
 }
 
 export default function DashboardCard({
@@ -31,6 +33,7 @@ export default function DashboardCard({
   clipContent = false,
   index = 0,
   loading = false,
+  bareOnMobile = false,
 }: DashboardCardProps) {
   return (
     <motion.div
@@ -38,6 +41,8 @@ export default function DashboardCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: "easeOut", delay: index * 0.05 }}
       className={`relative w-full rounded-2xl overflow-visible flex flex-col border border-white/10 bg-[rgba(149,149,149,0.1)] backdrop-blur-[12px] ${
+        bareOnMobile ? "max-md:border-transparent max-md:bg-transparent max-md:backdrop-blur-none " : ""
+      }${
         autoHeight && !fill
           ? ""
           : fill
@@ -46,7 +51,7 @@ export default function DashboardCard({
       } ${className}`}
     >
       {/* Header */}
-      <div className="px-6 pt-6 pb-0 shrink-0 flex items-center justify-between gap-2">
+      <div className={`px-6 pt-6 pb-0 shrink-0 flex items-center justify-between gap-2 ${bareOnMobile ? "max-md:px-1 max-md:pt-0" : ""}`}>
         <h2
           className={`${
             titleSize ?? "text-[clamp(16px,1.6vw,24px)]"
@@ -67,7 +72,7 @@ export default function DashboardCard({
       </div>
 
       {/* Divider */}
-      <div className="h-px bg-white/10 mx-0 mt-4 mb-0 shrink-0" />
+      <div className={`h-px bg-white/10 mx-0 mt-4 mb-0 shrink-0 ${bareOnMobile ? "max-md:hidden" : ""}`} />
 
       {/* Content area */}
       <div
@@ -79,6 +84,8 @@ export default function DashboardCard({
       >
         <div
           className={`relative z-10 w-full px-6 py-6 ${
+            bareOnMobile ? "max-md:px-0 max-md:py-4 " : ""
+          }${
             fill
               ? "flex min-h-0 flex-1 flex-col"
               : autoHeight
