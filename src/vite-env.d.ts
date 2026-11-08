@@ -25,6 +25,12 @@ declare module "*/components/ui/Button.jsx" {
   export default Button;
 }
 
+declare module "*/ui/Background.jsx" {
+  import type { ComponentType, ReactNode } from "react";
+  const Background: ComponentType<{ variant?: "gray" | "dark"; className?: string; children?: ReactNode }>;
+  export default Background;
+}
+
 declare module "*/ui/Turtle.jsx" {
   import type { ComponentType } from "react";
   const Turtle: ComponentType<Record<string, unknown>>;

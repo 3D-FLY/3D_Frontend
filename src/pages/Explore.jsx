@@ -1,8 +1,13 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
 
 import Button from "../components/ui/Button";
 import { EXPLORE_CONTENT } from "../features/Explore/exploreContent";
+import ExploreStepMobile from "../features/Explore/ExploreStepMobile";
+import ExploreProgressBar from "../features/Explore/ExploreProgressBar";
+import useNavbarHeight from "../components/layout/useNavbarHeight";
 
 function ProgressDots({ activeIndex, total }) {
   return (
@@ -61,7 +66,7 @@ function StepSection({ step, index, onInView }) {
   return (
     <section
       ref={ref}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden px-6 py-20"
+      className="relative hidden md:flex min-h-[100svh] items-center justify-center overflow-hidden px-6 py-20"
     >
       {/* Ambient glow blob */}
       <motion.div
@@ -202,26 +207,29 @@ export default function Explore() {
   const [activeIndex, setActiveIndex] = useState(0);
   const handleInView = useCallback((i) => setActiveIndex(i), []);
   const steps = EXPLORE_CONTENT;
+  const navigate = useNavigate();
+  // Real navbar height, so sticky bars and the hero fit flush under it.
+  const navHeight = useNavbarHeight();
 
   return (
-    <div className="bg-dark min-h-screen">
+    <div className="bg-dark min-h-screen" style={{ "--nav-h": `${navHeight}px` }}>
       <ProgressDots activeIndex={activeIndex} total={steps.length} />
 
       {/* Hero */}
-      <section className="min-h-[calc(100dvh-var(--nav-h))] flex flex-col items-center justify-center text-center px-6">
+      <section className="min-h-[calc(100svh-var(--nav-h))] md:min-h-[calc(100dvh-var(--nav-h))] flex flex-col items-center justify-center text-center px-6 relative">
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="flex flex-nowrap justify-center items-baseline gap-1 font-extrabold italic text-gray mb-16"
+          className="text-center font-extrabold italic text-gray leading-[1.2] text-balance md:whitespace-nowrap mb-8 md:mb-16"
           style={{ fontFamily: "Montserrat, italic" }}
         >
-          <span className="flex shrink-0 items-baseline">
+          <span className="whitespace-nowrap">
             <span className="text-[clamp(2rem,8vw,7rem)]">H</span>
-            <span className="text-[clamp(20px,7vw,80px)]">OW DOES </span>
-            <span className="text-[clamp(2rem,8vw,7rem)] ml-[0.25em]">3D-FLY</span>
-          </span>
-          <span className="text-green text-[clamp(20px,7vw,80px)] shrink-0 ml-[0.25em]">WORK?</span>
+            <span className="text-[clamp(20px,7vw,80px)]">OW DOES</span>
+          </span>{" "}
+          <span className="text-[clamp(2rem,8vw,7rem)] whitespace-nowrap">3D-FLY</span>{" "}
+          <span className="text-green text-[clamp(20px,7vw,80px)] whitespace-nowrap">WORK?</span>
         </motion.h1>
 
         <motion.p
@@ -247,9 +255,39 @@ export default function Explore() {
         >
           Here's how the magic actually happens:
         </motion.p>
+
+        {/* Scroll cue (mobile only) */}
+        <motion.div
+          aria-hidden
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+          className="mt-8 text-green md:hidden"
+        >
+          <ChevronDown size={28} />
+        </motion.div>
       </section>
 
-      {/* Steps */}
+      {/* Steps — mobile: sticky progress bar + compact cards */}
+      <div className="md:hidden">
+        <ExploreProgressBar
+          titles={steps.map((s) => s.title)}
+          activeIndex={activeIndex}
+          idPrefix="explore-step-m-"
+        />
+        <div className="flex flex-col gap-6 px-4 py-6">
+          {steps.map((step, i) => (
+            <ExploreStepMobile
+              key={step.title}
+              step={step}
+              index={i}
+              id={`explore-step-m-${i}`}
+              onInView={handleInView}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Steps — desktop */}
       {steps.map((step, i) => (
         <StepSection
           key={step.title}
@@ -260,18 +298,25 @@ export default function Explore() {
       ))}
 
       {/* CTA */}
-      <section className="min-h-[50vh] flex flex-col items-center justify-center text-center px-6 pb-20">
+      <section className="min-h-[50svh] flex flex-col items-center justify-center text-center px-6 pb-20">
         <motion.h2
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ amount: 0.5 }}
           transition={{ duration: 0.6 }}
-          className="flex items-baseline gap-0 font-extrabold italic text-[#4CA835] leading-none"
+          className="text-center font-extrabold italic text-[#4CA835] leading-[1.2] text-balance"
           style={{ fontFamily: "Montserrat, italic" }}
         >
-          <span className="text-[clamp(2rem,8vw,7rem)]">R</span>
-          <span className="text-[clamp(20px,7vw,80px)]">EADY WHEN YOU ARE!</span>
+          <span className="whitespace-nowrap">
+            <span className="text-[clamp(2rem,8vw,7rem)]">R</span>
+            <span className="text-[clamp(20px,7vw,80px)]">EADY</span>
+          </span>{" "}
+          <span className="text-[clamp(20px,7vw,80px)] whitespace-nowrap">WHEN</span>{" "}
+          <span className="text-[clamp(20px,7vw,80px)] whitespace-nowrap">YOU ARE!</span>
         </motion.h2>
+        <Button size="lg" className="mt-8" onClick={() => navigate("/register")}>
+          TRY NOW
+        </Button>
       </section>
     </div>
   );

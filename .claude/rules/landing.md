@@ -16,6 +16,9 @@ paths:
 - Section wrapper pattern (in `Home.jsx`): `relative isolate z-0 w-full overflow-hidden` + alternating `bg-dark` / `bg-gray` + viewport heights via `h-[calc(100svh-var(--nav-h))]` on mobile and `lg:h-[calc(100dvh-var(--nav-h))]` on desktop. Use `--nav-h` (defined in `src/index.css`) and never a literal 72px.
 - Each section is a folder in `src/features/home/<Section>/` with its main component, sub-components, a data file (`featuresData.tsx`, `howItWorksData.js`), `assets/{icons,images}/`, and `icons/` (JSX icon components plus an `index.js` barrel, see `src/features/home/Features/icons/index.js`).
 - Explore content is data-driven: `EXPLORE_CONTENT` in `src/features/Explore/exploreContent.ts` is rendered by `src/pages/Explore.jsx` (scroll-tracked steps with `useInView`, progress dots).
+- Explore on mobile (below `md`) renders `ExploreProgressBar.tsx` (sticky "Step N of M" + jump list) and compact `ExploreStepMobile.tsx` cards (first paragraph, rest behind "Read more") from the same `EXPLORE_CONTENT`; the desktop full-screen `StepSection`s are `hidden md:flex`. Sticky bars use `top-[var(--nav-h)]`.
+- Sticky bars on landing pages must sit flush under the navbar: the navbar height is content-driven, not exactly `--nav-h`. Call `useNavbarHeight()` (`src/components/layout/useNavbarHeight.ts`) in the page and set `--nav-h` on the page root, so `top-[var(--nav-h)]` and `scroll-mt` use the real height (Explore, FAQ).
+- FAQ (`src/pages/FAQPage.tsx`): sticky search + single-row scrollable category pills, accessible accordion (`<button aria-expanded>`, one open at a time on phones), results grouped by category, search covers answers, empty answers show "Answer coming soon". `Background` uses `overflow-clip` (not `hidden`) so `sticky` children work inside it.
 
 ## Mobile / desktop split
 - When mobile and desktop layouts differ structurally, create **two components** and toggle them with CSS. Don't use JS width checks:

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, Search } from "lucide-react";
-import Background from "../components/ui/Background";
+import { ChevronDown, Search, X } from "lucide-react";
+import Background from "../components/ui/Background.jsx";
+import useNavbarHeight from "../components/layout/useNavbarHeight.js";
 
 interface FAQItem {
   q: string;
@@ -102,8 +103,297 @@ const faqData: FAQCategory[] = [
 ];
 
 const ALL_CATEGORY = "All";
+const EMPTY_ANSWER = "Answer coming soon";
 
-export default function FAQPage() {
+/** Wraps matches of `query` in <mark>. */
+function highlight(text: string, query: string): ReactNode {
+  const q = query.trim();
+  if (!q) return text;
+  const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const parts = text.split(new RegExp(`(${escaped})`, "gi"));
+  return parts.map((part, i) =>
+    part.toLowerCase() === q.toLowerCase() ? (
+      <mark key={i} className="rounded bg-green-500/25 px-0.5 text-white">
+        {part}
+      </mark>
+    ) : (
+      part
+    ),
+  );
+}
+
+interface FAQAccordionItemProps {
+  id: string;
+  question: string;
+  answer: string;
+  query: string;
+  isOpen: boolean;
+  onToggle: () => void;
+}
+
+function FAQAccordionItem({ id, question, answer, query, isOpen, onToggle }: FAQAccordionItemProps) {
+  const panelId = `${id}-panel`;
+  return (
+    <div
+      className={`overflow-hidden rounded-2xl border backdrop-blur-sm transition-colors ${
+        isOpen ? "border-green-500/30 bg-white/[0.07]" : "border-white/10 bg-white/[0.05]"
+      }`}
+    >
+      <h3 className="m-0">
+        <button
+          type="button"
+          id={id}
+          onClick={onToggle}
+          aria-expanded={isOpen}
+          aria-controls={panelId}
+          className="flex min-h-[56px] w-full items-center justify-between gap-4 px-5 py-4 text-left focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-green-500 md:px-6"
+        >
+          <span className="text-base font-semibold text-white">{highlight(question, query)}</span>
+          <ChevronDown
+            className={`h-5 w-5 flex-shrink-0 text-white/50 transition-transform duration-300 ${
+              isOpen ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+      </h3>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            id={panelId}
+            role="region"
+            aria-labelledby={id}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            {answer ? (
+              <p className="px-5 pb-5 text-[15px] leading-relaxed text-white/60 md:px-6">
+                {highlight(answer, query)}
+              </p>
+            ) : (
+              <p className="px-5 pb-5 text-[15px] italic text-white/40 md:px-6">{EMPTY_ANSWER}</p>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function FAQMobile() {
+  const [activeCategory, setActiveCategory] = useState<string>(ALL_CATEGORY);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [openItems, setOpenItems] = useState<Set<string>>(new Set());
+  const navHeight = useNavbarHeight();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchIconRef = useRef<HTMLButtonElement>(null);
+
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setSearchQuery("");
+    requestAnimationFrame(() => searchIconRef.current?.focus());
+  };
+
+  const toggleItem = (id: string) =>
+    setOpenItems((prev) => {
+      const next = new Set<string>(); // single open at a time on phones
+      if (prev.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
+  const q = searchQuery.trim().toLowerCase();
+
+  const groups = faqData
+    .map((cat, ci) => ({
+      category: cat.category,
+      items: cat.questions
+        .map((item, qi) => ({ ...item, id: `faq-${ci}-${qi}` }))
+        .filter(
+          (item) => !q || item.q.toLowerCase().includes(q) || item.a.toLowerCase().includes(q),
+        ),
+    }))
+    .filter((g) => (activeCategory === ALL_CATEGORY || g.category === activeCategory) && g.items.length > 0);
+
+  const totalResults = groups.reduce((n, g) => n + g.items.length, 0);
+
+  const pills = (layoutId: string) =>
+    [ALL_CATEGORY, ...faqData.map((c) => c.category)].map((cat) => {
+      const isActive = cat === activeCategory;
+      const count =
+        cat === ALL_CATEGORY
+          ? faqData.reduce((n, c) => n + c.questions.length, 0)
+          : (faqData.find((c) => c.category === cat)?.questions.length ?? 0);
+      return (
+        <button
+          key={cat}
+          type="button"
+          role="tab"
+          aria-selected={isActive}
+          onClick={() => setActiveCategory(cat)}
+          className={`relative min-h-[40px] shrink-0 rounded-full px-4 py-2 text-sm uppercase transition-colors md:px-5 ${
+            isActive
+              ? "font-bold text-green-500"
+              : "border border-white/10 bg-white/[0.05] font-medium text-white/50 hover:border-white/20 hover:text-white/70"
+          }`}
+        >
+          {isActive && (
+            <motion.span
+              layoutId={layoutId}
+              className="absolute inset-0 rounded-full border border-green-500/40 bg-green-500/15"
+              transition={{ type: "spring", stiffness: 350, damping: 30 }}
+            />
+          )}
+          <span className="relative z-10">
+            {cat} <span className="text-[0.85em] opacity-60">· {count}</span>
+          </span>
+        </button>
+      );
+    });
+
+  return (
+    <div dir="ltr" style={{ "--nav-h": `${navHeight}px` } as CSSProperties}>
+      <Background variant="dark" className="overflow-clip!">
+        {/* Hero */}
+        <div className="mx-auto px-6 pb-4 pt-10 text-center md:pb-10 md:pt-24">
+          <h1 className="text-[clamp(22px,6vw,56px)] font-bold uppercase leading-tight text-white md:whitespace-nowrap">
+            Frequently asked questions
+          </h1>
+          <p className="mx-auto mt-4 hidden max-w-xl text-lg text-white/50 md:block">
+            Find answers to the most common questions about 3D-Fly.
+          </p>
+        </div>
+
+        {/* Sticky search + categories */}
+        <div className="sticky top-[var(--nav-h)] z-30 border-y border-white/5 bg-dark/90 py-3 backdrop-blur">
+          {/* Desktop: search field always visible */}
+          <div className="relative mx-auto hidden max-w-md px-6 md:block">
+            <Search className="pointer-events-none absolute left-10 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search for a question..."
+              aria-label="Search questions"
+              className="w-full rounded-xl border border-white/10 bg-white/[0.05] py-3 pl-11 pr-4 text-base text-white outline-none transition-colors placeholder:text-white/30 focus:border-green-500/50"
+            />
+          </div>
+
+          {/* Desktop: category pills */}
+          <div
+            className="mt-3 hidden flex-wrap justify-center gap-2 px-6 pb-1 md:flex"
+            role="tablist"
+            aria-label="Question categories"
+          >
+            {pills("active-pill-desktop")}
+          </div>
+
+          {/* Mobile: search icon + pills, or the search field in place of the pills */}
+          <div className="px-4 md:hidden">
+            {searchOpen ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.2 }}
+                className="flex items-center gap-2"
+              >
+                <div className="relative min-w-0 flex-1">
+                  <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/30" />
+                  <input
+                    type="search"
+                    autoFocus
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === "Escape" && closeSearch()}
+                    placeholder="Search for a question..."
+                    aria-label="Search questions"
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.05] py-2.5 pl-10 pr-4 text-base text-white outline-none transition-colors placeholder:text-white/30 focus:border-green-500/50"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={closeSearch}
+                  aria-label="Close search"
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 text-white/70 transition-colors hover:text-white"
+                >
+                  <X size={18} />
+                </button>
+              </motion.div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  ref={searchIconRef}
+                  type="button"
+                  onClick={() => setSearchOpen(true)}
+                  aria-label="Search questions"
+                  aria-expanded={false}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-white/70 transition-colors hover:text-white"
+                >
+                  <Search size={18} />
+                </button>
+                <div
+                  className="flex min-w-0 flex-1 flex-nowrap gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                  role="tablist"
+                  aria-label="Question categories"
+                >
+                  {pills("active-pill-mobile")}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Results */}
+        <div className="mx-auto flex max-w-3xl flex-col gap-8 px-4 pb-24 pt-8 md:px-6">
+          {totalResults === 0 ? (
+            <div className="flex flex-col items-center gap-4 py-16 text-center" role="status">
+              <p className="text-white/60">No questions found.</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery("");
+                  setActiveCategory(ALL_CATEGORY);
+                }}
+                className="min-h-[44px] rounded-full border border-green-500/40 px-5 text-sm font-bold uppercase tracking-wide text-green-500 transition-colors hover:bg-green-500/10"
+              >
+                Clear search
+              </button>
+            </div>
+          ) : (
+            groups.map((group) => (
+              <section key={group.category} aria-label={group.category}>
+                {activeCategory === ALL_CATEGORY && (
+                  <h2 className="mb-3 flex items-baseline gap-2 text-sm font-bold uppercase tracking-[0.12em] text-green-500">
+                    {group.category}
+                    <span className="text-xs font-medium text-white/40">{group.items.length}</span>
+                  </h2>
+                )}
+                <div className="flex flex-col gap-3">
+                  {group.items.map((item) => (
+                    <FAQAccordionItem
+                      key={item.id}
+                      id={item.id}
+                      question={item.q}
+                      answer={item.a}
+                      query={searchQuery}
+                      isOpen={openItems.has(item.id)}
+                      onToggle={() => toggleItem(item.id)}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))
+          )}
+        </div>
+      </Background>
+    </div>
+  );
+}
+
+// ─── Desktop (original layout, unchanged) ───────────────────────────────────────
+function FAQDesktop() {
   const [activeCategory, setActiveCategory] = useState<string>(ALL_CATEGORY);
   const [searchQuery, setSearchQuery] = useState("");
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
@@ -225,5 +515,19 @@ export default function FAQPage() {
         </div>
       </Background>
     </div>
+  );
+}
+
+/** Desktop (md+) keeps the original layout; phones get the mobile-first layout above. */
+export default function FAQPage() {
+  return (
+    <>
+      <div className="md:hidden">
+        <FAQMobile />
+      </div>
+      <div className="hidden md:block">
+        <FAQDesktop />
+      </div>
+    </>
   );
 }
