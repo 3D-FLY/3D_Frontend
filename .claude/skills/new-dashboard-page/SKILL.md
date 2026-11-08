@@ -22,6 +22,7 @@ Reference pages: `src/pages/dashboard/admin/AdminDashboard.tsx` (cards + table),
 - KPIs → grid `grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4` of `StatusBadge`.
 - Sections → `DashboardCard` with increasing `index`, `autoHeight` for content-sized cards, `viewAllTo` for "View All →".
 - Lists → `DashboardTable` with a module-level `COLUMNS` const and `renderCell` switch. Statuses → `OrderStatusPill`.
+- Card props (`src/features/dashboard/components/DashboardCard.tsx`): `title` (required), `index` (stagger order, increase per card), `autoHeight` (content-sized), `fill` (stretch in a flex column), `viewAllTo`, `headerAction`, `loading`, `clipContent`. Never restyle the glass background with `className`.
 - Dialogs → `Modal`. Inputs → `Input`. Charts → Recharts styled as in `SupplierPayments.tsx`.
 
 ## 4. Data
