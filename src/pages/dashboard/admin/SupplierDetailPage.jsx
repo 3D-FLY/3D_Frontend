@@ -196,6 +196,7 @@ export default function SupplierDetailPage() {
             ) : (
               <DashboardTable
                 variant="list"
+                animateRows
                 scrollable={false}
                 gridTemplateColumns="0.75fr 1.5fr 1.2fr 0.75fr 24px"
                 columns={[
@@ -208,7 +209,7 @@ export default function SupplierDetailPage() {
                 rows={orders}
                 getRowKey={(order) => order.id}
                 onRowClick={(order) =>
-                  navigate(`/dashboard/admin/orders?order=${order.orderId}`)
+                  navigate(`/dashboard/admin/orders/${order.orderId}`)
                 }
                 renderCell={(order, key) => {
                   if (key === "order") {

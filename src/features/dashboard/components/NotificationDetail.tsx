@@ -81,7 +81,7 @@ export default function NotificationDetail({ role }: NotificationDetailProps) {
   const goToOrder = () => {
     const rawId = notification.orderId.replace("#", "");
     if (role === "admin") {
-      navigate(`/dashboard/admin/orders?order=${rawId}`);
+      navigate(`/dashboard/admin/orders/${rawId}`);
     } else {
       navigate(`/dashboard/${role}/orders/${rawId}`);
     }
