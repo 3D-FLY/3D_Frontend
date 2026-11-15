@@ -36,5 +36,11 @@ After editing a script, use **Deploy → Manage deployments → Edit → New ver
 
 ## Safety notes
 
-- The web app URL is embedded in the site and is public, so anyone can send requests to it. The script defends itself: required-field and email checks, a 2000-character cap per cell, a honeypot field (`hp`), formula neutralising (values starting with `=`, `+`, `-`, `@` get a leading `'`), and a script lock for concurrent writes.
+- The web app URL is embedded in the site and is public, so anyone can send requests to it. The scripts validate everything again, with the same rules as the website:
+  - required fields, email format, phone (allowed characters and 7–15 actual digits), website format
+  - exact length limits: 200 characters for short fields, 2000 for free text (requests over the limit are rejected, not cut)
+  - every choice must be one of the allowed values (Kind, Printers, Production Time, etc.), multi-select cells may only contain listed technologies/materials/services plus one `Other: …`
+  - a honeypot field (`hp`), formula neutralising (values starting with `=`, `+`, `-`, `@` get a leading `'`), and a script lock for concurrent writes
+- **Keep the option lists in sync.** If an option is added or renamed in `src/features/PartnerJoin/supplierContent.ts` or `src/features/Join/joinContent.ts`, update the lists at the top of the matching script and redeploy (new version). Otherwise submissions with the new option are rejected.
+- `testRejects()` in each script logs a set of invalid inputs and why each one is rejected. Run it after editing.
 - Without a URL in `.env`: in dev the forms run in **mock mode** (a yellow notice appears and the payload is logged with `[MOCK SUBMIT]`; nothing is saved). In a production build the forms show an error instead of a fake success.
