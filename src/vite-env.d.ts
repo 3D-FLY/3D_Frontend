@@ -120,3 +120,10 @@ declare module "*.png" {
   const src: string;
   export default src;
 }
+
+interface ImportMetaEnv {
+  /** Google Apps Script web app URL for the Join form */
+  readonly VITE_JOIN_SHEET_URL?: string;
+  /** Google Apps Script web app URL for the supplier application form */
+  readonly VITE_SUPPLIER_SHEET_URL?: string;
+}

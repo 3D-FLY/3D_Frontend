@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../../../components/ui/Button";
 import Turtle from "../../../components/ui/Turtle";
 import MainSectionGlow from "./MainSectionGlow";
@@ -6,6 +7,8 @@ import GlobalSupplierScene from "./GlobalSupplierScene/GlobalSupplierScene";
 import "./MainSection.css";
 
 export default function MainSection() {
+  const navigate = useNavigate();
+
   return (
     <section className="relative w-full min-h-[calc(100svh-var(--nav-h))] overflow-hidden bg-dark">
 
@@ -58,10 +61,11 @@ export default function MainSection() {
         </h1>
 
         <div
-          className="mt-8 md:mt-8 xl:hidden flex justify-center"
+          className="mt-8 md:mt-8 flex justify-center"
           style={{ animation: "riseUp 2800ms ease-out 400ms both" }}
         >
           <Button
+            onClick={() => navigate("/join")}
             variant="primary"
             size="lg"
             hovering="darkBg"

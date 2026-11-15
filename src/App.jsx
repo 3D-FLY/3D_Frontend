@@ -20,6 +20,7 @@ import Store from "./pages/Store";
 import Blog from "./pages/Blog";
 import STLPricing from "./pages/STLPricing";
 import JoinAsPartnerPage from "./pages/JoinAsPartnerPage.jsx";
+import JoinPage from "./pages/JoinPage";
 import RegistrationForm from "./features/auth/RegistrationForm.tsx";
 import LoginForm from "./features/auth/LoginForm.tsx";
 import ScrollToTop from "./components/ui/ScrollToTop.tsx";
@@ -406,6 +407,7 @@ function App() {
           <Route path="/store" element={<Store />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/stl-pricing" element={<STLPricing />} />
+          <Route path="/join" element={<JoinPage />} />
           <Route path="/join-as-partner" element={<JoinAsPartnerPage />} />
           <Route path="/register" element={<RegistrationForm />} />
           <Route path="/login" element={<LoginForm />} />
