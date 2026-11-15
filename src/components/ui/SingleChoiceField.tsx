@@ -1,7 +1,8 @@
 import { useId, useRef, useState, type KeyboardEvent } from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { Check } from "lucide-react";
 import BottomSheet from "./BottomSheet.js";
 import ChoiceGroup, { type ChoiceOption } from "./ChoiceGroup.js";
+import ChoiceTrigger from "./ChoiceTrigger.js";
 import FieldShell from "./FieldShell.js";
 
 interface SingleChoiceFieldProps {
@@ -75,30 +76,18 @@ export default function SingleChoiceField({
           error={error}
           errorId={errorId}
         >
-          <button
+          <ChoiceTrigger
             id={triggerId}
-            type="button"
-            data-choice-trigger
-            aria-haspopup="dialog"
-            aria-expanded={open}
-            aria-labelledby={`${labelId} ${valueId}`}
-            aria-invalid={error ? true : undefined}
-            aria-describedby={error ? errorId : undefined}
-            onClick={() => setOpen(true)}
-            className={[
-              "flex w-full items-center justify-between gap-3 rounded-[18px] border bg-[rgba(33,33,33,0.9)] px-4 py-2.5 text-left text-base font-medium outline-none transition-[border-color] duration-200",
-              error
-                ? "border-rose-400 focus-visible:border-rose-400/60"
-                : compact
-                  ? "border-white/10 focus-visible:border-green-500/60"
-                  : "border-transparent focus-visible:border-gray/50",
-            ].join(" ")}
-          >
-            <span id={valueId} className={selected ? "text-[#dfdfdf]" : "text-gray/70"}>
-              {selected ? selected.label : placeholder}
-            </span>
-            <ChevronDown size={16} aria-hidden="true" className="shrink-0 text-white/40" />
-          </button>
+            labelId={labelId}
+            valueId={valueId}
+            errorId={errorId}
+            displayValue={selected?.label}
+            placeholder={placeholder}
+            open={open}
+            error={error}
+            compact={compact}
+            onOpen={() => setOpen(true)}
+          />
         </FieldShell>
 
         <BottomSheet

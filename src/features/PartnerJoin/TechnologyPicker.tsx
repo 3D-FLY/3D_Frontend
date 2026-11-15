@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import ChoiceGroup from "../../components/ui/ChoiceGroup.js";
 import Reveal from "./Reveal.js";
-import WizardTextField from "./WizardTextField.js";
+import TextField from "../../components/ui/TextField.js";
 import {
   MATERIAL_GROUPS,
   OTHER_TECH_ID,
@@ -65,7 +65,7 @@ export default function TechnologyPicker({
 
       <Reveal show={technologies.includes(OTHER_TECH_ID)}>
         <div id="field-techOther">
-          <WizardTextField
+          <TextField
             label={techOtherLabel}
             value={techOther}
             onValueChange={onTechOtherChange}

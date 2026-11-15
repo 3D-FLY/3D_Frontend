@@ -1,12 +1,15 @@
 import { useId, useMemo, useState } from "react";
-import Select, { type StylesConfig } from "react-select";
+import Select, { type GroupBase, type StylesConfig } from "react-select";
 import CreatableSelect from "react-select/creatable";
+import { Check } from "lucide-react";
 import FieldShell from "./FieldShell.js";
 
 export interface SelectOption {
   value: string;
   label: string;
 }
+
+type OptionList = readonly (SelectOption | GroupBase<SelectOption>)[];
 
 interface SelectFieldProps {
   label?: string;
@@ -21,64 +24,85 @@ interface SelectFieldProps {
   creatable?: boolean;
   /** Caps rendered options (large lists such as cities) */
   maxVisible?: number;
-  /** Compact FieldShell layout (see FieldShell) */
+  /** Ranked filtering; defaults to a case-insensitive "contains" */
+  search?: (options: readonly SelectOption[], query: string) => SelectOption[];
+  /** Shown in a "Suggested" group above the list while nothing is typed */
+  suggested?: SelectOption | undefined;
+  /** Heading of the full list when `suggested` is shown */
+  allHeading?: string;
+  /** Compact FieldShell layout (see FieldShell) and a bordered control */
   compact?: boolean;
   wrapperClassName?: string;
 }
 
 // Dark theme based on the admin SupplierMapPage select, matched to `Input`'s surface.
-function buildStyles(hasError: boolean): StylesConfig<SelectOption, false> {
+// The menu matches the mobile bottom sheet: selected option in green with a check.
+function buildStyles(
+  hasError: boolean,
+  compact: boolean,
+): StylesConfig<SelectOption, false, GroupBase<SelectOption>> {
+  const idleBorder = compact ? "rgba(255,255,255,0.1)" : "transparent";
+  const focusBorder = compact ? "rgba(90,196,34,0.6)" : "rgba(149,149,149,0.5)";
   return {
     control: (base, state) => ({
       ...base,
       background: "rgba(33,33,33,0.9)",
       borderRadius: 18,
-      minHeight: 42,
-      borderColor: hasError
-        ? "#fb7185"
-        : state.isFocused
-          ? "rgba(149,149,149,0.5)"
-          : "transparent",
+      minHeight: 44,
+      borderColor: hasError ? "#fb7185" : state.isFocused ? focusBorder : idleBorder,
       boxShadow: "none",
-      "&:hover": { borderColor: hasError ? "#fb7185" : "rgba(149,149,149,0.5)" },
+      "&:hover": { borderColor: hasError ? "#fb7185" : focusBorder },
     }),
-    valueContainer: (base) => ({ ...base, paddingLeft: 12 }),
+    valueContainer: (base) => ({ ...base, paddingLeft: 14 }),
     menu: (base) => ({
       ...base,
-      background: "rgba(10,18,12,0.97)",
+      background: "#222222",
       border: "1px solid rgba(255,255,255,0.1)",
-      borderRadius: 12,
+      borderRadius: 14,
       overflow: "hidden",
       zIndex: 100,
     }),
-    menuList: (base) => ({ ...base, maxHeight: 240 }),
+    menuList: (base) => ({ ...base, maxHeight: 280, padding: 6 }),
+    group: (base) => ({ ...base, paddingTop: 2, paddingBottom: 2 }),
+    groupHeading: (base) => ({
+      ...base,
+      color: "rgba(255,255,255,0.4)",
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: "0.15em",
+      marginBottom: 2,
+    }),
     option: (base, state) => ({
       ...base,
+      borderRadius: 10,
       background: state.isSelected
-        ? "#5ac422"
+        ? state.isFocused
+          ? "rgba(90,196,34,0.15)"
+          : "rgba(90,196,34,0.10)"
         : state.isFocused
-          ? "rgba(90,196,34,0.12)"
+          ? "rgba(255,255,255,0.07)"
           : "transparent",
-      color: state.isSelected ? "#000" : "#e8f5e8",
+      color: state.isSelected ? "#5ac422" : "rgba(255,255,255,0.85)",
+      fontWeight: state.isSelected ? 600 : 400,
       cursor: "pointer",
-      fontSize: 13,
+      fontSize: 14,
+      "&:active": { background: "rgba(90,196,34,0.15)" },
     }),
     singleValue: (base) => ({ ...base, color: "#dfdfdf", fontWeight: 500 }),
     input: (base) => ({ ...base, color: "#dfdfdf" }),
-    placeholder: (base) => ({
-      ...base,
-      color: "#959595",
-      textTransform: "uppercase",
-      letterSpacing: "0.1em",
-      fontSize: 13,
-    }),
+    placeholder: (base) => ({ ...base, color: "rgba(149,149,149,0.7)" }),
     indicatorSeparator: () => ({ display: "none" }),
-    dropdownIndicator: (base) => ({ ...base, color: "#959595" }),
-    clearIndicator: (base) => ({ ...base, color: "#959595" }),
-    noOptionsMessage: (base) => ({ ...base, color: "#6b7280", fontSize: 12 }),
-    loadingMessage: (base) => ({ ...base, color: "#6b7280", fontSize: 12 }),
+    dropdownIndicator: (base) => ({ ...base, color: "rgba(255,255,255,0.4)" }),
+    clearIndicator: (base) => ({ ...base, color: "rgba(255,255,255,0.4)" }),
+    noOptionsMessage: (base) => ({ ...base, color: "#6b7280", fontSize: 13 }),
+    loadingMessage: (base) => ({ ...base, color: "#6b7280", fontSize: 13 }),
   };
 }
+
+const defaultSearch = (options: readonly SelectOption[], query: string) => {
+  const q = query.trim().toLowerCase();
+  return q ? options.filter((o) => o.label.toLowerCase().includes(q)) : [...options];
+};
 
 export default function SelectField({
   label,
@@ -91,22 +115,28 @@ export default function SelectField({
   isDisabled = false,
   creatable = false,
   maxVisible = Infinity,
+  search = defaultSearch,
+  suggested,
+  allHeading = "All",
   compact = false,
   wrapperClassName = "",
 }: SelectFieldProps) {
   const id = useId();
   const errorId = `${id}-error`;
   const [input, setInput] = useState("");
-  const styles = useMemo(() => buildStyles(Boolean(error)), [error]);
+  const styles = useMemo(() => buildStyles(Boolean(error), compact), [error, compact]);
 
-  // Filter ourselves so huge lists only render a capped slice.
-  const visible = useMemo(() => {
-    const q = input.trim().toLowerCase();
-    const matches = q
-      ? options.filter((o) => o.label.toLowerCase().includes(q))
-      : options;
-    return matches.slice(0, maxVisible);
-  }, [options, input, maxVisible]);
+  // Filter ourselves (ranked search, capped slice for huge lists).
+  const visible: OptionList = useMemo(() => {
+    const matches = search(options, input).slice(0, maxVisible);
+    if (suggested && !input.trim()) {
+      return [
+        { label: "Suggested", options: [suggested] },
+        { label: allHeading, options: matches },
+      ];
+    }
+    return matches;
+  }, [options, input, maxVisible, search, suggested, allHeading]);
 
   const common = {
     inputId: id,
@@ -118,6 +148,18 @@ export default function SelectField({
     styles,
     filterOption: null,
     onInputChange: (next: string) => setInput(next),
+    formatOptionLabel: (
+      option: SelectOption,
+      meta: { context: "menu" | "value"; selectValue: readonly SelectOption[] },
+    ) =>
+      meta.context === "menu" && meta.selectValue.some((v) => v.value === option.value) ? (
+        <span className="flex items-center justify-between gap-3">
+          {option.label}
+          <Check size={16} strokeWidth={2.5} aria-hidden="true" />
+        </span>
+      ) : (
+        option.label
+      ),
     "aria-invalid": error ? true : undefined,
     "aria-describedby": error ? errorId : undefined,
   } as const;
@@ -132,13 +174,13 @@ export default function SelectField({
       className={wrapperClassName}
     >
       {creatable ? (
-        <CreatableSelect<SelectOption, false>
+        <CreatableSelect<SelectOption, false, GroupBase<SelectOption>>
           {...common}
           formatCreateLabel={(text) => `Use "${text}"`}
           onChange={(next) => onChange(next)}
         />
       ) : (
-        <Select<SelectOption, false>
+        <Select<SelectOption, false, GroupBase<SelectOption>>
           {...common}
           onChange={(next) => onChange(next)}
         />

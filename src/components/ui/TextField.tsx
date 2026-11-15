@@ -1,7 +1,7 @@
-import { useId, type HTMLAttributes, type InputHTMLAttributes } from "react";
-import FieldShell from "../../components/ui/FieldShell.js";
+import { useId, type HTMLAttributes, type InputHTMLAttributes, type ReactNode } from "react";
+import FieldShell from "./FieldShell.js";
 
-interface WizardTextFieldProps {
+interface TextFieldProps {
   label: string;
   value: string;
   onValueChange: (next: string) => void;
@@ -16,6 +16,8 @@ interface WizardTextFieldProps {
   autoCapitalize?: string;
   spellCheck?: boolean;
   enterKeyHint?: InputHTMLAttributes<HTMLInputElement>["enterKeyHint"];
+  /** Non-blocking helper under the field (e.g. an email typo suggestion) */
+  hint?: ReactNode;
   className?: string;
 }
 
@@ -25,7 +27,7 @@ const SURFACE =
   "w-full rounded-[18px] border bg-[rgba(33,33,33,0.9)] px-4 py-2.5 text-base font-medium text-[#dfdfdf] " +
   "outline-none transition-[border-color] duration-200 placeholder:text-gray/70";
 
-export default function WizardTextField({
+export default function TextField({
   label,
   value,
   onValueChange,
@@ -40,8 +42,9 @@ export default function WizardTextField({
   autoCapitalize,
   spellCheck,
   enterKeyHint = "next",
+  hint,
   className = "",
-}: WizardTextFieldProps) {
+}: TextFieldProps) {
   const id = useId();
   const errorId = `${id}-error`;
   const stateClass = error
@@ -91,6 +94,7 @@ export default function WizardTextField({
           {...aria}
         />
       )}
+      {hint}
     </FieldShell>
   );
 }

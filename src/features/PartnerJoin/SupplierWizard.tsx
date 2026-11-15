@@ -30,7 +30,7 @@ import TechnologyPicker from "./TechnologyPicker.js";
 import WizardProgressBar from "./WizardProgressBar.js";
 import WizardStepNav from "./WizardStepNav.js";
 import WizardStepper, { type StepStatus } from "./WizardStepper.js";
-import WizardTextField from "./WizardTextField.js";
+import TextField from "../../components/ui/TextField.js";
 import useFormDraft from "./useFormDraft.js";
 import {
   MATERIALS_OTHER,
@@ -416,17 +416,17 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
     // 1 · Business Details
     <div key="business" className="grid gap-4 md:grid-cols-2 lg:gap-5">
       <div id="field-fullName">
-        <WizardTextField label={L.fullName} {...text("fullName")} autoComplete="name" autoCapitalize="words" />
+        <TextField label={L.fullName} {...text("fullName")} autoComplete="name" autoCapitalize="words" />
       </div>
       <div id="field-businessName">
-        <WizardTextField label={L.businessName} {...text("businessName")} autoComplete="organization" autoCapitalize="words" />
+        <TextField label={L.businessName} {...text("businessName")} autoComplete="organization" autoCapitalize="words" />
       </div>
       <div id="field-email">
-        <WizardTextField label={L.email} {...text("email")} type="email" inputMode="email"
+        <TextField label={L.email} {...text("email")} type="email" inputMode="email"
           autoComplete="email" autoCapitalize="none" spellCheck={false} />
       </div>
       <div id="field-phone">
-        <WizardTextField label={L.phone} {...text("phone")} type="tel" inputMode="tel" autoComplete="tel" />
+        <TextField label={L.phone} {...text("phone")} type="tel" inputMode="tel" autoComplete="tel" />
       </div>
       <div id="field-country">
         {/* Native picker on phones/tablets (OS wheel + autofill), searchable select on desktop */}
@@ -468,7 +468,7 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
         </div>
       </div>
       <div id="field-city">
-        <WizardTextField
+        <TextField
           label={L.city}
           value={form.city?.label ?? ""}
           onValueChange={(next) => {
@@ -482,7 +482,7 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
         />
       </div>
       <div id="field-website" className="md:col-span-2">
-        <WizardTextField label={L.website} {...text("website")} type="url" inputMode="url"
+        <TextField label={L.website} {...text("website")} type="url" inputMode="url"
           autoComplete="url" autoCapitalize="none" spellCheck={false} placeholder="yourstore.com" />
       </div>
     </div>,
@@ -514,7 +514,7 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
         )}
       </div>
       <div id="field-materialsOther">
-        <WizardTextField label={MATERIALS_OTHER.label} {...text("materialsOther")} />
+        <TextField label={MATERIALS_OTHER.label} {...text("materialsOther")} />
       </div>
       <div id="field-printersAmount">
         <SingleChoiceField compact label={L.printersAmount}
@@ -522,7 +522,7 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
           onChange={(next) => setField("printersAmount", next)} error={visibleError("printersAmount")} />
       </div>
       <div id="field-printerType">
-        <WizardTextField multiline rows={2} label={L.printerType} {...text("printerType")} autoCapitalize="sentences" />
+        <TextField multiline rows={2} label={L.printerType} {...text("printerType")} autoCapitalize="sentences" />
       </div>
     </div>,
 
@@ -536,7 +536,7 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
         </div>
         <Reveal show={form.packAndShip === "No"} className="mt-3">
           <div id="field-packAndShipDetail">
-            <WizardTextField multiline rows={2} label={L.packAndShipDetail} {...text("packAndShipDetail")} />
+            <TextField multiline rows={2} label={L.packAndShipDetail} {...text("packAndShipDetail")} />
           </div>
         </Reveal>
       </div>
@@ -563,11 +563,11 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
         </div>
       </div>
       <div id="field-shippingCarrier">
-        <WizardTextField label={L.shippingCarrier} {...text("shippingCarrier")}
+        <TextField label={L.shippingCarrier} {...text("shippingCarrier")}
           placeholder={SUPPLIER_PLACEHOLDERS.shippingCarrier} autoCapitalize="words" />
       </div>
       <div id="field-packagingMethod">
-        <WizardTextField multiline rows={3} label={L.packagingMethod} {...text("packagingMethod")}
+        <TextField multiline rows={3} label={L.packagingMethod} {...text("packagingMethod")}
           placeholder={SUPPLIER_PLACEHOLDERS.packagingMethod} autoCapitalize="sentences" />
       </div>
       <div>
@@ -579,12 +579,12 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
         </div>
         <Reveal show={form.services.includes(OTHER_SERVICE_ID)} className="mt-3">
           <div id="field-servicesOther">
-            <WizardTextField label={SERVICES_OTHER_LABEL} {...text("servicesOther")} />
+            <TextField label={SERVICES_OTHER_LABEL} {...text("servicesOther")} />
           </div>
         </Reveal>
       </div>
       <div id="field-additionalText">
-        <WizardTextField multiline rows={4} label={L.additionalText} {...text("additionalText")} autoCapitalize="sentences" />
+        <TextField multiline rows={4} label={L.additionalText} {...text("additionalText")} autoCapitalize="sentences" />
       </div>
     </div>,
 

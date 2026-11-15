@@ -18,10 +18,14 @@ export function checkEmail(value: string): string | undefined {
   return undefined;
 }
 
+// Allowed characters, plus 7–15 actual digits (15 is the E.164 maximum).
 export function checkPhone(value: string): string | undefined {
   const v = value.trim();
   if (!v) return undefined;
-  return PHONE_RE.test(v) ? undefined : "Enter a valid phone number";
+  const digits = v.replace(/\D/g, "").length;
+  return PHONE_RE.test(v) && digits >= 7 && digits <= 15
+    ? undefined
+    : "Enter a valid phone number";
 }
 
 export function checkWebsite(value: string): string | undefined {
