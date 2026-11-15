@@ -1,31 +1,8 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { footerSections } from "./footerConfig.js";
 import type { FooterItem } from "./footerConfig.js";
 import { FooterSocialIcons } from "./SocialIcons.js";
 import Turtle from "../ui/Turtle.jsx";
-
-const DEMO_LINKS = [
-  { label: "Admin",    path: "/dashboard/admin"    },
-  { label: "Seller",   path: "/dashboard/seller"   },
-  { label: "Supplier", path: "/dashboard/supplier" },
-];
-
-function DemoDashboardDots() {
-  const navigate = useNavigate();
-  return (
-    <div className="flex items-center gap-2">
-      {DEMO_LINKS.map(({ label, path }) => (
-        <button
-          key={label}
-          type="button"
-          onClick={() => navigate(path)}
-          aria-label={`Demo: ${label}`}
-          className="h-2 w-2 rounded-full bg-white/20 transition-colors duration-200 hover:bg-white/50"
-        />
-      ))}
-    </div>
-  );
-}
 
 function SmartLink({ item, className }: { item: FooterItem; className: string }) {
   if (item.to) return <Link to={item.to} className={className}>{item.label}</Link>;
@@ -64,7 +41,6 @@ export default function FooterSlim() {
           <span className="text-[11px] uppercase tracking-widest text-white/45 whitespace-nowrap">
             © 2025 3D-FLY
           </span>
-          <DemoDashboardDots />
         </div>
 
         {/* לינקים מהקונפיג */}

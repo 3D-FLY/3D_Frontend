@@ -1,32 +1,9 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Turtle from "../ui/Turtle.jsx";
 import { footerSections } from "./footerConfig.js";
 import type { FooterItem } from "./footerConfig.js";
 import { FooterSocialIcons } from "./SocialIcons.js";
-
-const DEMO_LINKS = [
-  { label: "Admin",    path: "/dashboard/admin"    },
-  { label: "Seller",   path: "/dashboard/seller"   },
-  { label: "Supplier", path: "/dashboard/supplier" },
-];
-
-function DemoDashboardDots() {
-  const navigate = useNavigate();
-  return (
-    <div className="flex items-center gap-2">
-      {DEMO_LINKS.map(({ label, path }) => (
-        <button
-          key={label}
-          type="button"
-          onClick={() => navigate(path)}
-          aria-label={`Demo: ${label}`}
-          className="h-2 w-2 rounded-full bg-white/20 transition-colors duration-200 hover:bg-white/50"
-        />
-      ))}
-    </div>
-  );
-}
 
 function SmartLink({
   item,
@@ -89,12 +66,12 @@ export default function Footer() {
         {/* 2x2 grid */}
         <div className="relative z-10 w-full px-6 grid grid-cols-2 gap-y-5">
 
-          {/* ROW 1 – LEFT: email + phone */}
+          {/* ROW 1 – LEFT: email */}
           <div className="flex flex-col gap-1 items-start">
             {footerSections
               .filter((s) => s.title === "CONTACT US")
               .flatMap((s) => s.items)
-              .filter((item) => ["info@3d-fly.com", "+972-5000000"].includes(item.label))
+              .filter((item) => item.label === "info@3d-fly.com")
               .map((item) => (
                 <SmartLink
                   key={item.label}
@@ -146,7 +123,6 @@ export default function Footer() {
           <span className="text-center text-white text-[10px] tracking-wide uppercase">
             © 2025 3D-FLY | ALL RIGHTS RESERVED
           </span>
-          <DemoDashboardDots />
         </div>
       </div>
 
@@ -181,12 +157,12 @@ export default function Footer() {
 
             {/* LEFT – Contact info + social icons */}
             <div className="flex flex-col justify-between h-full justify-self-start py-3">
-              {/* Email + phone */}
+              {/* Email */}
               <div className="flex flex-col gap-1">
                 {footerSections
                   .filter((s) => s.title === "CONTACT US")
                   .flatMap((s) => s.items)
-                  .filter((item) => ["info@3d-fly.com", "+972-5000000"].includes(item.label))
+                  .filter((item) => item.label === "info@3d-fly.com")
                   .map((item) => (
                     <SmartLink key={item.label} item={item} className={baseLink} />
                   ))}
@@ -229,7 +205,6 @@ export default function Footer() {
             <span className="text-center text-white text-[12px] text-medium tracking-wide uppercase">
               © 2025 3D-FLY | ALL RIGHTS RESERVED
             </span>
-            <DemoDashboardDots />
           </div>
         </div>
 

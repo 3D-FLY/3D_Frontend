@@ -20,7 +20,6 @@ export type FooterItem = {
       align: "left",
       items: [
         { label: "info@3d-fly.com", href: "mailto:info@3d-fly.com" },
-        { label: "+972-5000000", href: "tel:+9725000000" },
         { label: "Sunday-Thursday" },
         { label: "09:00-18:00" },
       ],
