@@ -19,7 +19,7 @@ import TermsPage from "./pages/TermsPage";
 import Store from "./pages/Store";
 import Blog from "./pages/Blog";
 import STLPricing from "./pages/STLPricing";
-import JoinAsPartnerPage from "./pages/JoinAsPartnerPage.jsx";
+import JoinAsPartnerPage from "./pages/JoinAsPartnerPage";
 import JoinPage from "./pages/JoinPage";
 import RegistrationForm from "./features/auth/RegistrationForm.tsx";
 import LoginForm from "./features/auth/LoginForm.tsx";

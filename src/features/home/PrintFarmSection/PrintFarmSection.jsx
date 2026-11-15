@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PrintFarmImage from "../assets/images/PrintFarm3D-Fly2.png";
 import Button from "../../../components/ui/Button";
 import GlowCircle from "../../../components/ui/GlowCircle";
@@ -31,6 +31,9 @@ function NetworkMapLink({ iconSize, textClassName = "" }) {
 }
 
 export default function PrintFarmSection() {
+  const navigate = useNavigate();
+  const goToPartnerForm = () => navigate("/join-as-partner");
+
   return (
     <section
       className="relative h-[90svh] w-full overflow-hidden min-h-0 2xl:h-auto 2xl:min-h-[calc(100dvh-var(--nav-h))]"
@@ -63,9 +66,10 @@ export default function PrintFarmSection() {
 
             <Button
               hovering="darkBg"
+              onClick={goToPartnerForm}
               className="px-[clamp(22px,6vw,34px)] py-[clamp(10px,2.5vw,14px)] text-[clamp(15px,4.5vw,22px)] font-extrabold italic"
             >
-              Join As a Parter!
+              Join As a Partner!
             </Button>
 
             <HeadsUpNote className="text-[clamp(11px,3vw,15px)]" />
@@ -114,6 +118,7 @@ export default function PrintFarmSection() {
 
               <Button
                 hovering="darkBg"
+                onClick={goToPartnerForm}
                 className="px-[clamp(16px,3vw,32px)] py-[clamp(8px,1.5vw,16px)] text-[clamp(14px,2vw,32px)] font-extrabold italic"
               >
                 Join As a Partner!
