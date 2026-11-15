@@ -22,7 +22,7 @@ After editing a script, use **Deploy → Manage deployments → Edit → New ver
 
 ## How it works
 
-- The page sends `POST` with `Content-Type: text/plain;charset=utf-8` and a JSON body: `{ "hp": "", "data": { ... } }`. `text/plain` avoids a CORS preflight, which Apps Script cannot answer.
+- The page sends `POST` with `Content-Type: text/plain;charset=utf-8` and the fields as a flat JSON body (`{ "fullName": "…", "email": "…", … }`). `text/plain` avoids a CORS preflight, which Apps Script cannot answer. The script also accepts `{ "hp": "…", "data": { … } }` (used by its test functions); a non-empty `hp` is treated as a bot. The site itself handles its honeypot in the browser and never sends `hp`.
 - The script replies with JSON: `{ "ok": true }` or `{ "ok": false, "error": "..." }`. The page shows the confirmation only when `ok` is true.
 - Columns are mapped by position, set in the `COLUMNS` array at the top of each script. Sheet headers (including the typos) are never changed.
 - Column **G** (Join) and **X** (Supplier) get a "Submitted At" timestamp in the script's time zone. Add a header there if you want one.
