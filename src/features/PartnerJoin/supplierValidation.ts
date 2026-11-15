@@ -130,6 +130,7 @@ export function validateSupplier(form: SupplierFormState): SupplierErrors {
   set("phone", checkPhone(form.phone));
   if (!form.country) e.country = "Select your country";
   if (!form.city) e.city = "Select or type your city";
+  else set("city", checkLength(form.city.label, MAX_SHORT));
   set("website", checkWebsite(form.website) ?? checkLength(form.website, MAX_SHORT));
 
   if (form.technologies.length === 0) {
@@ -205,7 +206,7 @@ export function toSupplierPayload(form: SupplierFormState): SheetPayload {
     email: clip(form.email, MAX_SHORT),
     phone: clip(form.phone, MAX_SHORT),
     country: form.country?.label ?? "",
-    city: form.city?.label ?? "",
+    city: clip(form.city?.label ?? "", MAX_SHORT),
     website: clip(form.website, MAX_SHORT),
     printTech,
     printersAmount: form.printersAmount,

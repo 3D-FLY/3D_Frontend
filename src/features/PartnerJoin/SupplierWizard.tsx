@@ -12,17 +12,16 @@ import {
 } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
-import { ChevronDown } from "lucide-react";
 import Button from "../../components/ui/Button.jsx";
 import ChoiceGroup from "../../components/ui/ChoiceGroup.js";
 import ConfirmDialog from "../../components/ui/ConfirmDialog.js";
-import FieldShell from "../../components/ui/FieldShell.js";
-import SelectField, { type SelectOption } from "../../components/ui/SelectField.js";
+import type { SelectOption } from "../../components/ui/SelectField.js";
 import SingleChoiceField from "../../components/ui/SingleChoiceField.js";
 import { EASE_SOFT } from "../dashboard/motion.js";
 import Honeypot from "../forms/Honeypot.js";
 import LegalConsent from "../forms/LegalConsent.js";
-import { loadCountryOptions } from "../forms/locationOptions.js";
+import CountryField from "../forms/CountryField.js";
+import EmailSuggestion from "../forms/EmailSuggestion.js";
 import { isMockSubmit, submitToSheet } from "../forms/submitToSheet.js";
 import Reveal from "./Reveal.js";
 import SupplierWizardReview from "./SupplierWizardReview.js";
@@ -93,8 +92,6 @@ type TextKey =
 const DRAFT_KEY = "3dfly:supplier-application-draft";
 const TEXT_INPUT_TYPES = new Set(["text", "email", "tel", "url", "search"]);
 const FOCUSABLE = "input, textarea, select, button";
-const NATIVE_SELECT =
-  "w-full appearance-none rounded-[18px] border bg-[rgba(33,33,33,0.9)] py-2.5 pl-4 pr-10 text-base font-medium text-[#dfdfdf] outline-none transition-[border-color] [&>option]:bg-dark";
 
 const toOptions = (values: readonly string[]) => values.map((v) => ({ value: v, label: v }));
 const isVisible = (el: HTMLElement) => el.offsetParent !== null || el.getClientRects().length > 0;
@@ -157,8 +154,6 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
   const [submitError, setSubmitError] = useState("");
   const [done, setDone] = useState(false);
   const [confirmClear, setConfirmClear] = useState(false);
-  const [countries, setCountries] = useState<SelectOption[]>([]);
-  const [countriesLoading, setCountriesLoading] = useState(true);
   const inFlight = useRef(false);
   const stopSaving = useRef(false);
   const topRef = useRef<HTMLDivElement>(null);
@@ -207,17 +202,6 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
     pendingFocus.current = true;
     topRef.current?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
   }, [step, reduceMotion]);
-
-  // ── Countries (react-select on lg+, native select below) ────────────────────
-  useEffect(() => {
-    let cancelled = false;
-    loadCountryOptions()
-      .then((options) => !cancelled && setCountries(options))
-      .finally(() => !cancelled && setCountriesLoading(false));
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   // ── Draft: saved locally while typing, cleared on success / "Clear form" ────
   useEffect(() => {
@@ -411,7 +395,6 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
     ) : null;
 
   // ── Step bodies ─────────────────────────────────────────────────────────────
-  const countryError = visibleError("country");
   const steps: ReactNode[] = [
     // 1 · Business Details
     <div key="business" className="grid gap-4 md:grid-cols-2 lg:gap-5">
@@ -423,49 +406,23 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
       </div>
       <div id="field-email">
         <TextField label={L.email} {...text("email")} type="email" inputMode="email"
-          autoComplete="email" autoCapitalize="none" spellCheck={false} />
+          autoComplete="email" autoCapitalize="none" spellCheck={false}
+          hint={
+            <EmailSuggestion
+              email={form.email}
+              onAccept={(fixed) => {
+                dirtyRef.current.add("email");
+                setField("email", fixed);
+              }}
+            />
+          } />
       </div>
       <div id="field-phone">
         <TextField label={L.phone} {...text("phone")} type="tel" inputMode="tel" autoComplete="tel" />
       </div>
       <div id="field-country">
-        {/* Native picker on phones/tablets (OS wheel + autofill), searchable select on desktop */}
-        <div className="lg:hidden">
-          <FieldShell compact label={L.country} htmlFor="wizard-country-native" error={countryError}
-            errorId="wizard-country-native-error">
-            <div className="relative">
-              <select
-                id="wizard-country-native"
-                autoComplete="country"
-                value={form.country?.value ?? ""}
-                onChange={(e) =>
-                  setCountry(countries.find((c) => c.value === e.target.value) ?? null)
-                }
-                aria-invalid={countryError ? true : undefined}
-                aria-describedby={countryError ? "wizard-country-native-error" : undefined}
-                className={`${NATIVE_SELECT} ${
-                  countryError ? "border-rose-400" : "border-white/10 focus:border-green-500/60"
-                } ${form.country ? "" : "text-gray/70"}`}
-              >
-                <option value="" disabled>
-                  {countriesLoading ? "Loading countries..." : "Select your country"}
-                </option>
-                {countries.map((c) => (
-                  <option key={c.value} value={c.value}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown size={16} aria-hidden="true"
-                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white/40" />
-            </div>
-          </FieldShell>
-        </div>
-        <div className="hidden lg:block" data-enter-passthrough>
-          <SelectField compact label={L.country} options={countries} value={form.country}
-            onChange={setCountry} isLoading={countriesLoading} placeholder="Select your country"
-            error={countryError} />
-        </div>
+        <CountryField compact label={L.country} value={form.country} onChange={setCountry}
+          error={visibleError("country")} />
       </div>
       <div id="field-city">
         <TextField
