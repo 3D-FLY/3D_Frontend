@@ -23,6 +23,7 @@ import LegalConsent from "../forms/LegalConsent.js";
 import CountryField from "../forms/CountryField.js";
 import EmailSuggestion from "../forms/EmailSuggestion.js";
 import { isMockSubmit, submitToSheet } from "../forms/submitToSheet.js";
+import { logSheetPreview } from "../forms/sheetPreview.js";
 import Reveal from "./Reveal.js";
 import SupplierWizardReview from "./SupplierWizardReview.js";
 import TechnologyPicker from "./TechnologyPicker.js";
@@ -58,6 +59,8 @@ import {
 import {
   EMPTY_SUPPLIER_FORM,
   OTHER_SERVICE_ID,
+  SUPPLIER_SHEET_COLUMNS,
+  SUPPLIER_SHEET_NAME,
   toSupplierPayload,
   validateSupplier,
   type SupplierFormState,
@@ -315,7 +318,9 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
     inFlight.current = true;
     setSubmitting(true);
     try {
-      await submitToSheet("supplier", toSupplierPayload(form));
+      const payload = toSupplierPayload(form);
+      logSheetPreview(SUPPLIER_SHEET_NAME, SUPPLIER_SHEET_COLUMNS, payload); // dev only
+      await submitToSheet("supplier", payload);
       finishSuccess();
     } catch (err) {
       console.error("Supplier application submission failed", err);

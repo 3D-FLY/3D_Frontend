@@ -10,6 +10,7 @@ import {
   required,
 } from "../forms/validators.js";
 import type { SheetPayload } from "../forms/submitToSheet.js";
+import { buildSheetPayload, type SheetColumn } from "../forms/sheetPreview.js";
 import {
   MATERIALS_OTHER,
   MATERIAL_GROUPS,
@@ -167,62 +168,78 @@ export function validateSupplier(form: SupplierFormState): SupplierErrors {
   return e;
 }
 
+// ─── Sheet cells ─────────────────────────────────────────────────────────────
 // Cell formats (multi-select values are joined with "; "):
-//   printTech         FDM; SLS; Other: <text>
-//   materials         one line per technology:  "FDM: PLA; PETG"  ... "Other: <text>"
+//   printTech          FDM; SLS; Other: <text>
+//   materials          one line per technology:  "FDM: PLA; PETG"  ... "Other: <text>"
 //   additionalServices Post-Processing & Painting; Other: <text>
-//   packAndShip       Yes | No – <details>
-// Keys match the column order in docs/apps-script/supplier-sheet.gs
-export function toSupplierPayload(form: SupplierFormState): SheetPayload {
-  const techLabel = (id: string) => TECH_OPTIONS.find((t) => t.id === id)?.label ?? id;
+//   packAndShip        Yes | No – <details>
 
-  const printTech = TECH_OPTIONS.filter((t) => form.technologies.includes(t.id))
-    .map((t) =>
-      t.id === OTHER_TECH_ID ? `Other: ${clip(form.techOther, MAX_SHORT)}` : t.label,
-    )
+const techLabel = (id: string) => TECH_OPTIONS.find((t) => t.id === id)?.label ?? id;
+
+function printTechCell(form: SupplierFormState): string {
+  return TECH_OPTIONS.filter((t) => form.technologies.includes(t.id))
+    .map((t) => (t.id === OTHER_TECH_ID ? `Other: ${clip(form.techOther, MAX_SHORT)}` : t.label))
     .join("; ");
+}
 
-  const materialLines: string[] = [];
+function materialsCell(form: SupplierFormState): string {
+  const lines: string[] = [];
   const picked = activeMaterials(form);
   for (const group of MATERIAL_GROUPS) {
     const list = picked[group.techId];
-    if (list) materialLines.push(`${techLabel(group.techId)}: ${list.join("; ")}`);
+    if (list) lines.push(`${techLabel(group.techId)}: ${list.join("; ")}`);
   }
   if (form.materialsOther.trim()) {
-    materialLines.push(`${MATERIALS_OTHER.heading.replace(":", "")}: ${clip(form.materialsOther, MAX_SHORT)}`);
+    lines.push(`${MATERIALS_OTHER.heading.replace(":", "")}: ${clip(form.materialsOther, MAX_SHORT)}`);
   }
+  return lines.join("\n");
+}
 
-  const services = form.services
-    .map((s) =>
-      s === OTHER_SERVICE_ID
-        ? `Other: ${clip(form.servicesOther, MAX_SHORT)}`
-        : s,
-    )
+function servicesCell(form: SupplierFormState): string {
+  return form.services
+    .map((s) => (s === OTHER_SERVICE_ID ? `Other: ${clip(form.servicesOther, MAX_SHORT)}` : s))
     .join("; ");
+}
 
-  return {
-    fullName: clip(form.fullName, MAX_SHORT),
-    businessName: clip(form.businessName, MAX_SHORT),
-    email: clip(form.email, MAX_SHORT),
-    phone: clip(form.phone, MAX_SHORT),
-    country: form.country?.label ?? "",
-    city: clip(form.city?.label ?? "", MAX_SHORT),
-    website: clip(form.website, MAX_SHORT),
-    printTech,
-    printersAmount: form.printersAmount,
-    printerType: clip(form.printerType),
-    materials: materialLines.join("\n"),
-    packAndShip:
-      form.packAndShip === "No"
-        ? `No – ${clip(form.packAndShipDetail)}`
-        : form.packAndShip,
-    multipleOrders: form.multipleOrders,
-    productionTime: form.productionTime,
-    shippingDestiny: form.shippingDestiny,
-    selfPickup: form.selfPickup,
-    shippingCarrier: clip(form.shippingCarrier, MAX_SHORT),
-    packagingMethod: clip(form.packagingMethod),
-    additionalServices: services,
-    additionalText: clip(form.additionalText),
-  };
+function packAndShipCell(form: SupplierFormState): string {
+  return form.packAndShip === "No" ? `No – ${clip(form.packAndShipDetail)}` : form.packAndShip;
+}
+
+export const SUPPLIER_SHEET_NAME = "Early Supplier";
+
+/**
+ * "Early Supplier" columns A–X, by position. Headers are copied from the sheet
+ * as they are (including "Ptiner Type" and "Shipping Destiney").
+ * Must match COLUMNS in docs/apps-script/supplier-sheet.gs.
+ */
+export const SUPPLIER_SHEET_COLUMNS: readonly SheetColumn<SupplierFormState>[] = [
+  { letter: "A", header: "Full Name", key: "fullName", value: (f) => clip(f.fullName, MAX_SHORT) },
+  { letter: "B", header: "Business Name", key: "businessName", value: (f) => clip(f.businessName, MAX_SHORT) },
+  { letter: "C", header: "Email", key: "email", value: (f) => clip(f.email, MAX_SHORT) },
+  { letter: "D", header: "Phone Number", key: "phone", value: (f) => clip(f.phone, MAX_SHORT) },
+  { letter: "E", header: "Country", key: "country", value: (f) => f.country?.label ?? "" },
+  { letter: "F", header: "City", key: "city", value: (f) => clip(f.city?.label ?? "", MAX_SHORT) },
+  { letter: "G", header: "Website", key: "website", value: (f) => clip(f.website, MAX_SHORT) },
+  { letter: "H", header: "", empty: true },
+  { letter: "I", header: "Print Tech", key: "printTech", value: printTechCell },
+  { letter: "J", header: "Printers Amount", key: "printersAmount", value: (f) => f.printersAmount },
+  { letter: "K", header: "Ptiner Type", key: "printerType", value: (f) => clip(f.printerType) },
+  { letter: "L", header: "Materials", key: "materials", value: materialsCell },
+  { letter: "M", header: "", empty: true },
+  { letter: "N", header: "Pack and Ship", key: "packAndShip", value: packAndShipCell },
+  { letter: "O", header: "Multiple Orders", key: "multipleOrders", value: (f) => f.multipleOrders },
+  { letter: "P", header: "Production Time", key: "productionTime", value: (f) => f.productionTime },
+  { letter: "Q", header: "Shipping Destiney", key: "shippingDestiny", value: (f) => f.shippingDestiny },
+  { letter: "R", header: "Self Pickup", key: "selfPickup", value: (f) => f.selfPickup },
+  { letter: "S", header: "Shipping Carrier", key: "shippingCarrier", value: (f) => clip(f.shippingCarrier, MAX_SHORT) },
+  { letter: "T", header: "Packaging Method", key: "packagingMethod", value: (f) => clip(f.packagingMethod) },
+  { letter: "U", header: "Additional Services", key: "additionalServices", value: servicesCell },
+  { letter: "V", header: "", empty: true },
+  { letter: "W", header: "Additional text", key: "additionalText", value: (f) => clip(f.additionalText) },
+  { letter: "X", header: "", timestamp: true },
+];
+
+export function toSupplierPayload(form: SupplierFormState): SheetPayload {
+  return buildSheetPayload(SUPPLIER_SHEET_COLUMNS, form);
 }
