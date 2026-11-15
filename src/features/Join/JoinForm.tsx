@@ -10,10 +10,13 @@ import { focusFirstError } from "../forms/focusField.js";
 import CountryField from "../forms/CountryField.js";
 import EmailSuggestion from "../forms/EmailSuggestion.js";
 import { isMockSubmit, submitToSheet } from "../forms/submitToSheet.js";
+import { logSheetPreview } from "../forms/sheetPreview.js";
 import { JOIN_FORM, JOIN_POPUP } from "./joinContent.js";
 import {
   EMPTY_JOIN_FORM,
   JOIN_FIELD_ORDER,
+  JOIN_SHEET_COLUMNS,
+  JOIN_SHEET_NAME,
   toJoinPayload,
   validateJoin,
   type JoinFormState,
@@ -63,7 +66,9 @@ export default function JoinForm({ className = "" }: JoinFormProps) {
     inFlight.current = true;
     setSubmitting(true);
     try {
-      await submitToSheet("join", toJoinPayload(form));
+      const payload = toJoinPayload(form);
+      logSheetPreview(JOIN_SHEET_NAME, JOIN_SHEET_COLUMNS, payload); // dev only
+      await submitToSheet("join", payload);
       setDone(true);
     } catch (err) {
       console.error("Join form submission failed", err);

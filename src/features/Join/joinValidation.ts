@@ -9,6 +9,7 @@ import {
   required,
 } from "../forms/validators.js";
 import type { SheetPayload } from "../forms/submitToSheet.js";
+import { buildSheetPayload, type SheetColumn } from "../forms/sheetPreview.js";
 
 export interface JoinFormState {
   fullName: string;
@@ -66,14 +67,22 @@ export function validateJoin(form: JoinFormState): JoinErrors {
   return errors;
 }
 
-// Keys match the column order in docs/apps-script/join-sheet.gs
+export const JOIN_SHEET_NAME = "Early Adapters List";
+
+/**
+ * "Early Adapters List" columns A–G, by position (headers as in the sheet).
+ * Must match COLUMNS in docs/apps-script/join-sheet.gs.
+ */
+export const JOIN_SHEET_COLUMNS: readonly SheetColumn<JoinFormState>[] = [
+  { letter: "A", header: "Full Name", key: "fullName", value: (f) => clip(f.fullName, MAX_SHORT) },
+  { letter: "B", header: "Email", key: "email", value: (f) => clip(f.email, MAX_SHORT) },
+  { letter: "C", header: "Country", key: "country", value: (f) => f.country?.label ?? "" },
+  { letter: "D", header: "Phone Number", key: "phone", value: (f) => clip(f.phone, MAX_SHORT) },
+  { letter: "E", header: "Kind", key: "kind", value: (f) => f.kind },
+  { letter: "F", header: "Website", key: "website", value: (f) => clip(f.website, MAX_SHORT) },
+  { letter: "G", header: "", timestamp: true },
+];
+
 export function toJoinPayload(form: JoinFormState): SheetPayload {
-  return {
-    fullName: clip(form.fullName, MAX_SHORT),
-    email: clip(form.email, MAX_SHORT),
-    country: form.country?.label ?? "",
-    phone: clip(form.phone, MAX_SHORT),
-    kind: form.kind,
-    website: clip(form.website, MAX_SHORT),
-  };
+  return buildSheetPayload(JOIN_SHEET_COLUMNS, form);
 }
