@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import Button from "../../../components/ui/Button.jsx";
-import Group26 from "./assets/images/Group26.png";
-import Group28 from "./assets/images/Group28.png";
-import Group36 from "./assets/images/image36.png";
+import StoreOrganizer from "./assets/images/store-organizer.jpg";
+import StoreDragon from "./assets/images/store-dragon.jpg";
+import StoreHeadphoneStand from "./assets/images/store-headphone-stand.jpg";
+import StoreVase from "./assets/images/store-vase.jpg";
 
 type SellItem = {
   id: number;
@@ -14,34 +15,34 @@ type SellItem = {
 
 const pages: SellItem[][] = [
   [
-    { id: 1, src: Group26, name: "FIDGET TOYS", models: "7 MODELS", price: 10 },
-    { id: 2, src: Group26, name: "EARCUPS STAND", models: "3 SIZES", price: 16 },
-    { id: 3, src: Group26, name: "DESK ORGANIZER", models: "6 MODELS", price: 8 },
-    { id: 4, src: Group26, name: "LITHOPHANE LAMP", models: "16 MODELS", price: 12 },
-    { id: 5, src: Group26, name: "LIGHTING FIXTURE", models: "LAMP INCLUDED", price: 14 },
-    { id: 6, src: Group26, name: "CONTROLLER STAND", models: "2 MODELS", price: 7 },
-    { id: 7, src: Group26, name: "PLANTER", models: "4 MODELS", price: 6 },
-    { id: 8, src: Group26, name: "DESK LAMPS", models: "3 MODELS", price: 9 },
+    { id: 1, src: StoreOrganizer, name: "FIDGET TOYS", models: "7 MODELS", price: 10 },
+    { id: 2, src: StoreDragon, name: "EARCUPS STAND", models: "3 SIZES", price: 16 },
+    { id: 3, src: StoreHeadphoneStand, name: "DESK ORGANIZER", models: "6 MODELS", price: 8 },
+    { id: 4, src: StoreVase, name: "LITHOPHANE LAMP", models: "16 MODELS", price: 12 },
+    { id: 5, src: StoreOrganizer, name: "LIGHTING FIXTURE", models: "LAMP INCLUDED", price: 14 },
+    { id: 6, src: StoreDragon, name: "CONTROLLER STAND", models: "2 MODELS", price: 7 },
+    { id: 7, src: StoreHeadphoneStand, name: "PLANTER", models: "4 MODELS", price: 6 },
+    { id: 8, src: StoreVase, name: "DESK LAMPS", models: "3 MODELS", price: 9 },
   ],
   [
-    { id: 9,  src: Group28, name: "PRODUCT 9",  models: "5 MODELS", price: 11 },
-    { id: 10, src: Group28, name: "PRODUCT 10", models: "2 SIZES",  price: 20 },
-    { id: 11, src: Group28, name: "PRODUCT 11", models: "8 MODELS", price: 5  },
-    { id: 12, src: Group28, name: "PRODUCT 12", models: "1 MODEL",  price: 18 },
-    { id: 13, src: Group28, name: "PRODUCT 13", models: "3 MODELS", price: 13 },
-    { id: 14, src: Group28, name: "PRODUCT 14", models: "6 MODELS", price: 9  },
-    { id: 15, src: Group28, name: "PRODUCT 15", models: "4 MODELS", price: 7  },
-    { id: 16, src: Group28, name: "PRODUCT 16", models: "2 MODELS", price: 15 },
+    { id: 9,  src: StoreOrganizer, name: "PRODUCT 9",  models: "5 MODELS", price: 11 },
+    { id: 10, src: StoreDragon, name: "PRODUCT 10", models: "2 SIZES",  price: 20 },
+    { id: 11, src: StoreHeadphoneStand, name: "PRODUCT 11", models: "8 MODELS", price: 5  },
+    { id: 12, src: StoreVase, name: "PRODUCT 12", models: "1 MODEL",  price: 18 },
+    { id: 13, src: StoreOrganizer, name: "PRODUCT 13", models: "3 MODELS", price: 13 },
+    { id: 14, src: StoreDragon, name: "PRODUCT 14", models: "6 MODELS", price: 9  },
+    { id: 15, src: StoreHeadphoneStand, name: "PRODUCT 15", models: "4 MODELS", price: 7  },
+    { id: 16, src: StoreVase, name: "PRODUCT 16", models: "2 MODELS", price: 15 },
   ],
   [
-    { id: 17, src: Group36, name: "PRODUCT 17", models: "7 MODELS", price: 22 },
-    { id: 18, src: Group36, name: "PRODUCT 18", models: "3 SIZES",  price: 8  },
-    { id: 19, src: Group36, name: "PRODUCT 19", models: "5 MODELS", price: 17 },
-    { id: 20, src: Group36, name: "PRODUCT 20", models: "9 MODELS", price: 11 },
-    { id: 21, src: Group36, name: "PRODUCT 21", models: "2 MODELS", price: 6  },
-    { id: 22, src: Group36, name: "PRODUCT 22", models: "4 SIZES",  price: 19 },
-    { id: 23, src: Group36, name: "PRODUCT 23", models: "1 MODEL",  price: 25 },
-    { id: 24, src: Group36, name: "PRODUCT 24", models: "6 MODELS", price: 14 },
+    { id: 17, src: StoreOrganizer, name: "PRODUCT 17", models: "7 MODELS", price: 22 },
+    { id: 18, src: StoreDragon, name: "PRODUCT 18", models: "3 SIZES",  price: 8  },
+    { id: 19, src: StoreHeadphoneStand, name: "PRODUCT 19", models: "5 MODELS", price: 17 },
+    { id: 20, src: StoreVase, name: "PRODUCT 20", models: "9 MODELS", price: 11 },
+    { id: 21, src: StoreOrganizer, name: "PRODUCT 21", models: "2 MODELS", price: 6  },
+    { id: 22, src: StoreDragon, name: "PRODUCT 22", models: "4 SIZES",  price: 19 },
+    { id: 23, src: StoreHeadphoneStand, name: "PRODUCT 23", models: "1 MODEL",  price: 25 },
+    { id: 24, src: StoreVase, name: "PRODUCT 24", models: "6 MODELS", price: 14 },
   ],
 ];
 

@@ -2,23 +2,24 @@ import React, { useEffect, useRef } from "react";
 import "./whatCanYouSell.css";
 import Button from "../../../components/ui/Button";
 import Turtle from "../../../components/ui/Turtle";
-import Group26 from "./assets/images/Group26.png";
-import Group28 from "./assets/images/Group28.png";
-import Group36 from "./assets/images/image36.png";
+import StoreOrganizer from "./assets/images/store-organizer-desktop.jpg";
+import StoreDragon from "./assets/images/store-dragon-desktop.jpg";
+import StoreHeadphoneStand from "./assets/images/store-headphone-stand-desktop.jpg";
+import StoreVase from "./assets/images/store-vase-desktop.jpg";
 
 /* דוגמת נתונים — החלף בנתונים אמיתיים */
 const itemsTop = [
-  { id: 1, src: Group26, alt: "Product 1" },
-  { id: 2, src: Group28, alt: "Product 2" },
-  { id: 3, src: Group36, alt: "Product 3" },
-  { id: 4, src: Group26, alt: "Product 4" },
+  { id: 1, src: StoreOrganizer, alt: "Product 1" },
+  { id: 2, src: StoreDragon, alt: "Product 2" },
+  { id: 3, src: StoreHeadphoneStand, alt: "Product 3" },
+  { id: 4, src: StoreVase, alt: "Product 4" },
 ];
 
 const itemsBottom = [
-  { id: 5, src: Group28, alt: "Product 5" },
-  { id: 6, src: Group36, alt: "Product 6" },
-  { id: 7, src: Group26, alt: "Product 7" },
-  { id: 8, src: Group28, alt: "Product 8" },
+  { id: 5, src: StoreOrganizer, alt: "Product 5" },
+  { id: 6, src: StoreDragon, alt: "Product 6" },
+  { id: 7, src: StoreHeadphoneStand, alt: "Product 7" },
+  { id: 8, src: StoreVase, alt: "Product 8" },
 ];
 
 /* קומפוננטת כרטיס פשוטה */
