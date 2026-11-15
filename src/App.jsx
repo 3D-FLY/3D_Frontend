@@ -13,6 +13,8 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Explore from "./pages/Explore";
 import FAQPage from "./pages/FAQPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import TermsPage from "./pages/TermsPage";
 import Store from "./pages/Store";
 import Blog from "./pages/Blog";
 import STLPricing from "./pages/STLPricing";
@@ -395,6 +397,8 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/faq" element={<FAQPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
           <Route path="/store" element={<Store />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/stl-pricing" element={<STLPricing />} />
