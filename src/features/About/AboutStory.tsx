@@ -12,7 +12,7 @@ const BODY_CLASS =
 
 export default function AboutStory({ className = "" }: AboutStoryProps) {
   return (
-    <section className={`mx-auto max-w-3xl px-6 py-10 md:py-16 ${className}`}>
+    <section className={`mx-auto max-w-4xl px-6 py-10 md:py-16 ${className}`}>
       <AboutReveal>
         <SectionTitle variant="flat">{ABOUT_STORY.title}</SectionTitle>
       </AboutReveal>

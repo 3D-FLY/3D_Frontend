@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import Navbar from "./components/layout/Navbar.jsx";
 import Footer from "./components/layout/Footer.jsx";
+import PageTransition from "./components/layout/PageTransition.tsx";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Explore from "./pages/Explore";
@@ -71,7 +72,10 @@ function MainLayout() {
     <div className="App font-sans flex min-h-screen flex-col">
       <Navbar />
       <main className="flex min-h-0 flex-1 flex-col">
-        <Outlet />
+        {/* The landing page ("/") has its own entrance animations */}
+        <PageTransition skipPaths={["/"]}>
+          <Outlet />
+        </PageTransition>
       </main>
       <Footer />
     </div>

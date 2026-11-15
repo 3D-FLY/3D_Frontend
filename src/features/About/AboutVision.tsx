@@ -8,7 +8,7 @@ interface AboutVisionProps {
 
 export default function AboutVision({ className = "" }: AboutVisionProps) {
   return (
-    <section className={`mx-auto max-w-3xl px-6 py-10 md:py-16 ${className}`}>
+    <section className={`mx-auto max-w-4xl px-6 py-10 md:py-16 ${className}`}>
       <AboutReveal>
         <SectionTitle variant="flat">{ABOUT_VISION.title}</SectionTitle>
       </AboutReveal>
