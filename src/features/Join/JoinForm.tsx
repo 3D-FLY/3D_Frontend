@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button.jsx";
-import ChoiceGroup from "../../components/ui/ChoiceGroup.js";
+import SingleChoiceField from "../../components/ui/SingleChoiceField.js";
 import ConfirmDialog from "../../components/ui/ConfirmDialog.js";
 import Input from "../../components/ui/Input.js";
 import SelectField, { type SelectOption } from "../../components/ui/SelectField.js";
@@ -146,8 +146,7 @@ export default function JoinForm({ className = "" }: JoinFormProps) {
         </div>
 
         <div id="field-kind">
-          <ChoiceGroup
-            type="radio"
+          <SingleChoiceField
             label={JOIN_FORM.labels.kind}
             options={JOIN_FORM.kinds.map((k) => ({ value: k, label: k }))}
             value={form.kind}

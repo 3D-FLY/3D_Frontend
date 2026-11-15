@@ -18,13 +18,15 @@ import ChoiceGroup from "../../components/ui/ChoiceGroup.js";
 import ConfirmDialog from "../../components/ui/ConfirmDialog.js";
 import FieldShell from "../../components/ui/FieldShell.js";
 import SelectField, { type SelectOption } from "../../components/ui/SelectField.js";
+import SingleChoiceField from "../../components/ui/SingleChoiceField.js";
 import { EASE_SOFT } from "../dashboard/motion.js";
 import Honeypot from "../forms/Honeypot.js";
 import LegalConsent from "../forms/LegalConsent.js";
 import { loadCountryOptions } from "../forms/locationOptions.js";
 import { isMockSubmit, submitToSheet } from "../forms/submitToSheet.js";
+import Reveal from "./Reveal.js";
 import SupplierWizardReview from "./SupplierWizardReview.js";
-import TechCardGrid from "./TechCardGrid.js";
+import TechnologyPicker from "./TechnologyPicker.js";
 import WizardProgressBar from "./WizardProgressBar.js";
 import WizardStepNav from "./WizardStepNav.js";
 import WizardStepper, { type StepStatus } from "./WizardStepper.js";
@@ -133,25 +135,6 @@ const stepVariants: Variants = {
     transition: { duration: 0.16, ease: EASE_SOFT },
   }),
 };
-
-// Expands a follow-up field ("Please Specify") in place.
-function Reveal({ show, children }: { show: boolean; children: ReactNode }) {
-  return (
-    <AnimatePresence initial={false}>
-      {show && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="overflow-hidden"
-        >
-          <div className="pt-1">{children}</div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-}
 
 export default function SupplierWizard({ className = "" }: SupplierWizardProps) {
   const navigate = useNavigate();
@@ -280,17 +263,15 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
     setField("country", next);
   };
 
-  const toggleTech = (id: string) =>
-    setForm((prev) => {
-      const on = prev.technologies.includes(id);
-      const materials = { ...prev.materials };
-      if (on) delete materials[id];
-      return {
-        ...prev,
-        technologies: on ? prev.technologies.filter((t) => t !== id) : [...prev.technologies, id],
-        materials,
-      };
-    });
+  // Unchecking a technology also drops its selected materials.
+  const setTechnologies = (next: string[]) =>
+    setForm((prev) => ({
+      ...prev,
+      technologies: next,
+      materials: Object.fromEntries(
+        Object.entries(prev.materials).filter(([techId]) => next.includes(techId)),
+      ),
+    }));
 
   function focusField(key: string) {
     const wrapper = document.getElementById(`field-${key}`);
@@ -394,7 +375,7 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
       e.preventDefault();
       const fields = Array.from(
         stepRef.current?.querySelectorAll<HTMLElement>(
-          'input[type="text"], input[type="email"], input[type="tel"], input[type="url"], textarea, select',
+          'input[type="text"], input[type="email"], input[type="tel"], input[type="url"], textarea, select, [data-choice-trigger]',
         ) ?? [],
       ).filter((el) => isVisible(el) && !el.closest("[data-enter-passthrough]"));
       const next = fields[fields.indexOf(target) + 1];
@@ -433,7 +414,7 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
   const countryError = visibleError("country");
   const steps: ReactNode[] = [
     // 1 · Business Details
-    <div key="business" className="grid gap-5 md:grid-cols-2">
+    <div key="business" className="grid gap-4 md:grid-cols-2 lg:gap-5">
       <div id="field-fullName">
         <WizardTextField label={L.fullName} {...text("fullName")} autoComplete="name" autoCapitalize="words" />
       </div>
@@ -507,29 +488,25 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
     </div>,
 
     // 2 · Printing Capabilities
-    <div key="capabilities" className="flex flex-col gap-7">
+    <div key="capabilities" className="flex flex-col gap-5 lg:gap-6">
       <div id="field-materials" className="flex flex-col gap-2">
-        <div id="field-technologies">
-          <TechCardGrid
-            label={L.technologies}
-            hint="Select each technology you offer, then pick its materials."
-            technologies={form.technologies}
-            materials={form.materials}
-            techOther={form.techOther}
-            onToggleTech={(id) => {
-              dirtyRef.current.add("technologies");
-              toggleTech(id);
-            }}
-            onMaterialsChange={(techId, next) =>
-              setForm((prev) => ({ ...prev, materials: { ...prev.materials, [techId]: next } }))
-            }
-            onTechOtherChange={text("techOther").onValueChange}
-            onTechOtherBlur={() => touch("techOther")}
-            techOtherLabel={SERVICES_OTHER_LABEL}
-            error={visibleError("technologies")}
-            techOtherError={visibleError("techOther")}
-          />
-        </div>
+        <TechnologyPicker
+          technologies={form.technologies}
+          materials={form.materials}
+          techOther={form.techOther}
+          onTechnologiesChange={(next) => {
+            dirtyRef.current.add("technologies");
+            setTechnologies(next);
+          }}
+          onMaterialsChange={(techId, next) =>
+            setForm((prev) => ({ ...prev, materials: { ...prev.materials, [techId]: next } }))
+          }
+          onTechOtherChange={text("techOther").onValueChange}
+          onTechOtherBlur={() => touch("techOther")}
+          techOtherLabel={SERVICES_OTHER_LABEL}
+          error={visibleError("technologies")}
+          techOtherError={visibleError("techOther")}
+        />
         {!visibleError("technologies") && visibleError("materials") && (
           <p className="text-xs font-medium text-rose-400" aria-live="polite">
             {visibleError("materials")}
@@ -540,7 +517,7 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
         <WizardTextField label={MATERIALS_OTHER.label} {...text("materialsOther")} />
       </div>
       <div id="field-printersAmount">
-        <ChoiceGroup type="radio" compact roving label={L.printersAmount}
+        <SingleChoiceField compact label={L.printersAmount}
           options={toOptions(PRINTERS_AMOUNT_OPTIONS)} value={form.printersAmount}
           onChange={(next) => setField("printersAmount", next)} error={visibleError("printersAmount")} />
       </div>
@@ -550,37 +527,37 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
     </div>,
 
     // 3 · Shipping & Services
-    <div key="shipping" className="flex flex-col gap-7">
+    <div key="shipping" className="flex flex-col gap-5 lg:gap-6">
       <div>
         <div id="field-packAndShip">
-          <ChoiceGroup type="radio" compact roving label={L.packAndShip}
+          <SingleChoiceField compact label={L.packAndShip}
             options={toOptions(PACK_AND_SHIP_OPTIONS)} value={form.packAndShip}
             onChange={(next) => setField("packAndShip", next)} error={visibleError("packAndShip")} />
         </div>
-        <Reveal show={form.packAndShip === "No"}>
-          <div id="field-packAndShipDetail" className="mt-4">
+        <Reveal show={form.packAndShip === "No"} className="mt-3">
+          <div id="field-packAndShipDetail">
             <WizardTextField multiline rows={2} label={L.packAndShipDetail} {...text("packAndShipDetail")} />
           </div>
         </Reveal>
       </div>
       <div id="field-multipleOrders">
-        <ChoiceGroup type="radio" compact roving label={L.multipleOrders}
+        <SingleChoiceField compact label={L.multipleOrders}
           options={toOptions(MULTIPLE_ORDERS_OPTIONS)} value={form.multipleOrders}
           onChange={(next) => setField("multipleOrders", next)} error={visibleError("multipleOrders")} />
       </div>
       <div id="field-productionTime">
-        <ChoiceGroup type="radio" compact roving label={L.productionTime}
+        <SingleChoiceField compact label={L.productionTime}
           options={toOptions(PRODUCTION_TIME_OPTIONS)} value={form.productionTime}
           onChange={(next) => setField("productionTime", next)} error={visibleError("productionTime")} />
       </div>
-      <div className="grid gap-7 md:grid-cols-2">
+      <div className="grid gap-5 md:grid-cols-2 lg:gap-6">
         <div id="field-shippingDestiny">
-          <ChoiceGroup type="radio" compact roving label={L.shippingDestiny}
+          <SingleChoiceField compact label={L.shippingDestiny}
             options={toOptions(SHIPPING_DESTINY_OPTIONS)} value={form.shippingDestiny}
             onChange={(next) => setField("shippingDestiny", next)} error={visibleError("shippingDestiny")} />
         </div>
         <div id="field-selfPickup">
-          <ChoiceGroup type="radio" compact roving label={L.selfPickup}
+          <SingleChoiceField compact label={L.selfPickup}
             options={toOptions(YES_NO_OPTIONS)} value={form.selfPickup}
             onChange={(next) => setField("selfPickup", next)} error={visibleError("selfPickup")} />
         </div>
@@ -600,8 +577,8 @@ export default function SupplierWizard({ className = "" }: SupplierWizardProps) 
             value={form.services} onChange={(next) => setField("services", next)}
             error={visibleError("services")} />
         </div>
-        <Reveal show={form.services.includes(OTHER_SERVICE_ID)}>
-          <div id="field-servicesOther" className="mt-4">
+        <Reveal show={form.services.includes(OTHER_SERVICE_ID)} className="mt-3">
+          <div id="field-servicesOther">
             <WizardTextField label={SERVICES_OTHER_LABEL} {...text("servicesOther")} />
           </div>
         </Reveal>

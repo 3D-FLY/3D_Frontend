@@ -37,11 +37,9 @@ interface CheckboxGroupProps extends ChoiceGroupBase {
 
 export type ChoiceGroupProps = RadioGroupProps | CheckboxGroupProps;
 
-// Chip styles copied from the dashboard (SupplierCapabilities.tsx) on md+.
-// Below md: tighter padding and larger sentence-case text, so more chips fit per row.
+// Compact sentence-case chips. Colors follow the dashboard chips (SupplierCapabilities.tsx).
 const CHIP_BASE =
-  "flex min-h-9 cursor-pointer select-none items-center rounded-md border px-3 py-1 text-[14px] font-semibold leading-tight transition-colors " +
-  "md:min-h-10 md:px-4 md:py-1.5 md:text-[12px] md:font-bold md:uppercase md:tracking-wide " +
+  "flex min-h-8 cursor-pointer select-none items-center rounded-md border px-2.5 py-1 text-[13px] font-medium leading-tight transition-colors lg:px-3 " +
   "peer-focus-visible:ring-2 peer-focus-visible:ring-green-500/60 ";
 const CHIP_OFF =
   "border-white/10 bg-white/[0.03] text-white/40 hover:border-white/20 hover:text-white/60";
@@ -133,7 +131,7 @@ export default function ChoiceGroup(props: ChoiceGroupProps) {
         aria-labelledby={label ? labelId : undefined}
         aria-label={!label ? ariaLabel : undefined}
         aria-describedby={error ? errorId : undefined}
-        className="flex flex-wrap gap-1.5 md:gap-2"
+        className="flex flex-wrap gap-1.5"
       >
         {options.map((option, index) => {
           const checked = isChecked(option.value);

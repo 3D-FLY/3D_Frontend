@@ -1,7 +1,8 @@
-import { useEffect, useRef, type ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
+import useModalBehavior from "./useModalBehavior.js";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -16,9 +17,6 @@ interface ConfirmDialogProps {
   actions: ReactNode;
 }
 
-const FOCUSABLE =
-  'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
 // Animated modal for landing forms: Escape, scroll lock, focus trap, focus return.
 export default function ConfirmDialog({
   open,
@@ -29,50 +27,7 @@ export default function ConfirmDialog({
   actions,
 }: ConfirmDialogProps) {
   const panelRef = useRef<HTMLDivElement>(null);
-  // Keep the latest onClose without re-running the open/close effect on every render.
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
-
-  useEffect(() => {
-    if (!open) return;
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    // Focus the primary action (last focusable) once the panel is mounted.
-    const raf = requestAnimationFrame(() => {
-      const items = panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE);
-      items?.[items.length - 1]?.focus();
-    });
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && dismissible) {
-        e.stopPropagation();
-        onCloseRef.current();
-        return;
-      }
-      if (e.key !== "Tab") return;
-      const items = panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE);
-      if (!items || items.length === 0) return;
-      const first = items[0] as HTMLElement;
-      const last = items[items.length - 1] as HTMLElement;
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-    document.addEventListener("keydown", onKeyDown);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = previousOverflow;
-      previouslyFocused?.focus?.();
-    };
-  }, [open, dismissible]);
+  useModalBehavior({ open, panelRef, onClose, dismissible });
 
   return createPortal(
     <AnimatePresence>
