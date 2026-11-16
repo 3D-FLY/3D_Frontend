@@ -164,8 +164,8 @@ export default function WhatCanYouSellMobile() {
             <div className="w-full overflow-hidden flex-shrink-0">
               <h2 className="font-extrabold text-gray/90 leading-[1.2]
                             tracking-wide whitespace-nowrap
-                            text-[clamp(18px,6.5vw,42px)]">
-                <span className="text-[clamp(20px,7vw,46px)]">W</span>
+                            text-[clamp(10px,6vw,42px)]">
+                <span className="text-[clamp(11px,6.6vw,46px)]">W</span>
                 HAT CAN YOU{" "}
                 <span className="text-green">SELL?</span>
               </h2>

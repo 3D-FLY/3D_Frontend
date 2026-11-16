@@ -69,7 +69,7 @@ export default function MainSection() {
             variant="primary"
             size="lg"
             hovering="darkBg"
-            className="text-[clamp(16px,2.2vw,28px)] shadow-[0_12px_30px_rgba(0,0,0,0.35)] px-10"
+            className="text-[clamp(16px,2.2vw,28px)] px-10"
           >
             JOIN!
           </Button>

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../../../components/ui/Button";
 import Turtle from "../../../components/ui/Turtle";
+import ConfirmDialog from "../../../components/ui/ConfirmDialog";
+import { PRICE_COMING_SOON } from "./priceComingSoonContent";
 import ShellsStepper from "./ShellsStepper";
 import FieldLabel from "./FieldLabel";
 import OptionGroup from "./OptionGroup";
@@ -8,6 +11,8 @@ import LabeledSlider from "./LabeledSlider";
 import UploadDropCard from "./UploadDropCard";
 
 export default function FileUploader() {
+  const navigate = useNavigate();
+  const [priceOpen, setPriceOpen] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [tech, setTech] = useState("FDM");
   const [material, setMaterial] = useState("PLA");
@@ -132,7 +137,7 @@ export default function FileUploader() {
               variant="tertiary"
               hovering="garyBg"
               className="mt-7 font-medium w-full max-w-[200px] lg:max-w-none h-11 py-2.5 text-base lg:h-20 lg:py-4 lg:text-[35px] relative italic overflow-hidden"
-              onClick={() => console.log("Check price clicked")}
+              onClick={() => setPriceOpen(true)}
             >
               CHECK PRICE
             </Button>
@@ -147,6 +152,33 @@ export default function FileUploader() {
         </div>
         </div>
       </div>
+      <ConfirmDialog
+        open={priceOpen}
+        onClose={() => setPriceOpen(false)}
+        ariaLabel={PRICE_COMING_SOON.title}
+        actions={
+          <Button
+            variant="primary"
+            size="md"
+            hovering="darkBg"
+            onClick={() => {
+              setPriceOpen(false);
+              navigate("/join");
+            }}
+          >
+            {PRICE_COMING_SOON.action}
+          </Button>
+        }
+      >
+        <h2 className="text-2xl font-extrabold italic text-white md:text-3xl">
+          {PRICE_COMING_SOON.title}
+        </h2>
+        {PRICE_COMING_SOON.lines.map((line) => (
+          <p key={line} className="text-[15px] font-medium text-white/60 md:text-base">
+            {line}
+          </p>
+        ))}
+      </ConfirmDialog>
     </section>
   );
 }

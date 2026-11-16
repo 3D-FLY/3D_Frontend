@@ -2,10 +2,10 @@ import React, { useEffect, useRef } from "react";
 import "./whatCanYouSell.css";
 import Button from "../../../components/ui/Button";
 import Turtle from "../../../components/ui/Turtle";
-import StoreOrganizer from "./assets/images/store-organizer-desktop.jpg";
-import StoreDragon from "./assets/images/store-dragon-desktop.jpg";
-import StoreHeadphoneStand from "./assets/images/store-headphone-stand-desktop.jpg";
-import StoreVase from "./assets/images/store-vase-desktop.jpg";
+import StoreOrganizer from "./assets/images/store-organizer.jpg";
+import StoreDragon from "./assets/images/store-dragon.jpg";
+import StoreHeadphoneStand from "./assets/images/store-headphone-stand.jpg";
+import StoreVase from "./assets/images/store-vase.jpg";
 
 /* דוגמת נתונים — החלף בנתונים אמיתיים */
 const itemsTop = [
@@ -25,12 +25,12 @@ const itemsBottom = [
 /* קומפוננטת כרטיס פשוטה */
 function Card({ item }) {
   return (
-    <div data-card className="h-full max-h-full aspect-[397/276] bg-white rounded-[40px] lg:rounded-[50px] xl:rounded-[60px] border-2 border-gray-300 overflow-hidden flex-shrink-0 mr-6">      
+    <div data-card className="relative h-full max-h-full aspect-[397/276] bg-white rounded-[40px] lg:rounded-[50px] xl:rounded-[60px] border-2 border-gray-300 overflow-hidden flex-shrink-0 mr-6">      
      <img
         src={item.src}
         alt={item.alt}
         loading="lazy"
-        className="w-full h-full object-cover block"
+        className="absolute inset-0 w-full h-full object-cover block"
         style={{ display: "block" }}
       />
     </div>

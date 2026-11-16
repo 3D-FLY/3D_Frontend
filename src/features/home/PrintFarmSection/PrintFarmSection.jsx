@@ -10,7 +10,7 @@ const contentGap = "gap-[clamp(16px,4vw,24px)]";
 function HeadsUpNote({ className = "" }) {
   return (
     <p className={`text-gray m-0 text-center font-bold italic leading-snug opacity-80 ${className}`}>
-      <span className="text-[clamp(13px,3.5vw,17px)] 2xl:text-[clamp(12px,1.8vw,22px)]">H</span>
+      <span className="text-[clamp(13px,3.5vw,17px)] lg:text-[clamp(12px,1.8vw,22px)]">H</span>
       EADS UP – WE&apos;RE PICKY, AND PROUD OF IT! :)
     </p>
   );
@@ -36,11 +36,11 @@ export default function PrintFarmSection() {
 
   return (
     <section
-      className="relative h-[90svh] w-full overflow-hidden min-h-0 2xl:h-auto 2xl:min-h-[calc(100dvh-var(--nav-h))]"
+      className="relative h-[90svh] w-full overflow-hidden min-h-0 lg:h-auto lg:min-h-[calc(100dvh-var(--nav-h))]"
     >
 
       {/* ========== MOBILE + TABLET (עד מסכים רחבים — כולל אייפדים בכל הכיוונים) ========== */}
-      <div className="flex h-full min-h-0 flex-col 2xl:hidden">
+      <div className="flex h-full min-h-0 flex-col lg:hidden">
 
         {/* תמונה (~55% מתוך 90svh; אחוזים מההורה כדי שלא יחרוג מ־h-[90svh]) */}
         <div className="h-[55%] min-h-0 w-full shrink-0 overflow-hidden">
@@ -59,7 +59,7 @@ export default function PrintFarmSection() {
         >
           <div className="flex w-full flex-1 flex-col items-center justify-center">
             <div className={`flex w-fit flex-col items-center ${contentGap}`}>
-            <h3 className="text-gray m-0 self-start text-left text-[clamp(38px,11vw,60px)] font-extrabold italic leading-tight">
+            <h3 className="text-gray m-0 self-start text-left whitespace-nowrap text-[clamp(16px,9.5vw,60px)] font-extrabold italic leading-tight">
               RUNNING A <br />
               <span className="text-green">PRINT FARM?</span>
             </h3>
@@ -84,7 +84,7 @@ export default function PrintFarmSection() {
       </div>
 
       {/* ========== DESKTOP (מסכים רחבים בלבד) ========== */}
-      <div className="hidden h-[calc(100dvh-var(--nav-h))] 2xl:flex">
+      <div className="hidden h-[calc(100dvh-var(--nav-h))] lg:flex">
         <GlowCircle
           size={450}
           blur={600}

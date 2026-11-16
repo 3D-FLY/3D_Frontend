@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../../../components/ui/Button";
 import HowItWorksStep from "./HowItWorksStep";
 import HowDoesItWorkGlow from "./HowItWorksGlow";
@@ -17,6 +18,7 @@ const MOBILE_ARROW_DURATION_S = 0.48;
 const MOBILE_REVEAL_THRESHOLD = 0.15;
 
 export default function HowDoesItWork() {
+  const navigate = useNavigate();
   const [inView, setInView] = useState(false); // desktop trigger
   const [mobileReveal, setMobileReveal] = useState(false); // mobile time-based steps
   const sectionRef = useRef(null);
@@ -56,10 +58,10 @@ export default function HowDoesItWork() {
           style={{ fontFamily: "Montserrat, italic" }}
         >
           <span className="flex shrink-0 items-baseline lg:contents">
-            <span className="text-[clamp(2rem,8vw,7rem)]">H</span>
-            <span className="text-[clamp(20px,7vw,80px)]">OW DOES IT</span>
+            <span className="text-[clamp(1rem,8vw,7rem)]">H</span>
+            <span className="whitespace-nowrap text-[clamp(10px,6.2vw,80px)]">OW DOES IT</span>
           </span>
-          <span className="text-green text-[clamp(20px,7vw,80px)] shrink-0 lg:ml-6">WORK?</span>
+          <span className="text-green whitespace-nowrap text-[clamp(10px,6.2vw,80px)] shrink-0 lg:ml-6">WORK?</span>
         </h2>
 
         {/* =========================
@@ -146,6 +148,7 @@ export default function HowDoesItWork() {
           <Button
             hovering="darkBg"
             size="md"
+            onClick={() => navigate("/join")}
             className="italic min-w-[143px] h-[44px] px-[32px] py-[10px] text-[16px]"
           >
             TRY NOW!
