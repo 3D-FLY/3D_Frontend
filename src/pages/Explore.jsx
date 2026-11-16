@@ -109,6 +109,7 @@ function StepSection({ step, index, onInView }) {
               ease: "easeInOut",
               delay: 0.5,
             }}
+            style={{ scale: step.imageScale ?? 1 }}
             className="w-full h-auto"
           />
         </motion.div>

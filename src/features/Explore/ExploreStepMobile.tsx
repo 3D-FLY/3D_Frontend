@@ -34,7 +34,7 @@ export default function ExploreStepMobile({ step, index, id, onInView }: Explore
       className="scroll-mt-[calc(var(--nav-h)+56px)] rounded-2xl border border-white/10 bg-[rgba(149,149,149,0.08)] p-5"
     >
       <div className="mb-4 flex aspect-[4/3] max-h-[260px] w-full items-center justify-center overflow-hidden rounded-xl">
-        <img src={step.image} alt={step.title} className="h-full w-full object-contain" loading="lazy" />
+        <img src={step.image} alt={step.title} className="h-full w-full object-contain" style={{ transform: `scale(${step.imageScale ?? 1})` }} loading="lazy" />
       </div>
 
       <span className="text-xs font-bold tracking-widest text-green">

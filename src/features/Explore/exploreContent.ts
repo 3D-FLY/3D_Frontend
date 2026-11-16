@@ -1,9 +1,9 @@
 import stepConnect     from "./step-connect.png";
 import stepUpload      from "./step-upload.png";
 import stepSell        from "./step-sell.png";
-import stepRouting     from "./ChatGPT Image Jun 1, 2026, 10_02_17 AM.png";
+import stepRouting     from "./step-routing.png";
 import stepFulfillment from "./step-fulfillment.png";
-import stepScale       from "./ChatGPT Image Jun 1, 2026, 10_29_18 AM.png";
+import stepScale       from "./step-scale.png";
 
 export type ExploreContent = {
   id: number;
@@ -14,6 +14,8 @@ export type ExploreContent = {
   /** If set, bullets are rendered after this description index (0-based) */
   bulletsAfterIndex?: number;
   image: string;
+  /** Optional zoom for artwork with a lot of empty canvas (1 = as is). */
+  imageScale?: number;
 };
 
 export const EXPLORE_CONTENT = [
@@ -39,6 +41,7 @@ export const EXPLORE_CONTENT = [
       "This is where you stay in full control of your product, without dealing with the production itself.",
     ],
     image: stepUpload,
+    imageScale: 1.7,
   },
   {
     id: 3,
